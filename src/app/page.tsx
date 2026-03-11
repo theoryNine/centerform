@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const ArrowIcon = ({ size = 20, color = "currentColor" }: { size?: number; color?: string }) => (
   <svg
@@ -17,25 +19,97 @@ const ArrowIcon = ({ size = 20, color = "currentColor" }: { size?: number; color
   </svg>
 );
 
+interface VenueOption {
+  name: string;
+  slug: string;
+  city: string | null;
+}
+
 export default function RootPage() {
   const [venueCode, setVenueCode] = useState("");
   const [focused, setFocused] = useState(false);
   const [time, setTime] = useState(0);
   const [pressed, setPressed] = useState(false);
+  const [options, setOptions] = useState<VenueOption[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const router = useRouter();
+  const abortRef = useRef<AbortController | null>(null);
+  const dropdownRef = useRef<HTMLUListElement>(null);
+
+  const debouncedQuery = useDebounce(venueCode.trim(), 300);
 
   useEffect(() => {
     const interval = setInterval(() => setTime((t) => t + 0.02), 50);
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (debouncedQuery.length < 2) {
+      setOptions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    // Abort any in-flight request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const supabase = createClient();
+    supabase
+      .from("venues")
+      .select("name, slug, city")
+      .or(`name.ilike.%${debouncedQuery}%,slug.ilike.%${debouncedQuery}%`)
+      .limit(6)
+      .abortSignal(controller.signal)
+      .then(({ data, error }) => {
+        if (error) {
+          // Aborted requests throw — ignore them
+          if (error.message?.includes("abort")) return;
+          console.error("Venue search error:", error);
+          return;
+        }
+        setOptions(data ?? []);
+        setShowDropdown((data ?? []).length > 0);
+        setHighlightedIndex(-1);
+      });
+
+    return () => controller.abort();
+  }, [debouncedQuery]);
+
   const breathe = 0.5 + Math.sin(time * 0.8) * 0.2;
+
+  function selectVenue(slug: string) {
+    setVenueCode("");
+    setShowDropdown(false);
+    router.push(`/${slug}`);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (highlightedIndex >= 0 && options[highlightedIndex]) {
+      selectVenue(options[highlightedIndex].slug);
+      return;
+    }
     const slug = venueCode.trim().toLowerCase().replace(/\s+/g, "-");
     if (slug) {
       router.push(`/${slug}`);
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (!showDropdown || options.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((i) => (i + 1) % options.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((i) => (i - 1 + options.length) % options.length);
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
+      setHighlightedIndex(-1);
     }
   }
 
@@ -174,25 +248,84 @@ export default function RootPage() {
           zIndex: 1,
         }}
       >
-        <input
-          value={venueCode}
-          onChange={(e) => setVenueCode(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          placeholder="e.g. the-grand-hotel"
-          style={{
-            flex: 1,
-            padding: "12px 16px",
-            background: "rgba(255,255,255,0.05)",
-            border: `1px solid ${focused ? "rgba(212,180,131,0.4)" : "rgba(196,180,152,0.15)"}`,
-            borderRadius: 100,
-            color: "#e8dcc8",
-            fontSize: 14,
-            outline: "none",
-            transition: "border-color 0.2s ease",
-            fontFamily: "inherit",
-          }}
-        />
+        <div style={{ flex: 1, position: "relative" }}>
+          <input
+            value={venueCode}
+            onChange={(e) => setVenueCode(e.target.value)}
+            onFocus={() => {
+              setFocused(true);
+              if (options.length > 0) setShowDropdown(true);
+            }}
+            onBlur={() => {
+              setFocused(false);
+              // Delay hiding so click on option registers
+              setTimeout(() => setShowDropdown(false), 200);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="e.g. the-grand-hotel"
+            autoComplete="off"
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              background: "rgba(255,255,255,0.05)",
+              border: `1px solid ${focused ? "rgba(212,180,131,0.4)" : "rgba(196,180,152,0.15)"}`,
+              borderRadius: showDropdown ? "20px 20px 0 0" : 100,
+              color: "#e8dcc8",
+              fontSize: 14,
+              outline: "none",
+              transition: "border-color 0.2s ease, border-radius 0.15s ease",
+              fontFamily: "inherit",
+              boxSizing: "border-box",
+            }}
+          />
+
+          {/* Autocomplete dropdown */}
+          {showDropdown && options.length > 0 && (
+            <ul
+              ref={dropdownRef}
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                right: 0,
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                background: "rgba(30, 26, 22, 0.98)",
+                border: "1px solid rgba(212,180,131,0.4)",
+                borderTop: "1px solid rgba(196,180,152,0.1)",
+                borderRadius: "0 0 16px 16px",
+                overflow: "hidden",
+                zIndex: 10,
+              }}
+            >
+              {options.map((venue, i) => (
+                <li
+                  key={venue.slug}
+                  onMouseDown={() => selectVenue(venue.slug)}
+                  onMouseEnter={() => setHighlightedIndex(i)}
+                  style={{
+                    padding: "10px 16px",
+                    cursor: "pointer",
+                    background:
+                      highlightedIndex === i
+                        ? "rgba(212,180,131,0.12)"
+                        : "transparent",
+                    transition: "background 0.1s ease",
+                  }}
+                >
+                  <div style={{ fontSize: 14, color: "#e8dcc8" }}>
+                    {venue.name}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#6B5D4D", marginTop: 2 }}>
+                    {venue.city ? `${venue.city}` : ''}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <button
           type="submit"
           disabled={!venueCode.trim()}

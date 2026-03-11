@@ -1,8 +1,7 @@
 -- Centerform Initial Schema
 -- Digital Concierge SaaS Platform
 
--- Enable UUID generation
-create extension if not exists "uuid-ossp";
+-- Enable UUID generation (gen_random_uuid is built-in to Postgres 13+)
 
 -- Venue types enum
 create type venue_type as enum ('hotel', 'resort', 'museum', 'event_space', 'other');
@@ -20,7 +19,7 @@ create type place_category as enum ('restaurant', 'bar', 'cafe', 'attraction', '
 -- VENUES
 -------------------------------------------------------
 create table venues (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name text not null,
   slug text not null unique,
   description text,
@@ -45,7 +44,7 @@ create index idx_venues_slug on venues(slug);
 -- VENUE THEMES
 -------------------------------------------------------
 create table venue_themes (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   venue_id uuid not null references venues(id) on delete cascade,
   primary_color text not null default '#1a1a2e',
   secondary_color text not null default '#16213e',
@@ -64,7 +63,7 @@ create table venue_themes (
 -- VENUE MEMBERS (links users to venues with roles)
 -------------------------------------------------------
 create table venue_members (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   venue_id uuid not null references venues(id) on delete cascade,
   user_id uuid not null,
   role member_role not null default 'staff',
@@ -78,7 +77,7 @@ create index idx_venue_members_user on venue_members(user_id);
 -- SERVICES
 -------------------------------------------------------
 create table services (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   venue_id uuid not null references venues(id) on delete cascade,
   name text not null,
   description text,
@@ -96,7 +95,7 @@ create index idx_services_venue on services(venue_id);
 -- EVENTS
 -------------------------------------------------------
 create table events (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   venue_id uuid not null references venues(id) on delete cascade,
   title text not null,
   description text,
@@ -117,7 +116,7 @@ create index idx_events_start on events(start_time);
 -- NEARBY PLACES
 -------------------------------------------------------
 create table nearby_places (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   venue_id uuid not null references venues(id) on delete cascade,
   name text not null,
   description text,
@@ -267,3 +266,13 @@ create trigger events_updated_at before update on events
 
 create trigger nearby_places_updated_at before update on nearby_places
   for each row execute function update_updated_at();
+
+-------------------------------------------------------
+-- SAMPLE VENUES
+-------------------------------------------------------
+insert into venues (name, slug, description, address, city, state, country, venue_type) values
+  ('The Grand Hotel', 'the-grand-hotel', 'A luxurious downtown hotel with world-class amenities and stunning city views.', '100 Grand Avenue', 'New York', 'NY', 'US', 'hotel'),
+  ('Seaside Hotel & Spa', 'seaside-hotel', 'An oceanfront hotel offering tranquil spa experiences and beachside dining.', '1 Ocean Drive', 'Miami', 'FL', 'US', 'hotel'),
+  ('The Mountainview Inn', 'the-mountainview-inn', 'A cozy mountain hotel with hiking trails and fireside dining.', '88 Alpine Road', 'Aspen', 'CO', 'US', 'hotel'),
+  ('Harbor Lights Hotel', 'harbor-lights-hotel', 'A waterfront boutique hotel with panoramic harbor views.', '42 Wharf Street', 'San Francisco', 'CA', 'US', 'hotel'),
+  ('The Regent Palace', 'the-regent-palace', 'A historic hotel blending old-world elegance with modern comfort.', '7 Royal Crescent', 'Charleston', 'SC', 'US', 'hotel');
