@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BellRing, Calendar, Utensils } from "lucide-react";
+import { Home, MessageCircle, Calendar, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
@@ -11,9 +11,9 @@ interface BottomNavProps {
 
 const tabs = [
   { label: "Home", icon: Home, href: "" },
-  { label: "Services", icon: BellRing, href: "/services" },
+  { label: "Explore", icon: Compass, href: "/dining" },
   { label: "Events", icon: Calendar, href: "/events" },
-  { label: "Dining", icon: Utensils, href: "/dining" },
+  { label: "Concierge", icon: MessageCircle, href: "/concierge" },
 ];
 
 export function BottomNav({ venueSlug }: BottomNavProps) {
