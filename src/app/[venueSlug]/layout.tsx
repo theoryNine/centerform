@@ -1,5 +1,4 @@
 import { VenueThemeProvider } from "@/components/theme-provider";
-import { BottomNav } from "@/components/guest/bottom-nav";
 import type { VenueTheme } from "@/types";
 
 // TODO: Fetch venue + theme from Supabase by slug
@@ -53,7 +52,6 @@ export default async function VenueLayout({
         {children}
       </main>
 
-      <BottomNav venueSlug={venueSlug} />
     </VenueThemeProvider>
   );
 }
