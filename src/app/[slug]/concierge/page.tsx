@@ -18,8 +18,8 @@ interface Message {
 }
 
 export default function ConciergePage() {
-  const { venueSlug } = useParams<{ venueSlug: string }>();
-  const venueName = formatVenueName(venueSlug);
+  const { slug } = useParams<{ slug: string }>();
+  const venueName = formatVenueName(slug);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {

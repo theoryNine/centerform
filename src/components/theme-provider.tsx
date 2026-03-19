@@ -1,6 +1,6 @@
 "use client";
 
-import type { VenueTheme } from "@/types";
+import type { ThemeColors } from "@/types";
 
 function hexToOklch(hex: string): string {
   // For now, pass through the hex value directly as CSS color
@@ -8,12 +8,12 @@ function hexToOklch(hex: string): string {
   return hex;
 }
 
-interface VenueThemeProviderProps {
-  theme: VenueTheme;
+interface ThemeProviderProps {
+  theme: ThemeColors;
   children: React.ReactNode;
 }
 
-export function VenueThemeProvider({ theme, children }: VenueThemeProviderProps) {
+export function VenueThemeProvider({ theme, children }: ThemeProviderProps) {
   const style = {
     "--primary": hexToOklch(theme.primary_color),
     "--secondary": hexToOklch(theme.secondary_color),

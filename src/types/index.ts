@@ -96,3 +96,90 @@ export interface NearbyPlace {
 export interface VenueWithTheme extends Venue {
   venue_themes: VenueTheme | null;
 }
+
+// --- Standalone Events ---
+
+export type EventType = "conference" | "concert" | "festival" | "wedding" | "gala" | "other";
+
+export interface StandaloneEvent {
+  id: string;
+  venue_id: string | null;
+  name: string;
+  slug: string;
+  description: string | null;
+  event_type: EventType;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  logo_url: string | null;
+  cover_image_url: string | null;
+  start_date: string;
+  end_date: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StandaloneEventTheme {
+  id: string;
+  event_id: string;
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  background_color: string;
+  foreground_color: string;
+  font_family: string | null;
+  border_radius: string | null;
+  custom_css: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StandaloneEventMember {
+  id: string;
+  event_id: string;
+  user_id: string;
+  role: MemberRole;
+  created_at: string;
+}
+
+export interface EventScheduleItem {
+  id: string;
+  event_id: string;
+  title: string;
+  description: string | null;
+  location: string | null;
+  start_time: string;
+  end_time: string | null;
+  speaker: string | null;
+  is_featured: boolean;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StandaloneEventWithTheme extends StandaloneEvent {
+  standalone_event_themes: StandaloneEventTheme | null;
+}
+
+// --- Shared types ---
+
+export interface ThemeColors {
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  background_color: string;
+  foreground_color: string;
+  font_family: string | null;
+  border_radius: string | null;
+  custom_css: string | null;
+}
+
+export type SlugResolution =
+  | { type: "venue"; data: VenueWithTheme }
+  | { type: "event"; data: StandaloneEventWithTheme };

@@ -11,7 +11,6 @@ import {
   Wifi,
   Copy,
   Check,
-  ChevronRight,
   Music,
   Phone,
   Clock,
@@ -50,10 +49,10 @@ const COLLAPSED_TRANSLATE_VH = 56; // shows ~38vh of drawer
 const EXPANDED_TRANSLATE_VH = 0; // shows full drawer
 const SNAP_VELOCITY_THRESHOLD = 0.3; // vh/ms
 
-export default function VenueHomePage() {
-  const { venueSlug } = useParams<{ venueSlug: string }>();
+export function VenueHomePage() {
+  const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
-  const venueName = formatVenueName(venueSlug);
+  const venueName = formatVenueName(slug);
 
   // Welcome envelope state
   const [envelopeDismissed, setEnvelopeDismissed] = useState(false);
@@ -97,7 +96,6 @@ export default function VenueHomePage() {
   // --- Drawer touch/mouse handlers ---
   const handleDragStart = useCallback(
     (clientY: number) => {
-      // If content is scrolled down and drawer is expanded, don't start drag
       if (contentRef.current && contentRef.current.scrollTop > 0 && isExpanded) return;
       setIsDragging(true);
       dragRef.current = {
@@ -129,13 +127,11 @@ export default function VenueHomePage() {
     if (!isDragging) return;
     setIsDragging(false);
 
-    // Calculate velocity
     const now = Date.now();
     const dt = now - dragRef.current.lastTime || 1;
     const dy = ((dragRef.current.lastY - dragRef.current.startY) / window.innerHeight) * 100;
-    const velocity = dy / dt; // vh/ms
+    const velocity = dy / dt;
 
-    // Snap based on velocity or position
     if (Math.abs(velocity) > SNAP_VELOCITY_THRESHOLD) {
       setTranslateY(velocity > 0 ? COLLAPSED_TRANSLATE_VH : EXPANDED_TRANSLATE_VH);
     } else {
@@ -144,7 +140,6 @@ export default function VenueHomePage() {
     }
   }, [isDragging, translateY]);
 
-  // Touch events
   const onTouchStart = useCallback(
     (e: React.TouchEvent) => handleDragStart(e.touches[0].clientY),
     [handleDragStart],
@@ -155,7 +150,6 @@ export default function VenueHomePage() {
   );
   const onTouchEnd = useCallback(() => handleDragEnd(), [handleDragEnd]);
 
-  // Mouse events (desktop drag testing)
   const onMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -183,7 +177,6 @@ export default function VenueHomePage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -215,7 +208,7 @@ export default function VenueHomePage() {
       label: "Explore",
       sublabel: "Discover nearby",
       icon: Compass,
-      href: `/${venueSlug}/dining`,
+      href: `/${slug}/dining`,
       gradient: "linear-gradient(135deg, #2a4a3e 0%, #1a332a 100%)",
       iconColor: "#6bcba0",
     },
@@ -223,7 +216,7 @@ export default function VenueHomePage() {
       label: "Events",
       sublabel: "Today's activities",
       icon: Calendar,
-      href: `/${venueSlug}/events`,
+      href: `/${slug}/events`,
       gradient: "linear-gradient(135deg, #3a2a4a 0%, #2a1a3a 100%)",
       iconColor: "#b39ddb",
     },
@@ -231,7 +224,7 @@ export default function VenueHomePage() {
       label: "Concierge",
       sublabel: "Ask anything",
       icon: MessageCircle,
-      href: `/${venueSlug}/concierge`,
+      href: `/${slug}/concierge`,
       gradient: "linear-gradient(135deg, #4a3a2a 0%, #3a2a1a 100%)",
       iconColor: colors.gold,
     },
@@ -239,7 +232,7 @@ export default function VenueHomePage() {
       label: "Your Stay",
       sublabel: "Coming soon",
       icon: Key,
-      href: `/${venueSlug}`,
+      href: `/${slug}`,
       gradient: "linear-gradient(135deg, #2a3a4a 0%, #1a2a3a 100%)",
       iconColor: "#7eb8d8",
     },

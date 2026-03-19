@@ -35,7 +35,24 @@ export default function DashboardLayout({
             href="/dashboard/venue/events"
             className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Events
+            Venue Events
+          </a>
+
+          <div className="my-3 border-t" />
+          <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Standalone Events
+          </p>
+          <a
+            href="/dashboard/events"
+            className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            My Events
+          </a>
+          <a
+            href="/dashboard/events/new"
+            className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Create Event
           </a>
         </nav>
       </aside>

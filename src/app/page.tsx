@@ -19,7 +19,8 @@ const ArrowIcon = ({ size = 20, color = "currentColor" }: { size?: number; color
   </svg>
 );
 
-interface VenueOption {
+interface SearchOption {
+  type: "venue" | "event";
   name: string;
   slug: string;
   city: string | null;
@@ -30,7 +31,7 @@ export default function RootPage() {
   const [focused, setFocused] = useState(false);
   const [time, setTime] = useState(0);
   const [pressed, setPressed] = useState(false);
-  const [options, setOptions] = useState<VenueOption[]>([]);
+  const [options, setOptions] = useState<SearchOption[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const router = useRouter();
@@ -57,23 +58,43 @@ export default function RootPage() {
     abortRef.current = controller;
 
     const supabase = createClient();
-    supabase
-      .from("venues")
-      .select("name, slug, city")
-      .or(`name.ilike.%${debouncedQuery}%,slug.ilike.%${debouncedQuery}%`)
-      .limit(6)
-      .abortSignal(controller.signal)
-      .then(({ data, error }) => {
-        if (error) {
-          // Aborted requests throw — ignore them
-          if (error.message?.includes("abort")) return;
-          console.error("Venue search error:", error);
-          return;
-        }
-        setOptions(data ?? []);
-        setShowDropdown((data ?? []).length > 0);
-        setHighlightedIndex(-1);
-      });
+    const filter = `name.ilike.%${debouncedQuery}%,slug.ilike.%${debouncedQuery}%`;
+
+    Promise.all([
+      supabase
+        .from("venues")
+        .select("name, slug, city")
+        .or(filter)
+        .limit(4)
+        .abortSignal(controller.signal),
+      supabase
+        .from("standalone_events")
+        .select("name, slug, city")
+        .or(filter)
+        .limit(4)
+        .abortSignal(controller.signal),
+    ]).then(([venueResult, eventResult]) => {
+      if (venueResult.error?.message?.includes("abort")) return;
+      if (venueResult.error) {
+        console.error("Venue search error:", venueResult.error);
+      }
+      if (eventResult.error && !eventResult.error.message?.includes("abort")) {
+        console.error("Event search error:", eventResult.error);
+      }
+
+      const venues: SearchOption[] = (venueResult.data ?? []).map((v) => ({
+        ...v,
+        type: "venue" as const,
+      }));
+      const events: SearchOption[] = (eventResult.data ?? []).map((e) => ({
+        ...e,
+        type: "event" as const,
+      }));
+      const merged = [...venues, ...events];
+      setOptions(merged);
+      setShowDropdown(merged.length > 0);
+      setHighlightedIndex(-1);
+    });
 
     return () => controller.abort();
   }, [debouncedQuery]);
@@ -200,7 +221,7 @@ export default function RootPage() {
           zIndex: 1,
         }}
       >
-        Scan a QR code at your venue to get started
+        Scan a QR code at your venue or event to get started
       </div>
 
       {/* Divider with text */}
@@ -224,7 +245,7 @@ export default function RootPage() {
           }}
         />
         <span style={{ fontSize: 11, color: "#6B5D4D", whiteSpace: "nowrap" }}>
-          or enter venue code
+          or search by name
         </span>
         <div
           style={{
@@ -299,10 +320,10 @@ export default function RootPage() {
                 zIndex: 10,
               }}
             >
-              {options.map((venue, i) => (
+              {options.map((option, i) => (
                 <li
-                  key={venue.slug}
-                  onMouseDown={() => selectVenue(venue.slug)}
+                  key={`${option.type}-${option.slug}`}
+                  onMouseDown={() => selectVenue(option.slug)}
                   onMouseEnter={() => setHighlightedIndex(i)}
                   style={{
                     padding: "10px 16px",
@@ -314,11 +335,27 @@ export default function RootPage() {
                     transition: "background 0.1s ease",
                   }}
                 >
-                  <div style={{ fontSize: 14, color: "#e8dcc8" }}>
-                    {venue.name}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 14, color: "#e8dcc8" }}>
+                      {option.name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 600,
+                        letterSpacing: 0.5,
+                        color: option.type === "event" ? "#b39ddb" : "#6bcba0",
+                        textTransform: "uppercase",
+                        background: option.type === "event" ? "rgba(179,157,219,0.12)" : "rgba(107,203,160,0.12)",
+                        padding: "2px 6px",
+                        borderRadius: 4,
+                      }}
+                    >
+                      {option.type === "event" ? "Event" : "Venue"}
+                    </span>
                   </div>
                   <div style={{ fontSize: 11, color: "#6B5D4D", marginTop: 2 }}>
-                    {venue.city ? `${venue.city}` : ''}
+                    {option.city || ""}
                   </div>
                 </li>
               ))}
