@@ -1,14 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getAllStandaloneEvents } from "@/lib/queries";
 
-const placeholderEvents = [
-  { name: "TechConnect 2026", event_type: "conference", city: "Austin, TX", start_date: "Jun 15, 2026", active: true },
-  { name: "Summer Sounds Festival", event_type: "festival", city: "Portland, OR", start_date: "Jul 25, 2026", active: true },
-  { name: "The Anderson-Park Wedding", event_type: "wedding", city: "Savannah, GA", start_date: "Sep 12, 2026", active: true },
-];
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
-export default function ManageStandaloneEventsPage() {
+export default async function ManageStandaloneEventsPage() {
+  const events = await getAllStandaloneEvents();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -26,29 +31,35 @@ export default function ManageStandaloneEventsPage() {
       <Card>
         <CardContent className="p-0">
           <div className="divide-y">
-            {placeholderEvents.map((event) => (
-              <div key={event.name} className="flex items-center justify-between p-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{event.name}</p>
-                    <Badge variant="outline" className="text-xs capitalize">
-                      {event.event_type}
-                    </Badge>
+            {events.length === 0 ? (
+              <p className="p-6 text-center text-sm text-muted-foreground">
+                No standalone events yet. Create your first event to get started.
+              </p>
+            ) : (
+              events.map((event) => (
+                <div key={event.id} className="flex items-center justify-between p-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">{event.name}</p>
+                      <Badge variant="outline" className="text-xs capitalize">
+                        {event.event_type}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {event.city}{event.state ? `, ${event.state}` : ""} &middot; {formatDate(event.start_date)}
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {event.city} &middot; {event.start_date}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={event.is_active ? "default" : "secondary"}>
+                      {event.is_active ? "Active" : "Draft"}
+                    </Badge>
+                    <Button variant="ghost" size="sm">
+                      Edit
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={event.active ? "default" : "secondary"}>
-                    {event.active ? "Active" : "Draft"}
-                  </Badge>
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>

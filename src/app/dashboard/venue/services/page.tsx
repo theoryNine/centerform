@@ -1,17 +1,27 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
 
-const placeholderServices = [
-  { name: "Room Service", category: "room_service", active: true },
-  { name: "Spa & Wellness", category: "spa", active: true },
-  { name: "Concierge", category: "concierge", active: true },
-  { name: "Airport Transfer", category: "transportation", active: true },
-  { name: "Fitness Center", category: "activities", active: true },
-  { name: "Laundry", category: "other", active: false },
-];
+export default async function ManageServicesPage() {
+  const supabase = await createClient();
 
-export default function ManageServicesPage() {
+  // TODO: scope to the authenticated user's venue
+  const { data: venue } = await supabase
+    .from("venues")
+    .select("id")
+    .limit(1)
+    .single();
+
+  const services = venue
+    ? (await supabase
+        .from("services")
+        .select("*")
+        .eq("venue_id", venue.id)
+        .order("display_order", { ascending: true }))
+        .data ?? []
+    : [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -27,26 +37,32 @@ export default function ManageServicesPage() {
       <Card>
         <CardContent className="p-0">
           <div className="divide-y">
-            {placeholderServices.map((service) => (
-              <div key={service.name} className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <p className="text-sm font-medium">{service.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {service.category.replace("_", " ")}
-                    </p>
+            {services.length === 0 ? (
+              <p className="p-6 text-center text-sm text-muted-foreground">
+                No services yet. Add your first service to get started.
+              </p>
+            ) : (
+              services.map((service) => (
+                <div key={service.id} className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <p className="text-sm font-medium">{service.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {service.category.replace("_", " ")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={service.is_active ? "default" : "secondary"}>
+                      {service.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                    <Button variant="ghost" size="sm">
+                      Edit
+                    </Button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={service.active ? "default" : "secondary"}>
-                    {service.active ? "Active" : "Inactive"}
-                  </Badge>
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>

@@ -1,22 +1,22 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getAllEventScheduleItems } from "@/lib/queries";
 
-const placeholderSchedule = [
-  { title: "Registration & Welcome Coffee", location: "Main Lobby", time: "8:00 AM", featured: false, active: true },
-  { title: "Opening Keynote", location: "Grand Ballroom", time: "9:00 AM", featured: true, active: true },
-  { title: "Workshop: Getting Started", location: "Room 201", time: "11:00 AM", featured: false, active: true },
-  { title: "Networking Lunch", location: "Terrace", time: "12:30 PM", featured: false, active: true },
-  { title: "Panel Discussion", location: "Grand Ballroom", time: "2:00 PM", featured: true, active: true },
-  { title: "Closing Ceremony", location: "Grand Ballroom", time: "4:00 PM", featured: true, active: false },
-];
+function formatTime(dateStr: string) {
+  return new Date(dateStr).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
 export default async function ManageSchedulePage({
   params,
 }: {
   params: Promise<{ eventId: string }>;
 }) {
-  await params;
+  const { eventId } = await params;
+  const schedule = await getAllEventScheduleItems(eventId);
 
   return (
     <div className="space-y-6">
@@ -33,27 +33,34 @@ export default async function ManageSchedulePage({
       <Card>
         <CardContent className="p-0">
           <div className="divide-y">
-            {placeholderSchedule.map((item) => (
-              <div key={item.title} className="flex items-center justify-between p-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{item.title}</p>
-                    {item.featured && <Badge variant="outline" className="text-xs">Featured</Badge>}
+            {schedule.length === 0 ? (
+              <p className="p-6 text-center text-sm text-muted-foreground">
+                No schedule items yet. Add your first session to get started.
+              </p>
+            ) : (
+              schedule.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">{item.title}</p>
+                      {item.is_featured && <Badge variant="outline" className="text-xs">Featured</Badge>}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {item.location} &middot; {formatTime(item.start_time)}
+                      {item.end_time && ` – ${formatTime(item.end_time)}`}
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {item.location} &middot; {item.time}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={item.is_active ? "default" : "secondary"}>
+                      {item.is_active ? "Active" : "Draft"}
+                    </Badge>
+                    <Button variant="ghost" size="sm">
+                      Edit
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={item.active ? "default" : "secondary"}>
-                    {item.active ? "Active" : "Draft"}
-                  </Badge>
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>

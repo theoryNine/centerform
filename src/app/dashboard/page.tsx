@@ -19,8 +19,8 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">1,284</p>
-            <p className="text-xs text-muted-foreground">+12% from last week</p>
+            <p className="text-2xl font-bold">—</p>
+            <p className="text-xs text-muted-foreground">Analytics coming soon</p>
           </CardContent>
         </Card>
 
@@ -31,8 +31,8 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">48</p>
-            <p className="text-xs text-muted-foreground">+5 today</p>
+            <p className="text-2xl font-bold">—</p>
+            <p className="text-xs text-muted-foreground">Tracking coming soon</p>
           </CardContent>
         </Card>
 
@@ -43,8 +43,8 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">6</p>
-            <p className="text-xs text-muted-foreground">2 this week</p>
+            <p className="text-2xl font-bold">—</p>
+            <p className="text-xs text-muted-foreground">Tracking coming soon</p>
           </CardContent>
         </Card>
 
@@ -55,34 +55,21 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">12</p>
-            <p className="text-xs text-muted-foreground">3 featured</p>
+            <p className="text-2xl font-bold">—</p>
+            <p className="text-xs text-muted-foreground">Tracking coming soon</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent activity placeholder */}
+      {/* Recent activity */}
       <Card>
         <CardHeader>
           <CardTitle>Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {[
-              { action: "New service request", detail: "Room service — Room 412", time: "5 min ago" },
-              { action: "Event updated", detail: "Live Jazz Night — new time", time: "1 hour ago" },
-              { action: "New dining partner", detail: "Sakura Sushi added", time: "3 hours ago" },
-              { action: "Theme updated", detail: "Primary color changed", time: "Yesterday" },
-            ].map((item) => (
-              <div key={item.detail} className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div>
-                  <p className="text-sm font-medium">{item.action}</p>
-                  <p className="text-xs text-muted-foreground">{item.detail}</p>
-                </div>
-                <span className="text-xs text-muted-foreground">{item.time}</span>
-              </div>
-            ))}
-          </div>
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            Activity tracking coming soon.
+          </p>
         </CardContent>
       </Card>
     </div>

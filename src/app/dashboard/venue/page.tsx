@@ -3,8 +3,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { createClient } from "@/lib/supabase/server";
 
-export default function VenueSettingsPage() {
+export default async function VenueSettingsPage() {
+  const supabase = await createClient();
+
+  // TODO: scope to the authenticated user's venue
+  const { data: venue } = await supabase
+    .from("venues")
+    .select("*, venue_themes(*)")
+    .limit(1)
+    .single();
+
+  const theme = venue?.venue_themes;
+
   return (
     <div className="space-y-6">
       <div>
@@ -24,31 +36,31 @@ export default function VenueSettingsPage() {
           <form className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Venue Name</Label>
-              <Input id="name" defaultValue="The Grand Hotel" />
+              <Input id="name" defaultValue={venue?.name ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="slug">URL Slug</Label>
-              <Input id="slug" defaultValue="the-grand-hotel" />
+              <Input id="slug" defaultValue={venue?.slug ?? ""} />
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="description">Description</Label>
-              <Input id="description" defaultValue="A boutique hotel in the heart of the city." />
+              <Input id="description" defaultValue={venue?.description ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Input id="address" defaultValue="123 Main Street" />
+              <Input id="address" defaultValue={venue?.address ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="city">City</Label>
-              <Input id="city" defaultValue="San Francisco" />
+              <Input id="city" defaultValue={venue?.city ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" defaultValue="+1 (555) 123-4567" />
+              <Input id="phone" defaultValue={venue?.phone ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" defaultValue="hello@thegrandhotel.com" />
+              <Input id="email" defaultValue={venue?.email ?? ""} />
             </div>
             <div className="md:col-span-2">
               <Button type="submit">Save Changes</Button>
@@ -72,35 +84,35 @@ export default function VenueSettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="primary">Primary Color</Label>
               <div className="flex gap-2">
-                <Input id="primary" type="color" defaultValue="#1a1a2e" className="h-10 w-14 p-1" />
-                <Input defaultValue="#1a1a2e" className="flex-1" />
+                <Input id="primary" type="color" defaultValue={theme?.primary_color ?? "#1a1a2e"} className="h-10 w-14 p-1" />
+                <Input defaultValue={theme?.primary_color ?? "#1a1a2e"} className="flex-1" />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="secondary">Secondary Color</Label>
               <div className="flex gap-2">
-                <Input id="secondary" type="color" defaultValue="#16213e" className="h-10 w-14 p-1" />
-                <Input defaultValue="#16213e" className="flex-1" />
+                <Input id="secondary" type="color" defaultValue={theme?.secondary_color ?? "#16213e"} className="h-10 w-14 p-1" />
+                <Input defaultValue={theme?.secondary_color ?? "#16213e"} className="flex-1" />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="accent">Accent Color</Label>
               <div className="flex gap-2">
-                <Input id="accent" type="color" defaultValue="#e94560" className="h-10 w-14 p-1" />
-                <Input defaultValue="#e94560" className="flex-1" />
+                <Input id="accent" type="color" defaultValue={theme?.accent_color ?? "#e94560"} className="h-10 w-14 p-1" />
+                <Input defaultValue={theme?.accent_color ?? "#e94560"} className="flex-1" />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="logo">Logo URL</Label>
-              <Input id="logo" placeholder="https://..." />
+              <Input id="logo" defaultValue={venue?.logo_url ?? ""} placeholder="https://..." />
             </div>
             <div className="space-y-2">
               <Label htmlFor="font">Font Family</Label>
-              <Input id="font" defaultValue="Inter" />
+              <Input id="font" defaultValue={theme?.font_family ?? "Inter"} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="radius">Border Radius</Label>
-              <Input id="radius" defaultValue="0.625rem" />
+              <Input id="radius" defaultValue={theme?.border_radius ?? "0.625rem"} />
             </div>
             <div className="md:col-span-3">
               <Button type="submit">Update Theme</Button>

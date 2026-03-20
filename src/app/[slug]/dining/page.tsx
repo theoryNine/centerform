@@ -1,87 +1,127 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
-const placeholderDining = [
-  {
-    name: "La Terrazza",
-    category: "restaurant",
-    distance: "0.1 mi",
-    rating: 4.5,
-    priceLevel: 3,
-    description: "Italian fine dining with a seasonal menu and garden terrace.",
-  },
-  {
-    name: "The Local",
-    category: "restaurant",
-    distance: "0.2 mi",
-    rating: 4.3,
-    priceLevel: 2,
-    description: "Farm-to-table American cuisine in a relaxed atmosphere.",
-  },
-  {
-    name: "Bloom Coffee",
-    category: "cafe",
-    distance: "0.1 mi",
-    rating: 4.7,
-    priceLevel: 1,
-    description: "Specialty coffee and pastries. Great for a morning pick-me-up.",
-  },
-  {
-    name: "The Rooftop Bar",
-    category: "bar",
-    distance: "In-house",
-    rating: 4.4,
-    priceLevel: 3,
-    description: "Craft cocktails with panoramic city views. Open nightly.",
-  },
-  {
-    name: "Sakura Sushi",
-    category: "restaurant",
-    distance: "0.3 mi",
-    rating: 4.6,
-    priceLevel: 2,
-    description: "Authentic Japanese cuisine with an extensive sake selection.",
-  },
-];
+import { resolveSlug } from "@/lib/slug-resolver";
+import { getNearbyPlaces } from "@/lib/queries";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, Star } from "lucide-react";
 
 function PriceLevel({ level }: { level: number }) {
   return (
-    <span className="text-xs text-muted-foreground">
+    <span style={{ fontSize: 12, color: "#8B8680" }}>
       {"$".repeat(level)}
-      <span className="opacity-30">{"$".repeat(4 - level)}</span>
+      <span style={{ opacity: 0.3 }}>{"$".repeat(4 - level)}</span>
     </span>
   );
 }
 
-export default function DiningPage() {
-  return (
-    <div className="py-6">
-      <h1 className="text-xl font-bold">Dining</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Restaurants, cafes, and bars nearby.
-      </p>
+export default async function DiningPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const resolved = await resolveSlug(slug);
 
-      <div className="mt-4 space-y-3">
-        {placeholderDining.map((place) => (
-          <Card key={place.name}>
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <p className="font-medium">{place.name}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium">{place.rating} ★</span>
-                  <PriceLevel level={place.priceLevel} />
+  if (!resolved || resolved.type !== "venue") {
+    notFound();
+  }
+
+  const places = await getNearbyPlaces(resolved.data.id);
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#F5F0E8", fontFamily: "'Inter', -apple-system, sans-serif" }}>
+      {/* Header */}
+      <div style={{ padding: "calc(env(safe-area-inset-top, 16px) + 12px) 20px 0" }}>
+        <Link
+          href={`/${slug}`}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 14,
+            color: "#1A7A6D",
+            textDecoration: "none",
+            fontWeight: 500,
+            marginBottom: 20,
+          }}
+        >
+          <ArrowLeft size={18} />
+          Back
+        </Link>
+
+        <div style={{ marginBottom: 20 }}>
+          <h1 style={{
+            fontSize: 22,
+            fontWeight: 400,
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            color: "#2D2A26",
+            margin: "0 0 8px 0",
+          }}>
+            Dining & Drinks
+          </h1>
+          <div style={{ width: "60%", height: 2, background: "#1A7A6D", borderRadius: 1 }} />
+        </div>
+
+        <p style={{ fontSize: 14, color: "#8B8680", marginBottom: 24 }}>
+          Restaurants, cafes, and bars nearby.
+        </p>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "0 20px 40px" }}>
+        {places.length === 0 ? (
+          <p style={{ padding: "48px 0", textAlign: "center", fontSize: 14, color: "#8B8680" }}>
+            No nearby places listed yet.
+          </p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {places.map((place) => (
+              <div
+                key={place.id}
+                style={{
+                  background: "#FFFFFF",
+                  borderRadius: 5,
+                  padding: "20px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "start", justifyContent: "space-between" }}>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: "#2D2A26", margin: 0 }}>
+                    {place.name}
+                  </p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {place.rating && (
+                      <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 12, fontWeight: 600, color: "#2D2A26" }}>
+                        {place.rating}
+                        <Star size={11} fill="#D4B483" color="#D4B483" />
+                      </span>
+                    )}
+                    {place.price_level && <PriceLevel level={place.price_level} />}
+                  </div>
                 </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                  <span style={{
+                    padding: "2px 10px",
+                    background: "#EDE8DE",
+                    borderRadius: 20,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: "#8B8680",
+                  }}>
+                    {place.category}
+                  </span>
+                  {place.distance && (
+                    <span style={{ fontSize: 12, color: "#8B8680" }}>{place.distance}</span>
+                  )}
+                </div>
+                {place.description && (
+                  <p style={{ fontSize: 13, color: "#8B8680", lineHeight: 1.6, marginTop: 10, marginBottom: 0 }}>
+                    {place.description}
+                  </p>
+                )}
               </div>
-              <div className="mt-1 flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">
-                  {place.category}
-                </Badge>
-                <span className="text-xs text-muted-foreground">{place.distance}</span>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">{place.description}</p>
-            </CardContent>
-          </Card>
-        ))}
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
