@@ -1,23 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { WelcomeEnvelope } from "@/components/guest/welcome-envelope";
-import {
-  Compass,
-  Calendar,
-  MessageCircle,
-  Bed,
-  Phone,
-  ChevronRight,
-} from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import type { VenueEvent } from "@/types";
+import { Phone, ArrowRight } from "lucide-react";
 
 function formatVenueName(slug: string) {
   return slug
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+function formatEventTime(startTime: string, endTime: string | null): string {
+  const start = new Date(startTime);
+  const formatTime = (d: Date) => {
+    const h = d.getHours();
+    const m = d.getMinutes();
+    const suffix = h >= 12 ? "pm" : "am";
+    const hour = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return m === 0 ? `${hour}${suffix}` : `${hour}:${m.toString().padStart(2, "0")}${suffix}`;
+  };
+  if (endTime) {
+    const end = new Date(endTime);
+    return `${formatTime(start)}–${formatTime(end)}`;
+  }
+  return formatTime(start);
 }
 
 export function VenueHomePage() {
@@ -29,53 +40,92 @@ export function VenueHomePage() {
 
   // Extract location parts
   const locationParts = [venue?.city, venue?.state].filter(Boolean);
-  const locationString = locationParts.length > 0
-    ? locationParts.join(" · ").toUpperCase()
-    : "";
+  const locationString =
+    locationParts.length > 0 ? locationParts.join(" · ").toUpperCase() : "";
 
   // Welcome envelope state
   const [envelopeDismissed, setEnvelopeDismissed] = useState(false);
   const [envelopeVisible, setEnvelopeVisible] = useState(true);
+
+  // Today's events
+  const [todayEvents, setTodayEvents] = useState<VenueEvent[]>([]);
+
+  useEffect(() => {
+    if (!venue?.id) return;
+    const supabase = createClient();
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
+
+    supabase
+      .from("events")
+      .select("*")
+      .eq("venue_id", venue.id)
+      .eq("is_active", true)
+      .gte("start_time", startOfDay)
+      .lt("start_time", endOfDay)
+      .order("start_time", { ascending: true })
+      .then(({ data }) => {
+        if (data) setTodayEvents(data);
+      });
+  }, [venue?.id]);
 
   function handleEnvelopeEnter() {
     setEnvelopeDismissed(true);
     setTimeout(() => setEnvelopeVisible(false), 500);
   }
 
+  const cityName = venue?.city ?? "the Area";
+
   const navItems = [
     {
       label: "Your Room & Stay",
       sublabel: "Amenities, services, and requests",
-      icon: Bed,
       href: `/${slug}/services`,
       image: "/images/room-placeholder.jpg",
     },
     {
-      label: "Events & Activities",
-      sublabel: "What's happening nearby",
-      icon: Calendar,
-      href: `/${slug}/events`,
-      image: "/images/events-placeholder.jpg",
-    },
-    {
-      label: "Dining & Drinks",
-      sublabel: "Restaurants, cafes, and bars",
-      icon: Compass,
+      label: "Dining",
+      sublabel: venue?.name ? `At ${venue.name}` : "Restaurants and cafes",
       href: `/${slug}/dining`,
       image: "/images/dining-placeholder.jpg",
     },
     {
-      label: "Concierge",
-      sublabel: "Ask us anything",
-      icon: MessageCircle,
-      href: `/${slug}/concierge`,
-      image: "/images/concierge-placeholder.jpg",
+      label: `Explore ${cityName}`,
+      sublabel: "Let us show you around town",
+      href: `/${slug}/dining`,
+      image: "/images/explore-placeholder.jpg",
     },
   ];
 
+  // Section divider component for consistency
+  const SectionDivider = ({ title }: { title: string }) => (
+    <div style={{ marginBottom: 16 }}>
+      <h3
+        style={{
+          fontSize: 22,
+          fontWeight: 400,
+          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          color: "var(--foreground, #2D2A26)",
+          margin: "0 0 8px 0",
+        }}
+      >
+        {title}
+      </h3>
+      <div
+        style={{
+          marginLeft: -20,
+          width: "calc(60% + 20px)",
+          height: 1,
+          background: "var(--foreground, #2D2A26)",
+        }}
+      />
+    </div>
+  );
+
   return (
     <>
-      {/* Welcome envelope overlay */}
+      {/* Welcome envelope overlay
       {envelopeVisible && (
         <div
           className="fixed inset-0 z-[100]"
@@ -96,8 +146,8 @@ export function VenueHomePage() {
       <div
         className="min-h-screen"
         style={{
-          background: "#F5F0E8",
-          fontFamily: "'Inter', -apple-system, sans-serif",
+          background: "var(--background, #F5F0E8)",
+          fontFamily: "var(--font-sans, 'Inter', -apple-system, sans-serif)",
         }}
       >
         {/* Header section with shaped image */}
@@ -106,12 +156,13 @@ export function VenueHomePage() {
             display: "flex",
             alignItems: "center",
             gap: 0,
-            paddingTop: "calc(env(safe-area-inset-top, 16px) + 24px)",
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 32px)",
             minHeight: 280,
           }}
         >
           {/* Image container — flush left, rounded right */}
           <div
+            className="animate-slide-in-left"
             style={{
               width: "45%",
               minWidth: 160,
@@ -123,55 +174,66 @@ export function VenueHomePage() {
               position: "relative",
             }}
           >
-            {/* Placeholder gradient — replace with venue image */}
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                background: `
-                  linear-gradient(135deg,
-                    #8B6914 0%,
-                    #5C4A1E 30%,
-                    #3A3520 60%,
-                    #2A2A1A 100%
-                  )
-                `,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {/* Warm ambient overlay to simulate lit doorway */}
-              <div
+            {venue?.cover_image_url ? (
+              <img
+                src={venue.cover_image_url}
+                alt={venueName}
                 style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: `
-                    radial-gradient(ellipse at 60% 50%,
-                      rgba(212, 160, 60, 0.3) 0%,
-                      rgba(139, 80, 20, 0.2) 40%,
-                      rgba(42, 36, 20, 0.6) 100%
-                    )
-                  `,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
                 }}
               />
-              <span
+            ) : (
+              <div
                 style={{
-                  fontSize: 48,
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  color: "rgba(212, 180, 131, 0.4)",
-                  fontWeight: 300,
-                  position: "relative",
-                  zIndex: 1,
+                  width: "100%",
+                  height: "100%",
+                  background: `
+                    linear-gradient(135deg,
+                      #8B6914 0%,
+                      #5C4A1E 30%,
+                      #3A3520 60%,
+                      #2A2A1A 100%
+                    )
+                  `,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {venueName.charAt(0)}
-              </span>
-            </div>
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: `
+                      radial-gradient(ellipse at 60% 50%,
+                        rgba(212, 160, 60, 0.3) 0%,
+                        rgba(139, 80, 20, 0.2) 40%,
+                        rgba(42, 36, 20, 0.6) 100%
+                      )
+                    `,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 48,
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    color: "rgba(212, 180, 131, 0.4)",
+                    fontWeight: 300,
+                    position: "relative",
+                    zIndex: 1,
+                  }}
+                >
+                  {venueName.charAt(0)}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Venue name and location */}
           <div
+            className="animate-fade-in-up"
             style={{
               flex: 1,
               padding: "0 24px",
@@ -187,7 +249,7 @@ export function VenueHomePage() {
                 fontSize: 28,
                 fontWeight: 400,
                 fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: "#2D2A26",
+                color: "var(--foreground, #2D2A26)",
                 lineHeight: 1.2,
                 margin: 0,
               }}
@@ -208,7 +270,7 @@ export function VenueHomePage() {
                   fontSize: 11,
                   fontWeight: 500,
                   letterSpacing: 2,
-                  color: "#8B8680",
+                  color: "var(--muted-foreground, #8B8680)",
                   marginTop: 8,
                   textTransform: "uppercase",
                 }}
@@ -224,10 +286,11 @@ export function VenueHomePage() {
           {/* Welcome card */}
           <div
             style={{
-              background: "#FFFFFF",
+              background: "var(--card, #FFFFFF)",
               borderRadius: 5,
               padding: "28px 24px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+              boxShadow:
+                "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
               marginBottom: 32,
             }}
           >
@@ -236,7 +299,7 @@ export function VenueHomePage() {
                 fontSize: 22,
                 fontWeight: 400,
                 fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: "#2D2A26",
+                color: "var(--foreground, #2D2A26)",
                 marginBottom: 8,
               }}
             >
@@ -245,70 +308,48 @@ export function VenueHomePage() {
             <p
               style={{
                 fontSize: 14,
-                color: "#8B8680",
+                color: "var(--muted-foreground, #8B8680)",
                 lineHeight: 1.6,
-                marginBottom: 20,
+                marginBottom: venue?.phone ? 20 : 0,
               }}
             >
-              We&apos;re glad you&apos;re here. Everything you need for your stay is right below.
+              We&apos;re glad you&apos;re here. Everything you need for your
+              stay is right below.
             </p>
             {venue?.phone && (
-              <a
-                href={`tel:${venue.phone.replace(/\D/g, "")}`}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  padding: "14px 0",
-                  background: "#1A7A6D",
-                  color: "#FFFFFF",
-                  border: "none",
-                  borderRadius: 5,
-                  fontSize: 15,
-                  fontWeight: 600,
-                  textAlign: "center",
-                  textDecoration: "none",
-                  cursor: "pointer",
-                }}
-              >
-                <Phone
-                  size={16}
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <a
+                  href={`tel:${venue.phone.replace(/\D/g, "")}`}
                   style={{
-                    display: "inline-block",
-                    verticalAlign: "middle",
-                    marginRight: 8,
-                    marginTop: -2,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "10px 20px",
+                    background: "transparent",
+                    color: "var(--primary, #1A7A6D)",
+                    border: "1px solid var(--primary, #1A7A6D)",
+                    borderRadius: 5,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
                   }}
-                />
-                Call the Front Desk
-              </a>
+                >
+                  <Phone size={15} />
+                  Call the Front Desk
+                </a>
+              </div>
             )}
           </div>
 
           {/* Your Stay section */}
           <div style={{ marginBottom: 32 }}>
-            <div style={{ marginBottom: 20 }}>
-              <h3
-                style={{
-                  fontSize: 18,
-                  fontWeight: 400,
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  color: "#2D2A26",
-                  margin: "0 0 8px 0",
-                }}
-              >
-                Your Stay
-              </h3>
-              <div
-                style={{
-                  width: "60%",
-                  height: 2,
-                  background: "#1A7A6D",
-                  borderRadius: 1,
-                }}
-              />
-            </div>
+            <SectionDivider title="Your Stay" />
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: 12 }}
+            >
               {navItems.map((item) => (
                 <button
                   key={item.label}
@@ -317,37 +358,46 @@ export function VenueHomePage() {
                     display: "flex",
                     alignItems: "center",
                     gap: 16,
-                    background: "#FFFFFF",
+                    background: "var(--card, #FFFFFF)",
                     border: "none",
                     borderRadius: 5,
-                    padding: 12,
+                    padding: 0,
                     cursor: "pointer",
                     textAlign: "left",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+                    boxShadow:
+                      "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
                     transition: "transform 0.15s ease",
                     width: "100%",
+                    overflow: "hidden",
                   }}
-                  onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
-                  onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                  onTouchStart={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
-                  onTouchEnd={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                  onMouseDown={(e) =>
+                    (e.currentTarget.style.transform = "scale(0.98)")
+                  }
+                  onMouseUp={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
+                  onTouchStart={(e) =>
+                    (e.currentTarget.style.transform = "scale(0.98)")
+                  }
+                  onTouchEnd={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
                 >
-                  {/* Thumbnail */}
+                  {/* Thumbnail — flush to card edges */}
                   <div
                     style={{
-                      width: 72,
-                      height: 72,
-                      borderRadius: 5,
+                      width: 88,
+                      height: 80,
                       overflow: "hidden",
                       flexShrink: 0,
-                      background: `linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      background:
+                        "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)",
                     }}
                   >
-                    <item.icon size={24} color="#8B8680" />
+                    {/* Placeholder — replace with actual images */}
                   </div>
 
                   {/* Label */}
@@ -356,7 +406,7 @@ export function VenueHomePage() {
                       style={{
                         fontSize: 15,
                         fontWeight: 600,
-                        color: "#2D2A26",
+                        color: "var(--foreground, #2D2A26)",
                         marginBottom: 2,
                       }}
                     >
@@ -365,7 +415,7 @@ export function VenueHomePage() {
                     <div
                       style={{
                         fontSize: 13,
-                        color: "#8B8680",
+                        color: "var(--muted-foreground, #8B8680)",
                         lineHeight: 1.4,
                       }}
                     >
@@ -374,10 +424,187 @@ export function VenueHomePage() {
                   </div>
 
                   {/* Arrow */}
-                  <ChevronRight size={20} color="#8B8680" style={{ flexShrink: 0 }} />
+                  <ArrowRight
+                    size={18}
+                    color="var(--primary, #1A7A6D)"
+                    style={{ flexShrink: 0, marginRight: 12 }}
+                  />
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Tonight section */}
+          {todayEvents.length > 0 && (
+            <div style={{ marginBottom: 32 }}>
+              <SectionDivider title="Tonight" />
+
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
+                {todayEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    style={{
+                      background: "var(--foreground, #2D2A26)",
+                      borderRadius: 5,
+                      padding: "20px 24px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 500,
+                        color: "var(--background, #F5F0E8)",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {event.title} · {formatEventTime(event.start_time, event.end_time)}
+                    </div>
+                    {event.location && (
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: "rgba(245, 240, 232, 0.6)",
+                        }}
+                      >
+                        {event.location}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Your Concierge section */}
+          <div style={{ marginBottom: 32 }}>
+            <SectionDivider title="Concierge" />
+
+            <p
+              style={{
+                fontSize: 14,
+                color: "var(--muted-foreground, #8B8680)",
+                lineHeight: 1.6,
+                marginBottom: 16,
+              }}
+            >
+              Ask us anything about your stay or the neighborhood.
+            </p>
+
+            <div
+              style={{
+                background: "var(--card, #FFFFFF)",
+                borderRadius: 5,
+                padding: 20,
+                boxShadow:
+                  "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+              }}
+            >
+              <button
+                onClick={() => router.push(`/${slug}/concierge`)}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  background: "var(--background, #F5F0E8)",
+                  border: "1px solid var(--border, #DDD8CE)",
+                  borderRadius: 5,
+                  fontSize: 14,
+                  color: "var(--muted-foreground, #8B8680)",
+                  textAlign: "left",
+                  cursor: "pointer",
+                  marginBottom: 12,
+                }}
+              >
+                What are you looking for?
+              </button>
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {["Dinner tonight", "Coffee nearby", "Late checkout", "Happy hour"].map(
+                  (chip) => (
+                    <button
+                      key={chip}
+                      onClick={() => router.push(`/${slug}/concierge`)}
+                      style={{
+                        padding: "8px 16px",
+                        background: "transparent",
+                        border: "1px solid var(--border, #DDD8CE)",
+                        borderRadius: 20,
+                        fontSize: 13,
+                        color: "var(--foreground, #2D2A26)",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        transition: "background 0.15s ease",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.background =
+                          "var(--secondary, #EDE8DE)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background = "transparent")
+                      }
+                    >
+                      {chip}
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div
+            style={{
+              textAlign: "center",
+              paddingTop: 24,
+              paddingBottom: 16,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: "var(--foreground, #2D2A26)",
+                marginBottom: 4,
+              }}
+            >
+              {venueName}
+            </div>
+            {venue?.address && (
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "var(--muted-foreground, #8B8680)",
+                  marginBottom: 4,
+                }}
+              >
+                {venue.address}
+              </div>
+            )}
+            {!venue?.address && (
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "var(--muted-foreground, #8B8680)",
+                  marginBottom: 4,
+                }}
+              >
+                {[venue?.city, venue?.state].filter(Boolean).join(", ")}
+              </div>
+            )}
+            {venue?.phone && (
+              <a
+                href={`tel:${venue.phone.replace(/\D/g, "")}`}
+                style={{
+                  fontSize: 13,
+                  color: "var(--primary, #1A7A6D)",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                }}
+              >
+                {venue.phone}
+              </a>
+            )}
           </div>
 
           {/* Bottom safe area */}
