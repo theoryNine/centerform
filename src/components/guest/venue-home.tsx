@@ -233,7 +233,7 @@ export function VenueHomePage() {
 
           {/* Venue name and location */}
           <div
-            className="animate-fade-in-up"
+            className="animate-fade-in"
             style={{
               flex: 1,
               padding: "0 24px",
