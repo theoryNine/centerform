@@ -233,7 +233,7 @@ export function VenueHomePage() {
 
           {/* Venue name and location */}
           <div
-            className="animate-fade-in"
+            className="animate-fade-in-up"
             style={{
               flex: 1,
               padding: "0 24px",
@@ -390,7 +390,7 @@ export function VenueHomePage() {
                   <div
                     style={{
                       width: 88,
-                      height: 80,
+                      alignSelf: "stretch",
                       overflow: "hidden",
                       flexShrink: 0,
                       background:
@@ -401,7 +401,7 @@ export function VenueHomePage() {
                   </div>
 
                   {/* Label */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: 1, minWidth: 0, padding: "16px 0" }}>
                     <div
                       style={{
                         fontSize: 15,
