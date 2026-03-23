@@ -125,7 +125,7 @@ export function VenueHomePage() {
 
   return (
     <>
-      {/* Welcome envelope overlay
+      {/* Welcome envelope overlay */}
       {envelopeVisible && (
         <div
           className="fixed inset-0 z-[100]"
@@ -162,7 +162,7 @@ export function VenueHomePage() {
         >
           {/* Image container — flush left, rounded right */}
           <div
-            className="animate-slide-in-left"
+            className={envelopeDismissed ? "animate-slide-in-left" : undefined}
             style={{
               width: "45%",
               minWidth: 160,
@@ -233,7 +233,7 @@ export function VenueHomePage() {
 
           {/* Venue name and location */}
           <div
-            className="animate-fade-in"
+            className={envelopeDismissed ? "animate-fade-in" : undefined}
             style={{
               flex: 1,
               padding: "0 24px",
