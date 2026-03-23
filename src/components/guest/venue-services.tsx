@@ -396,7 +396,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
               style={{
                 display: "flex",
                 alignItems: "center",
-                color: "var(--foreground, #2D2A26)",
+                color: "var(--primary, #1A7A6D)",
                 textDecoration: "none",
                 marginRight: 12,
               }}
@@ -475,7 +475,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
             style={{
               display: "flex",
               alignItems: "center",
-              color: "var(--foreground, #2D2A26)",
+              color: "var(--primary, #1A7A6D)",
               textDecoration: "none",
               marginRight: 12,
             }}
