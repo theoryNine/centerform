@@ -286,8 +286,7 @@ function AccordionItem({
 
 function buildMapUrl(address: string): string {
   const encoded = encodeURIComponent(address);
-  // Universal link — iOS opens Apple Maps, Android opens Google Maps
-  return `https://maps.apple.com/?q=${encoded}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encoded}`;
 }
 
 interface VenueServicesPageProps {
