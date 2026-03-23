@@ -116,8 +116,8 @@ export function VenueHomePage() {
         style={{
           marginLeft: -20,
           width: "calc(60% + 20px)",
-          height: 1,
-          background: "var(--foreground, #2D2A26)",
+          height: 2,
+          background: "var(--primary, #1A7A6D)",
         }}
       />
     </div>
