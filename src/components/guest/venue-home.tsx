@@ -268,7 +268,7 @@ export function VenueHomePage() {
               <p
                 style={{
                   fontSize: 11,
-                  fontWeight: 500,
+                  fontWeight: 800,
                   letterSpacing: 2,
                   color: "var(--muted-foreground, #8B8680)",
                   marginTop: 8,
