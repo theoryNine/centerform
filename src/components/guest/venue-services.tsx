@@ -230,6 +230,10 @@ function AccordionItem({
     <div
       style={{
         borderBottom: "1px solid var(--border, #DDD8CE)",
+        marginLeft: -20,
+        marginRight: -20,
+        paddingLeft: 20,
+        paddingRight: 20,
       }}
     >
       <button

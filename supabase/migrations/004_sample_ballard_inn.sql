@@ -12,7 +12,7 @@ VALUES (
   'the-ballard-inn',
   'A boutique inn in the heart of Ballard, Seattle. Walking distance to breweries, restaurants, and the waterfront.',
   '5300 Ballard Ave NW',
-  'Seattle, WA 98107',
+  'Seattle',
   'WA',
   'US',
   '+1 (206) 555-0123',
