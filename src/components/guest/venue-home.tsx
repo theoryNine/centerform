@@ -43,9 +43,12 @@ export function VenueHomePage() {
   const locationString =
     locationParts.length > 0 ? locationParts.join(" · ").toUpperCase() : "";
 
-  // Welcome envelope state
-  const [envelopeDismissed, setEnvelopeDismissed] = useState(false);
-  const [envelopeVisible, setEnvelopeVisible] = useState(true);
+  // Welcome envelope state — show only once per venue
+  const envelopeKey = `envelope-dismissed:${slug}`;
+  const alreadyDismissed =
+    typeof window !== "undefined" && !!localStorage.getItem(envelopeKey);
+  const [envelopeDismissed, setEnvelopeDismissed] = useState(alreadyDismissed);
+  const [envelopeVisible, setEnvelopeVisible] = useState(!alreadyDismissed);
 
   // Today's events
   const [todayEvents, setTodayEvents] = useState<VenueEvent[]>([]);
@@ -72,6 +75,7 @@ export function VenueHomePage() {
 
   function handleEnvelopeEnter() {
     setEnvelopeDismissed(true);
+    localStorage.setItem(envelopeKey, "1");
     setTimeout(() => setEnvelopeVisible(false), 500);
   }
 
