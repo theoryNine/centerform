@@ -37,6 +37,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-serif: "Cormorant Garamond", Georgia, serif;
 }
 
 :root {
@@ -116,8 +117,24 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans, system-ui, sans-serif);
+    font-family: var(--font-sans, "DM Sans", sans-serif);
   }
+}
+
+@utility card-shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+@utility pt-safe {
+  padding-top: calc(env(safe-area-inset-top, 16px) + 12px);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+@utility h-safe-bottom {
+  height: env(safe-area-inset-bottom, 20px);
 }
 
 /* Venue homepage header animations */

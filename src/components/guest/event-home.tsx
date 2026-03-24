@@ -206,19 +206,13 @@ export function EventHomePage() {
 
   return (
     <div
-      className="fixed inset-0 z-[60]"
-      style={{
-        background: colors.bgDeep,
-        fontFamily: "'Inter', -apple-system, sans-serif",
-      }}
+      className="fixed inset-0 z-[60] font-sans"
+      style={{ background: colors.bgDeep }}
     >
       {/* Hero image area */}
       <div
+        className="absolute inset-x-0 top-0"
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
           height: isDesktop ? "50vh" : "65vh",
           background: `
             linear-gradient(180deg,
@@ -234,52 +228,32 @@ export function EventHomePage() {
       >
         {/* Event name overlay at top */}
         <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            padding: "env(safe-area-inset-top, 16px) 20px 0",
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
-          }}
+          className="absolute inset-x-0 top-0 px-5"
+          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)" }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className="flex items-center gap-3">
             <div
+              className="flex size-9 shrink-0 items-center justify-center rounded-full"
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
                 background: "linear-gradient(135deg, #8B2635 0%, #6B1D29 50%, #4A1520 100%)",
                 boxShadow: "0 2px 8px rgba(139,38,53,0.4)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
               }}
             >
               <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: "rgba(255,255,255,0.9)",
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
-                }}
+                className="font-serif text-sm font-semibold"
+                style={{ color: "rgba(255,255,255,0.9)" }}
               >
                 {event.name.charAt(0)}
               </span>
             </div>
             <div>
               <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: colors.cream,
-                  letterSpacing: 0.3,
-                }}
+                className="text-[15px] font-semibold tracking-wide"
+                style={{ color: colors.cream }}
               >
                 {event.name}
               </div>
-              <div style={{ fontSize: 11, color: colors.muted, marginTop: 1 }}>
+              <div className="mt-px text-[11px]" style={{ color: colors.muted }}>
                 {eventTypeLabels[event.event_type] || "Event"}
               </div>
             </div>
@@ -287,34 +261,16 @@ export function EventHomePage() {
         </div>
 
         {/* Placeholder event image */}
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            textAlign: "center",
-            opacity: 0.15,
-          }}
-        >
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center opacity-15">
           <div
-            style={{
-              fontSize: 64,
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              color: colors.cream,
-              fontWeight: 300,
-            }}
+            className="font-serif text-[64px] font-light"
+            style={{ color: colors.cream }}
           >
             {event.name.charAt(0)}
           </div>
           <div
-            style={{
-              fontSize: 10,
-              letterSpacing: 4,
-              color: colors.cream,
-              textTransform: "uppercase",
-              marginTop: 8,
-            }}
+            className="mt-2 text-[10px] uppercase tracking-[4px]"
+            style={{ color: colors.cream }}
           >
             Event Photo
           </div>
@@ -323,20 +279,13 @@ export function EventHomePage() {
 
       {/* Drawer */}
       <div
+        className="fixed inset-x-0 bottom-0 z-10 flex flex-col rounded-t-3xl"
         style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
           height: `${DRAWER_HEIGHT_VH}vh`,
           transform: isDesktop ? "none" : `translateY(${translateY}vh)`,
           transition: isDragging ? "none" : "transform 0.45s cubic-bezier(0.32, 0.72, 0, 1)",
-          borderRadius: "24px 24px 0 0",
           background: colors.bg,
           boxShadow: "0 -8px 40px rgba(0,0,0,0.4)",
-          zIndex: 10,
-          display: "flex",
-          flexDirection: "column",
           maxWidth: isDesktop ? 640 : "none",
           marginLeft: isDesktop ? "auto" : undefined,
           marginRight: isDesktop ? "auto" : undefined,
@@ -349,22 +298,11 @@ export function EventHomePage() {
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
             onMouseDown={onMouseDown}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              paddingTop: 12,
-              paddingBottom: 8,
-              cursor: "grab",
-              touchAction: "none",
-            }}
+            className="flex cursor-grab justify-center pb-2 pt-3 touch-none"
           >
             <div
-              style={{
-                width: 36,
-                height: 4,
-                borderRadius: 2,
-                background: colors.white20,
-              }}
+              className="h-1 w-9 rounded-sm"
+              style={{ background: colors.white20 }}
             />
           </div>
         )}
@@ -372,33 +310,20 @@ export function EventHomePage() {
         {/* Scrollable content */}
         <div
           ref={contentRef}
+          className="flex-1 [-webkit-overflow-scrolling:touch]"
           style={{
-            flex: 1,
             overflowY: isDesktop || isExpanded ? "auto" : "hidden",
             padding: isDesktop ? "24px 24px 40px" : "0 20px 40px",
-            WebkitOverflowScrolling: "touch",
           }}
         >
           {/* Event date & type badge */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
+          <div className="mb-4 flex items-center gap-2">
             <span
+              className="rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide"
               style={{
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: 1,
                 color: colors.gold,
-                textTransform: "uppercase",
                 background: "rgba(212,180,131,0.12)",
-                padding: "4px 10px",
-                borderRadius: 20,
-                border: "1px solid rgba(212,180,131,0.2)",
+                borderColor: "rgba(212,180,131,0.2)",
               }}
             >
               {eventTypeLabels[event.event_type] || "Event"}
@@ -407,60 +332,41 @@ export function EventHomePage() {
 
           {/* Key info card */}
           <div
+            className="mb-4 rounded-2xl p-4"
             style={{
-              padding: "16px",
               background: colors.card,
               border: `1px solid ${colors.cardBorder}`,
-              borderRadius: 16,
-              marginBottom: 16,
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 14,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  background: "rgba(179,157,219,0.12)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+            <div className="mb-3.5 flex items-center gap-2.5">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[rgba(179,157,219,0.12)]">
                 <Calendar size={16} color="#b39ddb" />
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: colors.cream }}>
+              <div className="text-sm font-semibold" style={{ color: colors.cream }}>
                 Event Details
               </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: colors.muted }}>Date</span>
-                <span style={{ fontSize: 13, color: colors.cream, fontWeight: 500 }}>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: colors.muted }}>Date</span>
+                <span className="text-[13px] font-medium" style={{ color: colors.cream }}>
                   {formatDate(event.start_date)}
                   {event.end_date && ` – ${formatDate(event.end_date)}`}
                 </span>
               </div>
-              <div style={{ height: 1, background: colors.white05 }} />
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: colors.muted }}>Time</span>
-                <span style={{ fontSize: 13, color: colors.cream, fontWeight: 500 }}>
+              <div className="h-px" style={{ background: colors.white05 }} />
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: colors.muted }}>Time</span>
+                <span className="text-[13px] font-medium" style={{ color: colors.cream }}>
                   {formatTime(event.start_date)}
                 </span>
               </div>
               {locationString && (
                 <>
-                  <div style={{ height: 1, background: colors.white05 }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <span style={{ fontSize: 12, color: colors.muted, flexShrink: 0 }}>Location</span>
-                    <span style={{ fontSize: 13, color: colors.cream, fontWeight: 500, textAlign: "right", marginLeft: 16 }}>
+                  <div className="h-px" style={{ background: colors.white05 }} />
+                  <div className="flex items-start justify-between">
+                    <span className="shrink-0 text-xs" style={{ color: colors.muted }}>Location</span>
+                    <span className="ml-4 text-right text-[13px] font-medium" style={{ color: colors.cream }}>
                       {locationString}
                     </span>
                   </div>
@@ -468,10 +374,10 @@ export function EventHomePage() {
               )}
               {event.phone && (
                 <>
-                  <div style={{ height: 1, background: colors.white05 }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 12, color: colors.muted }}>Contact</span>
-                    <span style={{ fontSize: 13, color: colors.cream, fontWeight: 500 }}>
+                  <div className="h-px" style={{ background: colors.white05 }} />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs" style={{ color: colors.muted }}>Contact</span>
+                    <span className="text-[13px] font-medium" style={{ color: colors.cream }}>
                       {event.phone}
                     </span>
                   </div>
@@ -483,24 +389,14 @@ export function EventHomePage() {
                 href={event.website}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="mt-3.5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] py-2.5 no-underline transition-all duration-200 ease-out"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  width: "100%",
-                  marginTop: 14,
-                  padding: "10px 0",
                   background: colors.white05,
                   border: `1px solid ${colors.cardBorder}`,
-                  borderRadius: 10,
-                  cursor: "pointer",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease",
                 }}
               >
                 <Globe size={14} color={colors.goldDim} />
-                <span style={{ fontSize: 13, fontWeight: 500, color: colors.goldDim }}>
+                <span className="text-[13px] font-medium" style={{ color: colors.goldDim }}>
                   Visit website
                 </span>
                 <ExternalLink size={12} color={colors.goldDim} />
@@ -509,41 +405,22 @@ export function EventHomePage() {
           </div>
 
           {/* Quick Access cards */}
-          <div style={{ marginBottom: 24 }}>
+          <div className="mb-6">
             <div
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: 2,
-                color: colors.goldDim,
-                textTransform: "uppercase",
-                marginBottom: 12,
-              }}
+              className="mb-3 text-[11px] font-semibold uppercase tracking-[2px]"
+              style={{ color: colors.goldDim }}
             >
               Quick Access
             </div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 10,
-              }}
-            >
+            <div className="grid grid-cols-2 gap-2.5">
               {quickAccess.map((item) => (
                 <button
                   key={item.label}
                   onClick={() => router.push(item.href)}
+                  className="flex cursor-pointer flex-col gap-3 rounded-2xl px-4 pb-4 pt-[18px] text-left transition-transform duration-150 ease-out active:scale-[0.97]"
                   style={{
                     background: item.gradient,
                     border: `1px solid ${colors.cardBorder}`,
-                    borderRadius: 16,
-                    padding: "18px 16px",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "transform 0.15s ease, box-shadow 0.15s ease",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 12,
                   }}
                   onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
                   onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -553,10 +430,10 @@ export function EventHomePage() {
                 >
                   <item.icon size={22} color={item.iconColor} />
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: colors.cream }}>
+                    <div className="text-sm font-semibold" style={{ color: colors.cream }}>
                       {item.label}
                     </div>
-                    <div style={{ fontSize: 11, color: colors.muted, marginTop: 2 }}>
+                    <div className="mt-0.5 text-[11px]" style={{ color: colors.muted }}>
                       {item.sublabel}
                     </div>
                   </div>
@@ -567,10 +444,9 @@ export function EventHomePage() {
 
           {/* Divider */}
           <div
+            className="mb-6 h-px"
             style={{
-              height: 1,
               background: `linear-gradient(90deg, transparent, ${colors.cardBorder}, transparent)`,
-              marginBottom: 24,
             }}
           />
 
@@ -578,25 +454,14 @@ export function EventHomePage() {
           {event.description && (
             <div>
               <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  letterSpacing: 2,
-                  color: colors.goldDim,
-                  textTransform: "uppercase",
-                  marginBottom: 12,
-                }}
+                className="mb-3 text-[11px] font-semibold uppercase tracking-[2px]"
+                style={{ color: colors.goldDim }}
               >
                 About
               </div>
               <p
-                style={{
-                  fontSize: 14,
-                  color: colors.cream,
-                  lineHeight: 1.7,
-                  margin: 0,
-                  opacity: 0.85,
-                }}
+                className="m-0 text-sm leading-[1.7] opacity-85"
+                style={{ color: colors.cream }}
               >
                 {event.description}
               </p>
@@ -604,7 +469,7 @@ export function EventHomePage() {
           )}
 
           {/* Bottom padding for safe area */}
-          <div style={{ height: "env(safe-area-inset-bottom, 20px)" }} />
+          <div className="h-safe-bottom" />
         </div>
       </div>
     </div>

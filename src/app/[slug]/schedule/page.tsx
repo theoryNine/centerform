@@ -29,8 +29,8 @@ export default async function SchedulePage({
 
   if (!resolved || resolved.type !== "event") {
     return (
-      <div style={{ minHeight: "100vh", background: "#F5F0E8", padding: "48px 20px", textAlign: "center" }}>
-        <p style={{ fontSize: 14, color: "#8B8680" }}>This page is only available for events.</p>
+      <div className="min-h-screen bg-background px-5 py-12 text-center">
+        <p className="text-sm text-muted-foreground">This page is only available for events.</p>
       </div>
     );
   }
@@ -49,110 +49,72 @@ export default async function SchedulePage({
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F5F0E8", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-      <div style={{ padding: "calc(env(safe-area-inset-top, 16px) + 12px) 20px 0" }}>
+    <div className="min-h-screen bg-background font-sans">
+      <div className="pt-safe px-5">
         <Link
           href={`/${slug}`}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 14,
-            color: "#1A7A6D",
-            textDecoration: "none",
-            fontWeight: 500,
-            marginBottom: 20,
-          }}
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary no-underline"
         >
           <ArrowLeft size={18} />
           Back
         </Link>
 
-        <div style={{ marginBottom: 20 }}>
-          <h1 style={{
-            fontSize: 22,
-            fontWeight: 400,
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            color: "#2D2A26",
-            margin: "0 0 8px 0",
-          }}>
+        <div className="mb-5">
+          <h1 className="mb-2 font-serif text-[22px] font-normal text-foreground">
             Schedule
           </h1>
-          <div style={{ width: "60%", height: 2, background: "#1A7A6D", borderRadius: 1 }} />
+          <div className="h-0.5 w-3/5 rounded-sm bg-primary" />
         </div>
 
-        <p style={{ fontSize: 14, color: "#8B8680", marginBottom: 24 }}>
+        <p className="mb-6 text-sm text-muted-foreground">
           Full event schedule for {resolved.data.name}.
         </p>
       </div>
 
-      <div style={{ padding: "0 20px 40px" }}>
+      <div className="px-5 pb-10">
         {days.length === 0 ? (
-          <p style={{ padding: "48px 0", textAlign: "center", fontSize: 14, color: "#8B8680" }}>
+          <p className="py-12 text-center text-sm text-muted-foreground">
             No schedule items yet.
           </p>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+          <div className="flex flex-col gap-8">
             {days.map(([dayKey, dayItems]) => (
               <div key={dayKey}>
-                <h2 style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  letterSpacing: 2,
-                  color: "#8B8680",
-                  textTransform: "uppercase",
-                  marginBottom: 12,
-                }}>
+                <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[2px] text-muted-foreground">
                   {formatDayLabel(dayItems[0].start_time)}
                 </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div className="flex flex-col gap-3">
                   {dayItems.map((item) => (
                     <div
                       key={item.id}
-                      style={{
-                        background: "#FFFFFF",
-                        borderRadius: 5,
-                        padding: "20px",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
-                      }}
+                      className="card-shadow rounded-[5px] bg-card p-5"
                     >
-                      <div style={{ display: "flex", alignItems: "start", justifyContent: "space-between", gap: 8 }}>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: "#2D2A26", margin: 0 }}>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="m-0 text-[15px] font-semibold text-foreground">
                           {item.title}
                         </p>
                         {item.is_featured && (
-                          <span style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 4,
-                            padding: "3px 10px",
-                            background: "#1A7A6D",
-                            color: "#FFFFFF",
-                            borderRadius: 20,
-                            fontSize: 11,
-                            fontWeight: 600,
-                            flexShrink: 0,
-                          }}>
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground">
                             <Star size={10} />
                             Featured
                           </span>
                         )}
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+                      <div className="mt-2 flex items-center gap-3">
                         {item.location && (
-                          <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#8B8680" }}>
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin size={12} />
                             {item.location}
                           </span>
                         )}
-                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#8B8680" }}>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock size={12} />
                           {formatTime(item.start_time)}
                           {item.end_time && ` – ${formatTime(item.end_time)}`}
                         </span>
                       </div>
                       {item.speaker && (
-                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#8B8680", marginTop: 6 }}>
+                        <span className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
                           <User size={12} />
                           {item.speaker}
                         </span>

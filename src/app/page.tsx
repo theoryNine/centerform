@@ -135,141 +135,63 @@ export default function RootPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(180deg, #1a1612 0%, #0d0b09 100%)",
-        fontFamily: "'Inter', -apple-system, sans-serif",
-        position: "relative",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#1a1612] to-[#0d0b09] font-sans">
       {/* Ambient light */}
       <div
+        className="pointer-events-none absolute left-1/2 top-[30%] size-[400px] -translate-x-1/2"
         style={{
-          position: "absolute",
-          top: "30%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 400,
-          height: 400,
           background: `radial-gradient(circle, rgba(212,180,131,${0.06 * breathe}) 0%, transparent 60%)`,
-          pointerEvents: "none",
         }}
       />
 
       {/* Wax seal as logo */}
       <div
+        className="relative z-[1] flex size-16 items-center justify-center rounded-full"
         style={{
-          width: 64,
-          height: 64,
-          borderRadius: "50%",
           background: "linear-gradient(135deg, #8B2635 0%, #6B1D29 50%, #4A1520 100%)",
           boxShadow: `
             0 4px 16px rgba(139,38,53,0.5),
             0 0 ${20 + breathe * 15}px rgba(139,38,53,${0.3 * breathe}),
             inset 0 2px 4px rgba(255,255,255,0.2)
           `,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          zIndex: 1,
         }}
       >
-        <span
-          style={{
-            fontSize: 22,
-            fontWeight: 600,
-            color: "rgba(255,255,255,0.9)",
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-          }}
-        >
+        <span className="font-serif text-[22px] font-semibold text-white/90">
           C
         </span>
       </div>
 
       {/* Title */}
-      <div
-        style={{
-          marginTop: 24,
-          fontSize: 11,
-          fontWeight: 600,
-          letterSpacing: 3,
-          color: "#8B7355",
-          textTransform: "uppercase",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
+      <div className="relative z-[1] mt-6 text-[11px] font-semibold uppercase tracking-[3px] text-[#8B7355]">
         Centerform
       </div>
 
       {/* Tagline */}
-      <div
-        style={{
-          marginTop: 12,
-          fontSize: 14,
-          color: "#6B5D4D",
-          lineHeight: 1.6,
-          textAlign: "center",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
+      <div className="relative z-[1] mt-3 text-center text-sm leading-relaxed text-[#6B5D4D]">
         Scan a QR code at your venue or event to get started
       </div>
 
       {/* Divider with text */}
-      <div
-        style={{
-          marginTop: 40,
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          width: "100%",
-          maxWidth: 280,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
+      <div className="relative z-[1] mt-10 flex w-full max-w-[280px] items-center gap-4">
         <div
-          style={{
-            flex: 1,
-            height: 1,
-            background: "linear-gradient(90deg, transparent, #C4B498, transparent)",
-          }}
+          className="h-px flex-1"
+          style={{ background: "linear-gradient(90deg, transparent, #C4B498, transparent)" }}
         />
-        <span style={{ fontSize: 11, color: "#6B5D4D", whiteSpace: "nowrap" }}>
+        <span className="whitespace-nowrap text-[11px] text-[#6B5D4D]">
           or search by name
         </span>
         <div
-          style={{
-            flex: 1,
-            height: 1,
-            background: "linear-gradient(90deg, transparent, #C4B498, transparent)",
-          }}
+          className="h-px flex-1"
+          style={{ background: "linear-gradient(90deg, transparent, #C4B498, transparent)" }}
         />
       </div>
 
       {/* Input + button */}
       <form
         onSubmit={handleSubmit}
-        style={{
-          marginTop: 20,
-          display: "flex",
-          gap: 8,
-          width: "100%",
-          maxWidth: 280,
-          position: "relative",
-          zIndex: 1,
-        }}
+        className="relative z-[1] mt-5 flex w-full max-w-[280px] gap-2"
       >
-        <div style={{ flex: 1, position: "relative" }}>
+        <div className="relative flex-1">
           <input
             value={venueCode}
             onChange={(e) => setVenueCode(e.target.value)}
@@ -285,18 +207,10 @@ export default function RootPage() {
             onKeyDown={handleKeyDown}
             placeholder="e.g. the-grand-hotel"
             autoComplete="off"
+            className="w-full bg-white/5 px-4 py-3 font-[inherit] text-sm text-[#e8dcc8] outline-none transition-[border-color,border-radius] duration-200 ease-out"
             style={{
-              width: "100%",
-              padding: "12px 16px",
-              background: "rgba(255,255,255,0.05)",
               border: `1px solid ${focused ? "rgba(212,180,131,0.4)" : "rgba(196,180,152,0.15)"}`,
               borderRadius: showDropdown ? "20px 20px 0 0" : 100,
-              color: "#e8dcc8",
-              fontSize: 14,
-              outline: "none",
-              transition: "border-color 0.2s ease, border-radius 0.15s ease",
-              fontFamily: "inherit",
-              boxSizing: "border-box",
             }}
           />
 
@@ -304,20 +218,9 @@ export default function RootPage() {
           {showDropdown && options.length > 0 && (
             <ul
               ref={dropdownRef}
+              className="absolute inset-x-0 top-full z-10 m-0 list-none overflow-hidden rounded-b-2xl border border-t-0 border-[rgba(212,180,131,0.4)] bg-[rgba(30,26,22,0.98)] p-0"
               style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                right: 0,
-                margin: 0,
-                padding: 0,
-                listStyle: "none",
-                background: "rgba(30, 26, 22, 0.98)",
-                border: "1px solid rgba(212,180,131,0.4)",
                 borderTop: "1px solid rgba(196,180,152,0.1)",
-                borderRadius: "0 0 16px 16px",
-                overflow: "hidden",
-                zIndex: 10,
               }}
             >
               {options.map((option, i) => (
@@ -325,36 +228,29 @@ export default function RootPage() {
                   key={`${option.type}-${option.slug}`}
                   onMouseDown={() => selectVenue(option.slug)}
                   onMouseEnter={() => setHighlightedIndex(i)}
+                  className="cursor-pointer px-4 py-2.5 transition-colors duration-100 ease-out"
                   style={{
-                    padding: "10px 16px",
-                    cursor: "pointer",
                     background:
                       highlightedIndex === i
                         ? "rgba(212,180,131,0.12)"
                         : "transparent",
-                    transition: "background 0.1s ease",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 14, color: "#e8dcc8" }}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-[#e8dcc8]">
                       {option.name}
                     </span>
                     <span
+                      className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide"
                       style={{
-                        fontSize: 9,
-                        fontWeight: 600,
-                        letterSpacing: 0.5,
                         color: option.type === "event" ? "#b39ddb" : "#6bcba0",
-                        textTransform: "uppercase",
                         background: option.type === "event" ? "rgba(179,157,219,0.12)" : "rgba(107,203,160,0.12)",
-                        padding: "2px 6px",
-                        borderRadius: 4,
                       }}
                     >
                       {option.type === "event" ? "Event" : "Venue"}
                     </span>
                   </div>
-                  <div style={{ fontSize: 11, color: "#6B5D4D", marginTop: 2 }}>
+                  <div className="mt-0.5 text-[11px] text-[#6B5D4D]">
                     {option.city || ""}
                   </div>
                 </li>
@@ -371,24 +267,17 @@ export default function RootPage() {
           onMouseLeave={() => setPressed(false)}
           onTouchStart={() => setPressed(true)}
           onTouchEnd={() => setPressed(false)}
+          className="flex size-12 shrink-0 items-center justify-center rounded-full transition-[transform,background] duration-150 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 48,
-            height: 48,
             background: venueCode.trim()
               ? "linear-gradient(135deg, #D4B483 0%, #C4A473 100%)"
               : "rgba(255,255,255,0.05)",
             border: venueCode.trim() ? "none" : "1px solid rgba(196,180,152,0.15)",
-            borderRadius: "50%",
             cursor: venueCode.trim() ? "pointer" : "default",
             boxShadow: venueCode.trim()
               ? `0 4px 16px rgba(212,180,131,0.3), 0 0 ${20 + breathe * 15}px rgba(212,180,131,${0.15 * breathe})`
               : "none",
             transform: pressed && venueCode.trim() ? "scale(0.93)" : "scale(1)",
-            transition: "transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease",
-            flexShrink: 0,
           }}
         >
           <ArrowIcon size={18} color={venueCode.trim() ? "#1a1612" : "#6B5D4D"} />

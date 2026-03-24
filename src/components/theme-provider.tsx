@@ -21,7 +21,7 @@ export function VenueThemeProvider({ theme, children }: ThemeProviderProps) {
     "--background": hexToOklch(theme.background_color),
     "--foreground": hexToOklch(theme.foreground_color),
     "--radius": theme.border_radius ?? "0.625rem",
-    "--font-sans": theme.font_family ?? "Inter",
+    "--font-sans": theme.font_family ?? "DM Sans",
   } as React.CSSProperties;
 
   return (

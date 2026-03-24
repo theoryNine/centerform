@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronDown, Copy, Check } from "lucide-react";
 import type { Service, Venue } from "@/types";
+import { VenueFooter } from "@/components/guest/venue-footer";
 
 // Section definitions — maps service categories to display sections
 const SECTION_CONFIG = [
@@ -54,18 +55,7 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
   return (
     <button
       onClick={handleCopy}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        background: "none",
-        border: "none",
-        padding: 0,
-        cursor: "pointer",
-        fontSize: 13,
-        fontWeight: 600,
-        color: "var(--primary, #1A7A6D)",
-      }}
+      className="inline-flex cursor-pointer items-center gap-1 border-none bg-none p-0 text-[13px] font-semibold text-primary"
     >
       {label && <span>{label}</span>}
       {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -101,96 +91,34 @@ function WifiContent({ network, password }: { network: string; password: string 
   return (
     <div>
       {/* Network row */}
-      <div style={{ marginBottom: 16 }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: 1.5,
-            textTransform: "uppercase",
-            color: "var(--muted-foreground, #8B8680)",
-            marginBottom: 4,
-          }}
-        >
+      <div className="mb-4">
+        <div className="mb-1 text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
           Network
         </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <span
-            style={{
-              fontSize: 16,
-              fontWeight: 600,
-              color: "var(--foreground, #2D2A26)",
-            }}
-          >
+        <div className="flex items-center justify-between">
+          <span className="text-base font-semibold text-foreground">
             {network}
           </span>
         </div>
       </div>
 
       {/* Divider */}
-      <div
-        style={{
-          height: 1,
-          background: "var(--border, #DDD8CE)",
-          marginBottom: 16,
-        }}
-      />
+      <div className="mb-4 h-px bg-border" />
 
       {/* Password row — full-width tap target */}
       <button
         onClick={handleCopyPassword}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          background: "none",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
-          textAlign: "left",
-        }}
+        className="flex w-full cursor-pointer items-center justify-between border-none bg-none p-0 text-left"
       >
         <div>
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-              color: "var(--muted-foreground, #8B8680)",
-              marginBottom: 4,
-            }}
-          >
+          <div className="mb-1 text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
             Password
           </div>
-          <span
-            style={{
-              fontSize: 16,
-              fontWeight: 600,
-              color: "var(--foreground, #2D2A26)",
-            }}
-          >
+          <span className="text-base font-semibold text-foreground">
             {password}
           </span>
         </div>
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: "var(--primary, #1A7A6D)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-            flexShrink: 0,
-          }}
-        >
+        <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
           {copied ? (
             <>
               Copied <Check size={14} />
@@ -227,56 +155,24 @@ function AccordionItem({
   }, [isOpen, children]);
 
   return (
-    <div
-      style={{
-        borderBottom: "1px solid var(--border, #DDD8CE)",
-        marginLeft: -20,
-        marginRight: -20,
-        paddingLeft: 20,
-        paddingRight: 20,
-      }}
-    >
+    <div className="-mx-5 border-b border-border px-5">
       <button
         onClick={onToggle}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          padding: "16px 0",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          textAlign: "left",
-        }}
+        className="flex w-full cursor-pointer items-center justify-between border-none bg-none py-4 text-left"
       >
-        <span
-          style={{
-            fontSize: 15,
-            fontWeight: 500,
-            color: "var(--foreground, #2D2A26)",
-          }}
-        >
+        <span className="text-[15px] font-medium text-foreground">
           {title}
         </span>
         <ChevronDown
           size={18}
-          style={{
-            color: "var(--muted-foreground, #8B8680)",
-            transition: "transform 0.25s ease",
-            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-            flexShrink: 0,
-          }}
+          className={`shrink-0 text-muted-foreground transition-transform duration-[250ms] ease-out ${isOpen ? "rotate-180" : "rotate-0"}`}
         />
       </button>
       <div
-        style={{
-          overflow: "hidden",
-          transition: "height 0.25s ease",
-          height: isOpen ? contentHeight : 0,
-        }}
+        className="overflow-hidden transition-[height] duration-[250ms] ease-out"
+        style={{ height: isOpen ? contentHeight : 0 }}
       >
-        <div ref={contentRef} style={{ paddingBottom: 16 }}>
+        <div ref={contentRef} className="pb-4">
           {children}
         </div>
       </div>
@@ -287,6 +183,29 @@ function AccordionItem({
 function buildMapUrl(address: string): string {
   const encoded = encodeURIComponent(address);
   return `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+}
+
+function SectionTab({
+  section,
+  isActive,
+  onClick,
+}: {
+  section: (typeof SECTION_CONFIG)[number];
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`cursor-pointer rounded-full border-none px-4 py-2 text-[13px] font-medium transition-all duration-200 ease-out ${
+        isActive
+          ? "bg-primary text-primary-foreground"
+          : "bg-transparent text-foreground"
+      }`}
+    >
+      {section.label}
+    </button>
+  );
 }
 
 interface VenueServicesPageProps {
@@ -361,196 +280,81 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
   const fullAddress = [venue.address, venue.city, venue.state].filter(Boolean).join(", ");
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: "var(--background, #F5F0E8)",
-        fontFamily: "var(--font-sans, 'Inter', -apple-system, sans-serif)",
-      }}
-    >
+    <div className="min-h-screen bg-background font-sans">
       {/* Sticky nav — hidden until scroll past header */}
       <div
+        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          background: "var(--background, #F5F0E8)",
           transform: showStickyNav ? "translateY(0)" : "translateY(-100%)",
-          transition: "transform 0.3s ease",
         }}
       >
-        <div
-          style={{
-            paddingTop: "env(safe-area-inset-top, 0px)",
-          }}
-        >
+        <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
           {/* Sticky header row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "12px 20px",
-            }}
-          >
+          <div className="flex items-center px-5 py-3">
             <Link
               href={`/${slug}`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                color: "var(--primary, #1A7A6D)",
-                textDecoration: "none",
-                marginRight: 12,
-              }}
+              className="mr-3 flex items-center text-primary no-underline"
             >
               <ArrowLeft size={20} />
             </Link>
-            <span
-              style={{
-                fontSize: 16,
-                fontWeight: 400,
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: "var(--foreground, #2D2A26)",
-              }}
-            >
+            <span className="font-serif text-base font-normal text-foreground">
               {venueName}
             </span>
           </div>
 
           {/* Section tabs */}
-          <div
-            style={{
-              display: "flex",
-              gap: 0,
-              padding: "0 20px 12px",
-            }}
-          >
+          <div className="flex px-5 pb-3">
             {SECTION_CONFIG.map((section) => (
-              <button
+              <SectionTab
                 key={section.id}
+                section={section}
+                isActive={activeSection === section.id}
                 onClick={() => scrollToSection(section.id)}
-                style={{
-                  padding: "8px 16px",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  border: "none",
-                  borderRadius: 20,
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  background:
-                    activeSection === section.id
-                      ? "var(--primary, #1A7A6D)"
-                      : "transparent",
-                  color:
-                    activeSection === section.id
-                      ? "var(--primary-foreground, #FFFFFF)"
-                      : "var(--foreground, #2D2A26)",
-                }}
-              >
-                {section.label}
-              </button>
+              />
             ))}
           </div>
 
           {/* Divider line — only visible with sticky nav */}
-          <div
-            style={{
-              height: 1,
-              background: "var(--border, #DDD8CE)",
-            }}
-          />
+          <div className="h-px bg-border" />
         </div>
       </div>
 
       {/* Main header area */}
       <div ref={headerRef}>
         {/* Top bar with back arrow and venue name */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            padding: "calc(env(safe-area-inset-top, 0px) + 16px) 20px 12px",
-          }}
-        >
+        <div className="flex items-center px-5" style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}>
           <Link
             href={`/${slug}`}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "var(--primary, #1A7A6D)",
-              textDecoration: "none",
-              marginRight: 12,
-            }}
+            className="mr-3 flex items-center text-primary no-underline"
           >
             <ArrowLeft size={20} />
           </Link>
           <Link
             href={`/${slug}`}
-            style={{
-              fontSize: 16,
-              fontWeight: 400,
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              color: "var(--foreground, #2D2A26)",
-              textDecoration: "none",
-            }}
+            className="font-serif text-base font-normal text-foreground no-underline"
           >
             {venueName}
           </Link>
         </div>
 
         {/* Hero: image + title */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0,
-            minHeight: 180,
-          }}
-        >
+        <div className="flex min-h-[180px] items-center">
           {/* Image — flush left, rounded right */}
-          <div
-            style={{
-              width: "40%",
-              minWidth: 140,
-              maxWidth: 180,
-              height: 180,
-              borderRadius: "0 50% 50% 0",
-              overflow: "hidden",
-              flexShrink: 0,
-              position: "relative",
-            }}
-          >
+          <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
             {venue.cover_image_url ? (
               <img
                 src={venue.cover_image_url}
                 alt={venueName}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                }}
+                className="size-full object-cover"
               />
             ) : (
               <div
+                className="flex size-full items-center justify-center"
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  background:
-                    "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A09680 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A09680 100%)",
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 40,
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    color: "rgba(255,255,255,0.5)",
-                    fontWeight: 300,
-                  }}
-                >
+                <span className="font-serif text-[40px] font-light text-white/50">
                   {venueName.charAt(0)}
                 </span>
               </div>
@@ -558,27 +362,8 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
           </div>
 
           {/* Title */}
-          <div
-            style={{
-              flex: 1,
-              padding: "0 24px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              textAlign: "center",
-            }}
-          >
-            <h1
-              style={{
-                fontSize: 26,
-                fontWeight: 400,
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: "var(--foreground, #2D2A26)",
-                lineHeight: 1.2,
-                margin: 0,
-              }}
-            >
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <h1 className="m-0 font-serif text-[26px] font-normal leading-tight text-foreground">
               Your Room
               <br />
               &amp; Stay
@@ -587,64 +372,26 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
         </div>
 
         {/* Section tabs (inline, before subheader) */}
-        <div
-          style={{
-            display: "flex",
-            gap: 0,
-            padding: "20px 20px 0",
-          }}
-        >
+        <div className="flex px-5 pt-5">
           {SECTION_CONFIG.map((section) => (
-            <button
+            <SectionTab
               key={section.id}
+              section={section}
+              isActive={activeSection === section.id}
               onClick={() => scrollToSection(section.id)}
-              style={{
-                padding: "8px 16px",
-                fontSize: 13,
-                fontWeight: 500,
-                border: "none",
-                borderRadius: 20,
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                background:
-                  activeSection === section.id
-                    ? "var(--primary, #1A7A6D)"
-                    : "transparent",
-                color:
-                  activeSection === section.id
-                    ? "var(--primary-foreground, #FFFFFF)"
-                    : "var(--foreground, #2D2A26)",
-              }}
-            >
-              {section.label}
-            </button>
+            />
           ))}
         </div>
 
         {/* Subheader: address, hours, checkout */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "16px 20px",
-            gap: 16,
-            fontSize: 12,
-            color: "var(--muted-foreground, #8B8680)",
-          }}
-        >
+        <div className="flex justify-between gap-4 px-5 py-4 text-xs text-muted-foreground">
           <div>
             {venue.address && (
               <a
                 href={buildMapUrl(fullAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  color: "var(--primary, #1A7A6D)",
-                  textDecoration: "none",
-                  fontWeight: 500,
-                  lineHeight: 1.4,
-                  display: "block",
-                }}
+                className="block font-medium leading-snug text-primary no-underline"
               >
                 {venue.address}
                 {venue.city && (
@@ -657,9 +404,9 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
               </a>
             )}
           </div>
-          <div style={{ textAlign: "right", lineHeight: 1.5 }}>
+          <div className="text-right leading-relaxed">
             <div>Front Desk: 7am–10pm</div>
-            <div style={{ fontWeight: 600, color: "var(--foreground, #2D2A26)" }}>
+            <div className="font-semibold text-foreground">
               Check out by 11:00 AM
             </div>
           </div>
@@ -667,7 +414,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
       </div>
 
       {/* Accordion sections */}
-      <div style={{ padding: "0 20px 40px" }}>
+      <div className="px-5 pb-10">
         {sectionServices.map((section) => (
           <div
             key={section.id}
@@ -676,63 +423,25 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
             }}
           >
             {/* Section header */}
-            <div style={{ padding: "24px 0 8px" }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                <span
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: "var(--primary, #1A7A6D)",
-                    fontFamily: "var(--font-sans, 'Inter', sans-serif)",
-                  }}
-                >
+            <div className="pb-2 pt-6">
+              <div className="flex items-baseline gap-2">
+                <span className="text-xs font-medium text-primary">
                   {section.number}
                 </span>
-                <span style={{ color: "var(--muted-foreground, #8B8680)", fontSize: 12 }}>
+                <span className="text-xs text-muted-foreground">
                   ·
                 </span>
-                <h2
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 400,
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    color: "var(--foreground, #2D2A26)",
-                    margin: 0,
-                  }}
-                >
+                <h2 className="m-0 font-serif text-2xl font-normal text-foreground">
                   {section.title}
                 </h2>
               </div>
-              <div
-                style={{
-                  marginLeft: -20,
-                  width: "calc(60% + 20px)",
-                  height: 1,
-                  background: "var(--primary, #1A7A6D)",
-                  marginTop: 8,
-                }}
-              />
+              <div className="-ml-5 mt-2 h-px w-[calc(60%+20px)] bg-primary" />
             </div>
 
             {/* Accordion card */}
-            <div
-              style={{
-                background: "var(--card, #FFFFFF)",
-                borderRadius: 5,
-                padding: "0 20px",
-                boxShadow:
-                  "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
-              }}
-            >
+            <div className="card-shadow rounded-[5px] bg-card px-5">
               {section.services.length === 0 ? (
-                <div
-                  style={{
-                    padding: "24px 0",
-                    textAlign: "center",
-                    fontSize: 13,
-                    color: "var(--muted-foreground, #8B8680)",
-                  }}
-                >
+                <div className="py-6 text-center text-[13px] text-muted-foreground">
                   No items yet.
                 </div>
               ) : (
@@ -757,14 +466,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
                         />
                       ) : (
                         service.description && (
-                          <p
-                            style={{
-                              fontSize: 13,
-                              color: "var(--muted-foreground, #8B8680)",
-                              lineHeight: 1.6,
-                              margin: 0,
-                            }}
-                          >
+                          <p className="m-0 text-[13px] leading-relaxed text-muted-foreground">
                             {service.description}
                           </p>
                         )
@@ -778,51 +480,12 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
         ))}
       </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          textAlign: "center",
-          padding: "0 20px 16px",
-        }}
-      >
-        <div
-          style={{
-            fontSize: 16,
-            fontWeight: 400,
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            color: "var(--foreground, #2D2A26)",
-            marginBottom: 4,
-          }}
-        >
-          {venueName}
-        </div>
-        <div
-          style={{
-            fontSize: 13,
-            fontStyle: "italic",
-            color: "var(--muted-foreground, #8B8680)",
-            marginBottom: 8,
-          }}
-        >
-          If you need anything at all
-        </div>
-        {venue.phone && (
-          <a
-            href={`tel:${venue.phone.replace(/\D/g, "")}`}
-            style={{
-              fontSize: 14,
-              color: "var(--primary, #1A7A6D)",
-              textDecoration: "none",
-              fontWeight: 600,
-            }}
-          >
-            {venue.phone}
-          </a>
-        )}
+      <div className="px-5">
+        <VenueFooter venueName={venueName} phone={venue.phone} />
       </div>
 
       {/* Bottom safe area */}
-      <div style={{ height: "env(safe-area-inset-bottom, 20px)" }} />
+      <div className="h-safe-bottom" />
     </div>
   );
 }
