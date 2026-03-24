@@ -41,6 +41,28 @@ src/
 └── hooks/                  # React hooks
 ```
 
+## Database Schema
+
+Core tables (migrations in `supabase/migrations/`):
+
+- **venues** — venue profiles (name, slug, address, type, etc.)
+- **venue_themes** — per-venue color/font theming (1:1 with venues)
+- **venue_members** — links users to venues with roles (owner/admin/staff)
+- **services** — detailed venue service descriptions (WiFi instructions, housekeeping details, etc.)
+- **events** — venue-hosted events (wine hour, live jazz, etc.)
+- **nearby_places** — recommended spots near the venue
+- **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
+- **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.)
+- **standalone_events** — events independent of venues (conferences, festivals, weddings)
+- **standalone_event_themes** — theming for standalone events
+- **standalone_event_members** — user roles for standalone events
+- **event_schedule_items** — schedule/agenda for standalone events
+
+Key patterns:
+- All tables use UUID primary keys and `updated_at` triggers
+- RLS: public read access, write restricted to venue/event members by role
+- Slugs are globally unique across venues and standalone events (enforced by trigger)
+
 ## Conventions
 
 - **Formatting**: Double quotes, semicolons, 2-space indent, trailing commas, 100 char width
