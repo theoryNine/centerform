@@ -2,6 +2,8 @@ export type VenueType = "hotel" | "resort" | "museum" | "event_space" | "other";
 export type MemberRole = "owner" | "admin" | "staff";
 export type ServiceCategory = "room_service" | "spa" | "concierge" | "dining" | "transportation" | "activities" | "other";
 export type PlaceCategory = "restaurant" | "bar" | "cafe" | "attraction" | "shopping" | "entertainment" | "outdoors" | "other";
+export type AmenityCategory = "general" | "room" | "bathroom" | "kitchen" | "dining" | "recreation" | "business" | "wellness" | "parking" | "accessibility" | "family" | "safety" | "outdoor";
+export type InfoCategory = "general" | "policies" | "hours" | "payments";
 
 export interface Venue {
   id: string;
@@ -88,6 +90,30 @@ export interface NearbyPlace {
   website: string | null;
   image_url: string | null;
   is_featured: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VenueAmenity {
+  id: string;
+  venue_id: string;
+  category: AmenityCategory;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  is_available: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VenueInfo {
+  id: string;
+  venue_id: string;
+  category: InfoCategory;
+  key: string;
+  value: string;
   display_order: number;
   created_at: string;
   updated_at: string;

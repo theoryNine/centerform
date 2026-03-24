@@ -42,6 +42,70 @@ export async function getNearbyPlaces(venueId: string) {
   return data ?? [];
 }
 
+export async function getVenueAmenities(venueId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_amenities")
+    .select("*")
+    .eq("venue_id", venueId)
+    .eq("is_available", true)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
+export async function getVenueAmenitiesByCategory(venueId: string, category: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_amenities")
+    .select("*")
+    .eq("venue_id", venueId)
+    .eq("category", category)
+    .eq("is_available", true)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
+export async function getVenueInfo(venueId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_info")
+    .select("*")
+    .eq("venue_id", venueId)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
+export async function getVenueInfoByCategory(venueId: string, category: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_info")
+    .select("*")
+    .eq("venue_id", venueId)
+    .eq("category", category)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
+export async function getAllVenueAmenities(venueId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_amenities")
+    .select("*")
+    .eq("venue_id", venueId)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
+export async function getAllVenueInfo(venueId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_info")
+    .select("*")
+    .eq("venue_id", venueId)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
 export async function getEventScheduleItems(eventId: string) {
   const supabase = await createClient();
   const { data } = await supabase
