@@ -89,6 +89,8 @@ export interface NearbyPlace {
   phone: string | null;
   website: string | null;
   image_url: string | null;
+  area: string | null;
+  area_display_order: number;
   is_featured: boolean;
   display_order: number;
   created_at: string;

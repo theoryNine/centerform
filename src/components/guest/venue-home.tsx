@@ -103,7 +103,7 @@ export function VenueHomePage() {
     {
       label: `Explore ${cityName}`,
       sublabel: "Let us show you around town",
-      href: `/${slug}/dining`,
+      href: `/${slug}/explore`,
       image: "/images/explore-placeholder.jpg",
     },
   ];

@@ -27,7 +27,7 @@ src/
 │   ├── (auth)/             # Sign-in/sign-up routes
 │   ├── api/auth/           # NextAuth API handler
 │   ├── dashboard/          # Protected admin routes (venue, events)
-│   └── [slug]/             # Public venue/event pages (info, dining, events, etc.)
+│   └── [slug]/             # Public venue/event pages (services, dining, explore, events, concierge, etc.)
 ├── components/
 │   ├── ui/                 # shadcn/ui components
 │   └── guest/              # Page-specific components
@@ -50,7 +50,7 @@ Core tables (migrations in `supabase/migrations/`):
 - **venue_members** — links users to venues with roles (owner/admin/staff)
 - **services** — detailed venue service descriptions (WiFi instructions, housekeeping details, etc.)
 - **events** — venue-hosted events (wine hour, live jazz, etc.)
-- **nearby_places** — recommended spots near the venue
+- **nearby_places** — recommended spots near the venue, grouped by `area` (e.g. "Ballard", "Seattle", "Beyond Seattle") for the Explore page
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
 - **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.)
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
