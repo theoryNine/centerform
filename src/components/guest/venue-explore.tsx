@@ -138,7 +138,7 @@ function AreaSectionView({
           </span>
           <span className="text-[8px] text-primary">·</span>
           <h2 className="m-0 mb-2 font-serif text-[20px] font-normal text-foreground">
-            In {section.name}
+            {section.name.toLowerCase().startsWith("beyond") ? section.name : `In ${section.name}`}
           </h2>
         </div>
         <div className="-ml-5 h-0.5 w-[calc(60%+20px)] bg-primary" />
