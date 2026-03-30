@@ -343,7 +343,7 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
           </div>
         </div>
 
-        <VenueFooter venueName={venueName} phone={venue.phone} />
+        <VenueFooter venueName={venueName} address={venue.address} phone={venue.phone} />
 
         {/* Bottom safe area */}
         <div className="h-safe-bottom" />

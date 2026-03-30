@@ -1,15 +1,16 @@
 interface VenueFooterProps {
   venueName: string;
+  address?: string | null;
   phone?: string | null;
 }
 
-export function VenueFooter({ venueName, phone }: VenueFooterProps) {
+export function VenueFooter({ venueName, address, phone }: VenueFooterProps) {
   return (
     <div className="pb-4 pt-6 text-center">
       <div className="mb-1 font-serif text-sm font-medium text-foreground">
         {venueName}
       </div>
-      <p className="mb-1 text-[13px] text-muted-foreground">If you need anything at all</p>
+      {address && <p className="mb-1 text-[13px] text-muted-foreground">{address}</p>}
       {phone && (
         <a
           href={`tel:${phone.replace(/\D/g, "")}`}

@@ -481,7 +481,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
       </div>
 
       <div className="px-5">
-        <VenueFooter venueName={venueName} phone={venue.phone} />
+        <VenueFooter venueName={venueName} address={venue.address} phone={venue.phone} />
       </div>
 
       {/* Bottom safe area */}
