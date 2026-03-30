@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { ConciergePrompt } from "@/components/guest/concierge-prompt";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 interface AreaSection {
@@ -245,7 +245,6 @@ interface VenueExplorePageProps {
 }
 
 export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps) {
-  const router = useRouter();
   const venueName = venue.name;
   const cityName = venue.city ?? "the Area";
   const sections = groupByArea(places);
@@ -350,28 +349,11 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
             Or just ask.
           </h2>
 
-          <div className="card-shadow rounded-[5px] bg-card p-5">
-            <button
-              onClick={() => router.push(`/${slug}/concierge`)}
-              className="mb-3 w-full cursor-pointer rounded-[5px] border border-border bg-background px-4 py-3 text-left text-sm text-muted-foreground"
-            >
-              What are you in the mood for?
-            </button>
-
-            <div className="flex flex-wrap gap-2">
-              {["I'm hungry", "Something free", "Kid-friendly", "Surprise me"].map(
-                (chip) => (
-                  <button
-                    key={chip}
-                    onClick={() => router.push(`/${slug}/concierge`)}
-                    className="cursor-pointer whitespace-nowrap rounded-full border border-border bg-transparent px-4 py-2 text-[13px] text-foreground transition-colors duration-150 ease-out hover:bg-secondary"
-                  >
-                    {chip}
-                  </button>
-                ),
-              )}
-            </div>
-          </div>
+          <ConciergePrompt
+            slug={slug}
+            placeholder="What are you in the mood for?"
+            chips={["I'm hungry", "Something free", "Kid-friendly", "Surprise me"]}
+          />
         </div>
 
         <VenueFooter venueName={venueName} address={venue.address} phone={venue.phone} />

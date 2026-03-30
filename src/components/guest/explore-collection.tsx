@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { ConciergePrompt } from "@/components/guest/concierge-prompt";
 import type {
   ExploreCollectionWithItems,
   CollectionItemWithPlace,
@@ -261,9 +261,6 @@ function SomethingElse({
   slug: string;
   otherCollections: ExploreCollection[];
 }) {
-  const router = useRouter();
-  const chips = ["I'm hungry", "Something free", "Kid-friendly", "Surprise me"];
-
   return (
     <div className="mt-10">
       <h2 className="m-0 mb-1 text-center font-serif text-[22px] font-normal text-foreground">
@@ -273,24 +270,11 @@ function SomethingElse({
         Tell us what you&apos;re in the mood for.
       </p>
 
-      <button
-        onClick={() => router.push(`/${slug}/concierge`)}
-        className="mb-3 w-full cursor-pointer rounded-[5px] border border-border bg-background px-4 py-3 text-left text-[13px] text-muted-foreground"
-      >
-        Show me something different...
-      </button>
-
-      <div className="flex flex-wrap gap-2">
-        {chips.map((chip) => (
-          <button
-            key={chip}
-            onClick={() => router.push(`/${slug}/concierge`)}
-            className="cursor-pointer whitespace-nowrap rounded-full border border-border bg-transparent px-4 py-2 text-[13px] text-foreground"
-          >
-            {chip}
-          </button>
-        ))}
-      </div>
+      <ConciergePrompt
+        slug={slug}
+        placeholder="Show me something different..."
+        chips={["I'm hungry", "Something free", "Kid-friendly", "Surprise me"]}
+      />
 
       {otherCollections.length > 0 && (
         <div className="mt-6">

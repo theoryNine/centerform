@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { VenueEvent } from "@/types";
 import { Phone, ArrowRight } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { ConciergePrompt } from "@/components/guest/concierge-prompt";
 
 function formatVenueName(slug: string) {
   return slug
@@ -298,28 +299,7 @@ export function VenueHomePage() {
               Ask us anything about your stay or the neighborhood.
             </p>
 
-            <div className="card-shadow rounded-[5px] bg-card p-5">
-              <button
-                onClick={() => router.push(`/${slug}/concierge`)}
-                className="mb-3 w-full cursor-pointer rounded-[5px] border border-border bg-background px-4 py-3 text-left text-sm text-muted-foreground"
-              >
-                What are you looking for?
-              </button>
-
-              <div className="flex flex-wrap gap-2">
-                {["Dinner tonight", "Coffee nearby", "Late checkout", "Happy hour"].map(
-                  (chip) => (
-                    <button
-                      key={chip}
-                      onClick={() => router.push(`/${slug}/concierge`)}
-                      className="cursor-pointer whitespace-nowrap rounded-full border border-border bg-transparent px-4 py-2 text-[13px] text-foreground transition-colors duration-150 ease-out hover:bg-secondary"
-                    >
-                      {chip}
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
+            <ConciergePrompt slug={slug} />
           </div>
 
           <VenueFooter venueName={venueName} address={venue?.address} phone={venue?.phone} />
