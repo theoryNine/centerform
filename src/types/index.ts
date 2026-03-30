@@ -93,6 +93,11 @@ export interface NearbyPlace {
   area_display_order: number;
   is_featured: boolean;
   display_order: number;
+  tagline: string | null;
+  hours: string | null;
+  tips: string[] | null;
+  cta_label: string | null;
+  collection_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -193,6 +198,43 @@ export interface EventScheduleItem {
 
 export interface StandaloneEventWithTheme extends StandaloneEvent {
   standalone_event_themes: StandaloneEventTheme | null;
+}
+
+// --- Explore Collections ---
+
+export type CollectionLayout = "cards" | "timeline";
+
+export interface ExploreCollection {
+  id: string;
+  venue_id: string;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  layout: CollectionLayout;
+  area: string | null;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ExploreCollectionItem {
+  id: string;
+  collection_id: string;
+  place_id: string;
+  display_order: number;
+  time_label: string | null;
+  is_start: boolean;
+  is_end: boolean;
+  created_at: string;
+}
+
+export interface CollectionItemWithPlace extends ExploreCollectionItem {
+  place: NearbyPlace;
+}
+
+export interface ExploreCollectionWithItems extends ExploreCollection {
+  items: CollectionItemWithPlace[];
 }
 
 // --- Shared types ---

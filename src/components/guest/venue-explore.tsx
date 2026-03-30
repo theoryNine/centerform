@@ -31,9 +31,18 @@ function groupByArea(places: NearbyPlace[]): AreaSection[] {
   return Array.from(map.values()).sort((a, b) => a.displayOrder - b.displayOrder);
 }
 
-function PlaceCardList({ place }: { place: NearbyPlace }) {
+function placeHref(slug: string, place: NearbyPlace): string {
+  return place.collection_id
+    ? `/${slug}/explore/${place.collection_id}`
+    : `/${slug}/explore/place/${place.id}`;
+}
+
+function PlaceCardList({ place, slug }: { place: NearbyPlace; slug: string }) {
   return (
-    <div className="card-shadow flex items-center gap-4 overflow-hidden rounded-[5px] bg-card">
+    <Link
+      href={placeHref(slug, place)}
+      className="card-shadow flex items-center gap-4 overflow-hidden rounded-[5px] bg-card no-underline"
+    >
       {/* Thumbnail */}
       <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
         {place.image_url ? (
@@ -70,13 +79,16 @@ function PlaceCardList({ place }: { place: NearbyPlace }) {
         size={16}
         className="mr-4 shrink-0 text-primary"
       />
-    </div>
+    </Link>
   );
 }
 
-function PlaceCardGrid({ place }: { place: NearbyPlace }) {
+function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
   return (
-    <div className="card-shadow overflow-hidden rounded-[5px] bg-card">
+    <Link
+      href={placeHref(slug, place)}
+      className="card-shadow block overflow-hidden rounded-[5px] bg-card no-underline"
+    >
       {/* Image */}
       <div className="aspect-[4/3] w-full overflow-hidden rounded-t-[5px]">
         {place.image_url ? (
@@ -107,16 +119,18 @@ function PlaceCardGrid({ place }: { place: NearbyPlace }) {
           </p>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
 
 function AreaSectionView({
   section,
   index,
+  slug,
 }: {
   section: AreaSection;
   index: number;
+  slug: string;
 }) {
   const sectionNumber = String(index + 1).padStart(2, "0");
   const { places } = section;
@@ -124,9 +138,16 @@ function AreaSectionView({
   // First section uses list layout, subsequent sections use grid
   const useListLayout = index === 0;
 
+  // List layout: cap at 4, show "See more" if there are additional items
+  const LIST_MAX = 4;
+  const visiblePlaces = useListLayout ? places.slice(0, LIST_MAX) : places;
+  const hasMore = useListLayout && places.length > LIST_MAX;
+
   // For grid layout: featured items get full width, rest are 2-column
   const featuredPlace = places.find((p) => p.is_featured);
   const regularPlaces = places.filter((p) => !p.is_featured);
+
+  const areaHref = `/${slug}/explore/area/${encodeURIComponent(section.name)}`;
 
   return (
     <div className="mb-8">
@@ -145,10 +166,10 @@ function AreaSectionView({
       </div>
 
       {useListLayout ? (
-        /* List layout for first section */
+        /* List layout for first section — capped at 4 */
         <div className="flex flex-col gap-3">
-          {places.map((place) => (
-            <PlaceCardList key={place.id} place={place} />
+          {visiblePlaces.map((place) => (
+            <PlaceCardList key={place.id} place={place} slug={slug} />
           ))}
         </div>
       ) : (
@@ -156,7 +177,10 @@ function AreaSectionView({
         <div>
           {/* Featured card — full width */}
           {featuredPlace && (
-            <div className="card-shadow mb-3 overflow-hidden rounded-[5px] bg-card">
+            <Link
+              href={placeHref(slug, featuredPlace)}
+              className="card-shadow mb-3 block overflow-hidden rounded-[5px] bg-card no-underline"
+            >
               <div className="aspect-[16/9] w-full overflow-hidden rounded-t-[5px]">
                 {featuredPlace.image_url ? (
                   <img
@@ -184,25 +208,32 @@ function AreaSectionView({
                   </p>
                 )}
               </div>
-            </div>
+            </Link>
           )}
 
           {/* 2-column grid */}
           <div className="grid grid-cols-2 gap-3">
             {regularPlaces.map((place) => (
-              <PlaceCardGrid key={place.id} place={place} />
+              <PlaceCardGrid key={place.id} place={place} slug={slug} />
             ))}
           </div>
         </div>
       )}
 
       {/* See more link — right aligned */}
-      <div className="mt-3 flex justify-end">
-        <span className="flex items-center gap-1 text-[13px] font-medium text-primary">
-          See more in {section.name}
-          <ArrowRight size={14} />
-        </span>
-      </div>
+      {(hasMore || !useListLayout) && (
+        <div className="mt-3 flex justify-end">
+          <Link
+            href={areaHref}
+            className="flex items-center gap-1 text-[13px] font-medium text-primary no-underline"
+          >
+            {section.name.startsWith("Beyond")
+              ? `See more ${section.name.replace("Beyond", "beyond")}`
+              : `See more in ${section.name}`}
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
@@ -309,7 +340,7 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
           </p>
         ) : (
           sections.map((section, i) => (
-            <AreaSectionView key={section.name} section={section} index={i} />
+            <AreaSectionView key={section.name} section={section} index={i} slug={slug} />
           ))
         )}
 
