@@ -194,12 +194,16 @@ export async function getExploreCollectionWithItems(
   if (!data) return null;
 
   const items = ((data.explore_collection_items as unknown[]) ?? [])
+    .sort((a, b) => {
+      const ai = a as Record<string, unknown>;
+      const bi = b as Record<string, unknown>;
+      return (ai.display_order as number) - (bi.display_order as number);
+    })
     .map((i: unknown) => {
       const item = i as Record<string, unknown>;
       const { nearby_places, ...rest } = item;
       return { ...(rest as object), place: nearby_places as NearbyPlace };
-    })
-    .sort((a, b) => (a as { display_order: number }).display_order - (b as { display_order: number }).display_order);
+    });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { explore_collection_items: _, ...collection } = data as Record<string, unknown>;
