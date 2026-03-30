@@ -109,7 +109,7 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
   return (
     <div className="flex items-start gap-3">
       {/* Dot on timeline */}
-      <div className="relative z-10 mt-[18px] h-2 w-2 shrink-0 rounded-full bg-muted-foreground/40" />
+      <div className="relative z-10 mt-[6px] -ml-[2px] h-2 w-2 shrink-0 rounded-full bg-muted-foreground/60" />
 
       {/* Card */}
       <Link
