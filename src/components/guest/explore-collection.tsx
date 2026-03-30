@@ -70,20 +70,21 @@ function CollectionHeader({
   subtitle: string | null;
 }) {
   return (
-    <div className="relative mx-0 mb-5 px-4 py-6 text-center">
+    <div className="card-shadow relative mb-5 rounded-[5px] bg-card px-4 py-6 text-center">
       {/* Corner brackets */}
-      <span className="absolute left-0 top-0 inline-block h-4 w-4 border-l border-t border-foreground/25" />
-      <span className="absolute right-0 top-0 inline-block h-4 w-4 border-r border-t border-foreground/25" />
-      <span className="absolute bottom-0 left-0 inline-block h-4 w-4 border-b border-l border-foreground/25" />
-      <span className="absolute bottom-0 right-0 inline-block h-4 w-4 border-b border-r border-foreground/25" />
+      <span className="absolute inline-block h-4 w-4 border-l-2 border-t-2 border-foreground/25" style={{ top: 10, left: 10 }} />
+      <span className="absolute inline-block h-4 w-4 border-r-2 border-t-2 border-foreground/25" style={{ top: 10, right: 10 }} />
+      <span className="absolute inline-block h-4 w-4 border-b-2 border-l-2 border-foreground/25" style={{ bottom: 10, left: 10 }} />
+      <span className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25" style={{ bottom: 10, right: 10 }} />
 
       <h1 className="m-0 font-serif text-[26px] font-normal leading-tight text-foreground">
         {title}
       </h1>
-      {/* Decorative underline */}
-      <div className="mx-auto my-3 h-px w-12 bg-foreground/20" />
       {subtitle && (
-        <p className="m-0 text-[13px] text-muted-foreground">{subtitle}</p>
+        <>
+          <div className="mx-auto my-3 h-[1.0px] w-15 bg-foreground/25" />
+          <p className="m-0 text-[13px] text-muted-foreground">{subtitle}</p>
+        </>
       )}
     </div>
   );
