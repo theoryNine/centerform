@@ -76,9 +76,9 @@ function PlaceCardList({ place }: { place: NearbyPlace }) {
 
 function PlaceCardGrid({ place }: { place: NearbyPlace }) {
   return (
-    <div className="overflow-hidden rounded-[5px]">
+    <div className="card-shadow overflow-hidden rounded-[5px] bg-card">
       {/* Image */}
-      <div className="aspect-[4/3] w-full overflow-hidden rounded-[5px]">
+      <div className="aspect-[4/3] w-full overflow-hidden rounded-t-[5px]">
         {place.image_url ? (
           <img
             src={place.image_url}
@@ -97,7 +97,7 @@ function PlaceCardGrid({ place }: { place: NearbyPlace }) {
       </div>
 
       {/* Text below image */}
-      <div className="py-2.5">
+      <div className="px-3 py-2.5">
         <p className="m-0 text-[13px] font-semibold leading-tight text-foreground">
           {place.name}
         </p>
@@ -156,8 +156,8 @@ function AreaSectionView({
         <div>
           {/* Featured card — full width */}
           {featuredPlace && (
-            <div className="mb-3">
-              <div className="aspect-[16/9] w-full overflow-hidden rounded-[5px]">
+            <div className="card-shadow mb-3 overflow-hidden rounded-[5px] bg-card">
+              <div className="aspect-[16/9] w-full overflow-hidden rounded-t-[5px]">
                 {featuredPlace.image_url ? (
                   <img
                     src={featuredPlace.image_url}
@@ -174,7 +174,7 @@ function AreaSectionView({
                   />
                 )}
               </div>
-              <div className="py-2.5">
+              <div className="px-4 py-2.5">
                 <p className="m-0 text-[14px] font-semibold text-foreground">
                   {featuredPlace.name}
                 </p>
