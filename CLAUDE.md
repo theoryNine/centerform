@@ -1,6 +1,6 @@
 # Centerform
 
-Digital concierge platform (PWA) for venues and standalone events. Built with Next.js App Router, Supabase, and Capacitor for mobile.
+Digital concierge platform (PWA) for venues, standalone events, and cruise ships. Built with Next.js App Router, Supabase, and Capacitor for mobile.
 
 ## Tech Stack
 
@@ -27,10 +27,28 @@ src/
 │   ├── (auth)/             # Sign-in/sign-up routes
 │   ├── api/auth/           # NextAuth API handler
 │   ├── dashboard/          # Protected admin routes (venue, events)
-│   └── [slug]/             # Public venue/event pages (services, dining, explore, events, concierge, etc.)
+│   └── [slug]/             # Public venue/event pages
+│       ├── page.tsx        # Routes to VenueHomePage, CruiseHomePage, or EventHomePage by type
+│       ├── services/       # Hotel "Your Room & Stay" (accordion)
+│       ├── dining/         # Hotel dining
+│       ├── explore/        # Explore hub + collections + place listings
+│       ├── concierge/      # Concierge chat
+│       ├── ship-info/      # Cruise: accordion info (Welcome Aboard / Amenities / Entertainment)
+│       ├── food-onboard/   # Cruise: restaurant list grouped by sit_down vs walk_up
+│       │   └── [restaurantId]/  # Cruise: individual restaurant detail page
+│       ├── group-plan/     # Cruise: day-by-day timeline with scrolling pill selector
+│       └── the-crew/       # Cruise: crew/group member listing
 ├── components/
 │   ├── ui/                 # shadcn/ui components
 │   └── guest/              # Page-specific components
+│       ├── venue-home.tsx          # Hotel homepage
+│       ├── venue-services.tsx      # Hotel services accordion
+│       ├── cruise-home.tsx         # Cruise homepage
+│       ├── cruise-ship-info.tsx    # Cruise ship info accordion
+│       ├── cruise-food-onboard.tsx # Cruise restaurant list
+│       ├── cruise-restaurant-listing.tsx  # Cruise restaurant detail
+│       ├── cruise-group-plan.tsx   # Cruise itinerary timeline with day pills
+│       └── cruise-crew.tsx         # Cruise crew listing
 ├── lib/
 │   ├── auth.ts             # NextAuth config
 │   ├── queries.ts          # Supabase query functions
@@ -55,6 +73,10 @@ Core tables (migrations in `supabase/migrations/`):
 - **explore_collection_items** — ordered join table linking a collection to its `nearby_places`. Supports `time_label`, `is_start`, and `is_end` for the timeline variant
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
 - **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.)
+- **cruise_restaurants** — dining venues on a cruise ship. `restaurant_type`: `sit_down` | `walk_up`. Linked from `cruise_itinerary_items` via optional `restaurant_id` FK.
+- **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item to a restaurant detail page.
+- **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
+- **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
 - **standalone_event_themes** — theming for standalone events
 - **standalone_event_members** — user roles for standalone events
@@ -64,6 +86,33 @@ Key patterns:
 - All tables use UUID primary keys and `updated_at` triggers
 - RLS: public read access, write restricted to venue/event members by role
 - Slugs are globally unique across venues and standalone events (enforced by trigger)
+- `venue_type = "cruise"` routes to cruise-specific pages; hotel/resort/etc. routes to the standard venue pages. The `[slug]/page.tsx` checks `venue_type` to dispatch to the right homepage component.
+
+## Cruise Ship Architecture
+
+Four pages under `/:slug/` for `venue_type = "cruise"`. All four routes return 404 for non-cruise venues.
+
+```
+Cruise home       /:slug                          (cruise-home.tsx)
+Ship Info         /:slug/ship-info                (cruise-ship-info.tsx)
+Food Onboard      /:slug/food-onboard             (cruise-food-onboard.tsx)
+  └── Detail      /:slug/food-onboard/[id]        (cruise-restaurant-listing.tsx)
+Group Plan        /:slug/group-plan               (cruise-group-plan.tsx)
+The Crew          /:slug/the-crew                 (cruise-crew.tsx)
+```
+
+**Ship Info** uses the existing `services` table with three cruise-specific categories:
+- `welcome_aboard` → section 01 Welcome Aboard
+- `ship_amenities` → section 02 Amenities
+- `ship_entertainment` → section 03 Entertainment
+
+**Food Onboard** groups `cruise_restaurants` into Sit Down Restaurants (`restaurant_type = "sit_down"`) and Walk Up Eateries (`restaurant_type = "walk_up"`). Each row links to an individual detail page.
+
+**Group Plan** renders a day-by-day timeline. `is_start=true` items are parsed as day headers and drive horizontal scrolling pill navigation at the top. Selecting a pill filters the timeline to show only that day's items. Items with `restaurant_id` set render as tappable cards linking to the restaurant detail page.
+
+**Cruise home** fetches `cruise_links` client-side (same pattern as venue-home fetching today's events) and renders them as a Links section.
+
+**Sample cruise**: "Ansel & Adam's Anniversary" at slug `ansel-adam` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migration `012_sample_anniversary_cruise.sql`.
 
 ## Explore Page Architecture
 

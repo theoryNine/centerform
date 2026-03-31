@@ -1,6 +1,6 @@
-export type VenueType = "hotel" | "resort" | "museum" | "event_space" | "other";
+export type VenueType = "hotel" | "resort" | "museum" | "event_space" | "cruise" | "other";
 export type MemberRole = "owner" | "admin" | "staff";
-export type ServiceCategory = "room_service" | "spa" | "concierge" | "dining" | "transportation" | "activities" | "other";
+export type ServiceCategory = "room_service" | "spa" | "concierge" | "dining" | "transportation" | "activities" | "other" | "welcome_aboard" | "ship_amenities" | "ship_entertainment";
 export type PlaceCategory = "restaurant" | "bar" | "cafe" | "attraction" | "shopping" | "entertainment" | "outdoors" | "other";
 export type AmenityCategory = "general" | "room" | "bathroom" | "kitchen" | "dining" | "recreation" | "business" | "wellness" | "parking" | "accessibility" | "family" | "safety" | "outdoor";
 export type InfoCategory = "general" | "policies" | "hours" | "payments";
@@ -235,6 +235,71 @@ export interface CollectionItemWithPlace extends ExploreCollectionItem {
 
 export interface ExploreCollectionWithItems extends ExploreCollection {
   items: CollectionItemWithPlace[];
+}
+
+// --- Cruise Ship ---
+
+export type CruiseRestaurantType = "sit_down" | "walk_up";
+
+export interface CruiseRestaurant {
+  id: string;
+  venue_id: string;
+  name: string;
+  description: string | null;
+  cuisine_type: string | null;
+  deck: string | null;
+  hours: string | null;
+  image_url: string | null;
+  phone: string | null;
+  website: string | null;
+  price_level: number | null;
+  restaurant_type: CruiseRestaurantType;
+  is_featured: boolean;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CruiseItineraryItem {
+  id: string;
+  venue_id: string;
+  title: string;
+  description: string | null;
+  location: string | null;
+  time_label: string | null;
+  image_url: string | null;
+  restaurant_id: string | null;
+  is_start: boolean;
+  is_end: boolean;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CruiseLink {
+  id: string;
+  venue_id: string;
+  label: string;
+  url: string;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CruiseCrewMember {
+  id: string;
+  venue_id: string;
+  name: string;
+  role: string;
+  bio: string | null;
+  image_url: string | null;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // --- Shared types ---

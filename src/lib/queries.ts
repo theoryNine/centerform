@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { NearbyPlace, ExploreCollectionWithItems } from "@/types";
+import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseCrewMember, CruiseLink } from "@/types";
 
 export async function getVenueBySlug(slug: string) {
   const supabase = await createClient();
@@ -227,4 +227,61 @@ export async function getAllEventScheduleItems(eventId: string) {
     .eq("event_id", eventId)
     .order("start_time", { ascending: true });
   return data ?? [];
+}
+
+// ─── Cruise queries ───────────────────────────────────────────────────────────
+
+export async function getCruiseRestaurants(venueId: string): Promise<CruiseRestaurant[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cruise_restaurants")
+    .select("*")
+    .eq("venue_id", venueId)
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+  return (data ?? []) as CruiseRestaurant[];
+}
+
+export async function getCruiseItineraryItems(venueId: string): Promise<CruiseItineraryItem[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cruise_itinerary_items")
+    .select("*")
+    .eq("venue_id", venueId)
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+  return (data ?? []) as CruiseItineraryItem[];
+}
+
+export async function getCruiseCrew(venueId: string): Promise<CruiseCrewMember[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cruise_crew")
+    .select("*")
+    .eq("venue_id", venueId)
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+  return (data ?? []) as CruiseCrewMember[];
+}
+
+export async function getCruiseRestaurantById(restaurantId: string): Promise<CruiseRestaurant | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cruise_restaurants")
+    .select("*")
+    .eq("id", restaurantId)
+    .eq("is_active", true)
+    .single();
+  return data as CruiseRestaurant | null;
+}
+
+export async function getCruiseLinks(venueId: string): Promise<CruiseLink[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cruise_links")
+    .select("*")
+    .eq("venue_id", venueId)
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+  return (data ?? []) as CruiseLink[];
 }
