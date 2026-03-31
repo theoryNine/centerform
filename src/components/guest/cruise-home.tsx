@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { Phone, ArrowRight, Anchor } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
-import { ConciergePrompt } from "@/components/guest/concierge-prompt";
 import { createClient } from "@/lib/supabase/client";
 import type { CruiseLink } from "@/types";
 
@@ -188,14 +187,14 @@ export function CruiseHomePage() {
           </div>
         </div>
 
-        {/* Concierge section */}
-        <div className="mb-8">
+        {/* Concierge section — temporarily hidden on cruise pages */}
+        {/* <div className="mb-8">
           <SectionDivider title="Concierge" />
           <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
             Ask us anything about your voyage.
           </p>
           <ConciergePrompt slug={slug} />
-        </div>
+        </div> */}
 
         {/* Links section */}
         {links.length > 0 && (
