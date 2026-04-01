@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { CruiseItineraryItem, Venue } from "@/types";
@@ -130,7 +130,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
         {item.time_label ?? ""}
       </div>
       <div className="flex flex-1 items-start gap-3 pb-3">
-        <div className="relative z-10 mt-[10px] -ml-[2px] h-2 w-2 shrink-0 rounded-full bg-muted-foreground/60" />
+        <div className="relative z-10 mt-[10px] ml-[2px] h-2 w-2 shrink-0 rounded-full bg-muted-foreground/60" />
         {item.restaurant_id ? (
           <Link
             href={`/${slug}/food-onboard/${item.restaurant_id}`}
@@ -166,7 +166,10 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
   const sentinelRef = useRef<HTMLDivElement>(null);
   const pillContainerRef = useRef<HTMLDivElement>(null);
   const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const isFirstRender = useRef(true);
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const headerRef = useRef<HTMLDivElement>(null);
+  // Prevent scroll-spy from fighting a programmatic scroll-to
+  const isScrollingTo = useRef(false);
 
   // Border on scroll past header
   useEffect(() => {
@@ -180,12 +183,8 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
     return () => observer.disconnect();
   }, []);
 
-  // Scroll active pill into view (skip on first render)
+  // Scroll active pill into view whenever activeDay changes
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
     const container = pillContainerRef.current;
     const pill = pillRefs.current[activeDay];
     if (!container || !pill) return;
@@ -193,17 +192,60 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
     container.scrollTo({ left: targetScroll, behavior: "smooth" });
   }, [activeDay]);
 
-  const selectedGroup = dayGroups.find((g) => g.id === activeDay) ?? dayGroups[0];
+  // Scroll-spy: update active pill as sections enter the viewport
+  useEffect(() => {
+    if (!hasDays) return;
+
+    // Fire when the top of a section enters the top ~40% of the visible area
+    // (accounting for the sticky header via rootMargin)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isScrollingTo.current) return;
+        // Find the topmost intersecting section
+        const intersecting = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (intersecting.length > 0) {
+          const id = (intersecting[0].target as HTMLElement).dataset.dayId;
+          if (id) setActiveDay(id);
+        }
+      },
+      { rootMargin: "-80px 0px -55% 0px", threshold: 0 },
+    );
+
+    dayGroups.forEach((group) => {
+      const el = sectionRefs.current[group.id];
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [hasDays, dayGroups]);
+
+  const scrollToDay = useCallback(
+    (groupId: string) => {
+      setActiveDay(groupId);
+      const section = sectionRefs.current[groupId];
+      if (!section) return;
+
+      isScrollingTo.current = true;
+      const headerHeight = headerRef.current?.offsetHeight ?? 90;
+      const top = section.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
+      window.scrollTo({ top, behavior: "smooth" });
+
+      // Re-enable scroll-spy after scroll settles
+      setTimeout(() => {
+        isScrollingTo.current = false;
+      }, 900);
+    },
+    [],
+  );
 
   return (
     <div className="min-h-screen bg-background font-sans">
       <div ref={sentinelRef} className="h-0" />
 
       {/* Sticky header — venue name + day pills together */}
-      <div
-        className="sticky top-0 z-30"
-        style={{ backgroundColor: "var(--background)" }}
-      >
+      <div ref={headerRef} className="sticky top-0 z-30" style={{ backgroundColor: "var(--background)" }}>
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
           {/* Venue name row */}
           <div className="flex items-center px-5 py-2">
@@ -233,7 +275,7 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
                   ref={(el) => {
                     pillRefs.current[group.id] = el;
                   }}
-                  onClick={() => setActiveDay(group.id)}
+                  onClick={() => scrollToDay(group.id)}
                   className={`shrink-0 cursor-pointer whitespace-nowrap rounded-chip border-none px-4 py-2 text-description font-medium transition-all duration-200 ease-out ${
                     activeDay === group.id
                       ? "bg-primary text-primary-foreground"
@@ -253,35 +295,45 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content — all days on one page */}
       <div className="px-page pb-10 pt-5">
         {items.length === 0 ? (
           <div className="py-12 text-center text-[14px] text-muted-foreground">
             Itinerary coming soon.
           </div>
-        ) : hasDays && selectedGroup ? (
-          <>
-            <DayHeader group={selectedGroup} />
+        ) : hasDays ? (
+          <div className="flex flex-col gap-10">
+            {dayGroups.map((group) => (
+              <div
+                key={group.id}
+                ref={(el) => {
+                  sectionRefs.current[group.id] = el;
+                }}
+                data-day-id={group.id}
+              >
+                <DayHeader group={group} />
 
-            {selectedGroup.items.length === 0 ? (
-              <p className="py-6 text-center text-[14px] text-muted-foreground">
-                Nothing scheduled — enjoy the day.
-              </p>
-            ) : (
-              <div className="relative">
-                {/* Vertical line */}
-                <div
-                  className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
-                  style={{ left: "calc(52px + 12px + 6px)" }}
-                />
-                <div className="flex flex-col">
-                  {selectedGroup.items.map((item) => (
-                    <TimelineItem key={item.id} item={item} slug={slug} />
-                  ))}
-                </div>
+                {group.items.length === 0 ? (
+                  <p className="py-6 text-center text-[14px] text-muted-foreground">
+                    Nothing scheduled — enjoy the day.
+                  </p>
+                ) : (
+                  <div className="relative">
+                    {/* Vertical line */}
+                    <div
+                      className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
+                      style={{ left: "calc(52px + 12px + 6px)" }}
+                    />
+                    <div className="flex flex-col">
+                      {group.items.map((item) => (
+                        <TimelineItem key={item.id} item={item} slug={slug} />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </>
+            ))}
+          </div>
         ) : (
           /* Fallback: flat timeline (no is_start grouping in data) */
           <div className="relative">
