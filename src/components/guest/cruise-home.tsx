@@ -127,12 +127,13 @@ export function CruiseHomePage() {
         {/* Welcome card */}
         <div className="card-shadow mb-8 rounded-[5px] bg-card px-6 py-7">
           <h2 className="mb-2 font-serif text-[22px] font-normal text-foreground">
-            Welcome aboard.
+            {venue?.welcome_heading ?? "Welcome aboard."}
           </h2>
           <p
             className={`text-sm leading-relaxed text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
           >
-            We&apos;re glad you&apos;re here. Everything you need for your voyage is right below.
+            {venue?.welcome_body ??
+              "We\u2019re glad you\u2019re here. Everything you need for your voyage is right below."}
           </p>
           {venue?.phone && (
             <div className="flex justify-end">
@@ -141,7 +142,7 @@ export function CruiseHomePage() {
                 className="inline-flex items-center gap-2 whitespace-nowrap rounded-[5px] border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary no-underline"
               >
                 <Phone size={15} />
-                Call the Bridge
+                {venue.phone_label ?? "Call the Bridge"}
               </a>
             </div>
           )}
