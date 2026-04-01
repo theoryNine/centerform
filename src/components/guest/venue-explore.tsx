@@ -41,7 +41,7 @@ function PlaceCardList({ place, slug }: { place: NearbyPlace; slug: string }) {
   return (
     <Link
       href={placeHref(slug, place)}
-      className="card-shadow flex items-center gap-4 overflow-hidden rounded-[5px] bg-card no-underline"
+      className="card-shadow flex items-center gap-4 overflow-hidden rounded-default bg-card no-underline"
     >
       {/* Thumbnail */}
       <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
@@ -64,7 +64,7 @@ function PlaceCardList({ place, slug }: { place: NearbyPlace; slug: string }) {
 
       {/* Content */}
       <div className="min-w-0 flex-1 py-3 pr-1">
-        <p className="m-0 text-[14px] font-semibold leading-tight text-foreground">
+        <p className="m-0 text-body-sm font-semibold leading-tight text-foreground">
           {place.name}
         </p>
         {place.description && (
@@ -87,7 +87,7 @@ function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
   return (
     <Link
       href={placeHref(slug, place)}
-      className="card-shadow block overflow-hidden rounded-[5px] bg-card no-underline"
+      className="card-shadow block overflow-hidden rounded-default bg-card no-underline"
     >
       {/* Image */}
       <div className="aspect-[4/3] w-full overflow-hidden rounded-t-[5px]">
@@ -110,7 +110,7 @@ function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
 
       {/* Text below image */}
       <div className="px-3 py-2.5">
-        <p className="m-0 text-[13px] font-semibold leading-tight text-foreground">
+        <p className="m-0 text-description font-semibold leading-tight text-foreground">
           {place.name}
         </p>
         {place.description && (
@@ -150,24 +150,24 @@ function AreaSectionView({
   const areaHref = `/${slug}/explore/area/${encodeURIComponent(section.name)}`;
 
   return (
-    <div className="mb-8">
+    <div className="mb-section">
       {/* Section header */}
-      <div className="mb-4">
+      <div className="mb-heading-gap">
         <div className="flex items-baseline gap-2.5">
           <span className="text-[12px] font-medium text-primary">
             {sectionNumber}
           </span>
           <span className="text-[8px] text-primary">·</span>
-          <h2 className="m-0 mb-2 font-serif text-[20px] font-normal text-foreground">
+          <h2 className="m-0 mb-2 font-serif text-card-title-md font-normal text-foreground">
             {section.name.toLowerCase().startsWith("beyond") ? section.name : `In ${section.name}`}
           </h2>
         </div>
-        <div className="-ml-5 h-0.5 w-[calc(60%+20px)] bg-primary" />
+        <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
       </div>
 
       {useListLayout ? (
         /* List layout for first section — capped at 4 */
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-card-gap">
           {visiblePlaces.map((place) => (
             <PlaceCardList key={place.id} place={place} slug={slug} />
           ))}
@@ -179,7 +179,7 @@ function AreaSectionView({
           {featuredPlace && (
             <Link
               href={placeHref(slug, featuredPlace)}
-              className="card-shadow mb-3 block overflow-hidden rounded-[5px] bg-card no-underline"
+              className="card-shadow mb-3 block overflow-hidden rounded-default bg-card no-underline"
             >
               <div className="aspect-[16/9] w-full overflow-hidden rounded-t-[5px]">
                 {featuredPlace.image_url ? (
@@ -199,7 +199,7 @@ function AreaSectionView({
                 )}
               </div>
               <div className="px-4 py-2.5">
-                <p className="m-0 text-[14px] font-semibold text-foreground">
+                <p className="m-0 text-body-sm font-semibold text-foreground">
                   {featuredPlace.name}
                 </p>
                 {featuredPlace.description && (
@@ -212,7 +212,7 @@ function AreaSectionView({
           )}
 
           {/* 2-column grid */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-card-gap">
             {regularPlaces.map((place) => (
               <PlaceCardGrid key={place.id} place={place} slug={slug} />
             ))}
@@ -225,7 +225,7 @@ function AreaSectionView({
         <div className="mt-3 flex justify-end">
           <Link
             href={areaHref}
-            className="flex items-center gap-1 text-[13px] font-medium text-primary no-underline"
+            className="flex items-center gap-1 text-description font-medium text-primary no-underline"
           >
             {section.name.startsWith("Beyond")
               ? `See more ${section.name.replace("Beyond", "beyond")}`
@@ -315,7 +315,7 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
 
         {/* Title */}
         <div className="flex flex-1 flex-col justify-center px-5 animate-fade-in">
-          <h1 className="m-0 font-serif text-[26px] font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
             Explore
             <br />
             {cityName} & Beyond
@@ -324,10 +324,10 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-10 pt-6">
+      <div className="px-page pb-10 pt-6">
         {/* Message card */}
-        <div className="card-shadow mb-8 rounded-[5px] bg-card px-6 py-5">
-          <p className="m-0 text-[14px] leading-relaxed text-muted-foreground">
+        <div className="card-shadow mb-section rounded-default bg-card px-card py-5">
+          <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
             These are the places we&apos;d send a friend.
           </p>
         </div>
@@ -345,7 +345,7 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
 
         {/* "Or just ask" section */}
         <div className="mb-8 mt-4">
-          <h2 className="mb-4 font-serif text-[20px] font-normal text-foreground">
+          <h2 className="mb-4 font-serif text-card-title-md font-normal text-foreground">
             Or just ask.
           </h2>
 

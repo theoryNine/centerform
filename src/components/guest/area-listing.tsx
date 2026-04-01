@@ -61,20 +61,20 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
         <div className="w-5 shrink-0" />
       </div>
 
-      <div className="px-5 pb-10 pt-6">
+      <div className="px-page pb-10 pt-6">
         {/* Section heading */}
         <div className="mb-6">
-          <h1 className="m-0 font-serif text-[26px] font-normal text-foreground">{heading}</h1>
-          <div className="-ml-5 mt-2 h-0.5 w-[calc(60%+20px)] bg-primary" />
+          <h1 className="m-0 font-serif text-page-title font-normal text-foreground">{heading}</h1>
+          <div className="-ml-page mt-2 h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
         </div>
 
         {/* Full place list */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-card-gap">
           {places.map((place) => (
             <Link
               key={place.id}
               href={placeHref(slug, place)}
-              className="card-shadow flex items-center gap-4 overflow-hidden rounded-[5px] bg-card no-underline"
+              className="card-shadow flex items-center gap-4 overflow-hidden rounded-default bg-card no-underline"
             >
               <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
                 {place.image_url ? (
@@ -91,7 +91,7 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
                 )}
               </div>
               <div className="min-w-0 flex-1 py-3 pr-1">
-                <p className="m-0 text-[14px] font-semibold leading-tight text-foreground">
+                <p className="m-0 text-body-sm font-semibold leading-tight text-foreground">
                   {place.name}
                 </p>
                 {place.description && (

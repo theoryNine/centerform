@@ -63,17 +63,17 @@ function DayHeader({ group }: { group: DayGroup }) {
   return (
     <div className="mb-5">
       {group.header.location && (
-        <p className="m-0 text-[11px] font-semibold uppercase tracking-[2px] text-primary">
+        <p className="m-0 text-label font-semibold uppercase tracking-[var(--cf-text-label-spacing)] text-primary">
           {group.header.location}
         </p>
       )}
-      <h2 className="m-0 mt-0.5 font-serif text-[22px] font-normal text-foreground">
+      <h2 className="m-0 mt-0.5 font-serif text-card-title-lg font-normal text-foreground">
         {group.header.title
           .split(/\s+/)
           .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
           .join(" ")}
       </h2>
-      <div className="-ml-5 mt-2 h-px w-[calc(50%+20px)] bg-primary/30" />
+      <div className="-ml-page mt-2 h-px w-[calc(50%+var(--cf-page-padding))] bg-primary/30" />
     </div>
   );
 }
@@ -85,12 +85,12 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
   if (item.is_end) {
     return (
       <div className="flex items-start gap-3">
-        <div className="w-[52px] shrink-0 pt-[2px] text-right text-[11px] font-semibold text-muted-foreground">
+        <div className="w-[52px] shrink-0 pt-[2px] text-right text-label font-semibold text-muted-foreground">
           {item.time_label ?? ""}
         </div>
         <div className="flex flex-1 items-center gap-2 pb-4">
           <div className="relative z-10 h-3 w-3 shrink-0 rounded-full bg-primary" />
-          <p className="m-0 text-[11px] font-semibold tracking-widest text-primary">
+          <p className="m-0 text-label font-semibold tracking-widest text-primary">
             END · {item.title.toUpperCase()}
           </p>
         </div>
@@ -106,11 +106,11 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
         </div>
       )}
       <div className={`min-w-0 flex-1 py-3 pl-3 ${item.restaurant_id ? "pr-2" : "pr-3"}`}>
-        <p className="m-0 font-serif text-[15px] font-semibold leading-tight text-foreground">
+        <p className="m-0 font-serif text-cta-button font-semibold leading-tight text-foreground">
           {item.title}
         </p>
         {item.location && (
-          <p className="m-0 mt-0.5 text-[11px] font-medium uppercase tracking-wide text-primary">
+          <p className="m-0 mt-0.5 text-label font-medium uppercase tracking-wide text-primary">
             {item.location}
           </p>
         )}
@@ -126,7 +126,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
 
   return (
     <div className="flex items-start gap-3">
-      <div className="w-[52px] shrink-0 pt-[6px] text-right text-[11px] font-semibold text-muted-foreground">
+      <div className="w-[52px] shrink-0 pt-[6px] text-right text-label font-semibold text-muted-foreground">
         {item.time_label ?? ""}
       </div>
       <div className="flex flex-1 items-start gap-3 pb-3">
@@ -134,12 +134,12 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
         {item.restaurant_id ? (
           <Link
             href={`/${slug}/food-onboard/${item.restaurant_id}`}
-            className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-[5px] bg-card no-underline"
+            className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
           >
             {cardContent}
           </Link>
         ) : (
-          <div className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-[5px] bg-card">
+          <div className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card">
             {cardContent}
           </div>
         )}
@@ -234,7 +234,7 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
                     pillRefs.current[group.id] = el;
                   }}
                   onClick={() => setActiveDay(group.id)}
-                  className={`shrink-0 cursor-pointer whitespace-nowrap rounded-full border-none px-4 py-2 text-[13px] font-medium transition-all duration-200 ease-out ${
+                  className={`shrink-0 cursor-pointer whitespace-nowrap rounded-chip border-none px-4 py-2 text-description font-medium transition-all duration-200 ease-out ${
                     activeDay === group.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-card text-foreground"
@@ -254,7 +254,7 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-10 pt-5">
+      <div className="px-page pb-10 pt-5">
         {items.length === 0 ? (
           <div className="py-12 text-center text-[14px] text-muted-foreground">
             Itinerary coming soon.

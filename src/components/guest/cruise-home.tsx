@@ -66,9 +66,9 @@ export function CruiseHomePage() {
   ];
 
   const SectionDivider = ({ title }: { title: string }) => (
-    <div className="mb-4">
-      <h3 className="mb-2 font-serif text-[22px] font-normal text-foreground">{title}</h3>
-      <div className="-ml-5 h-0.5 w-[calc(60%+20px)] bg-primary" />
+    <div className="mb-heading-gap">
+      <h3 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">{title}</h3>
+      <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
     </div>
   );
 
@@ -110,12 +110,12 @@ export function CruiseHomePage() {
 
         {/* Ship name and location */}
         <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-          <h1 className="m-0 font-serif text-[28px] font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
             {shipName}
           </h1>
           <div className="my-3 mb-1.5 h-px w-8 bg-[#D0CBC3]" />
           {locationString && (
-            <p className="mt-2 text-[11px] font-extrabold uppercase tracking-[2px] text-muted-foreground">
+            <p className="mt-2 text-label font-extrabold uppercase tracking-[var(--cf-text-label-spacing)] text-muted-foreground">
               {locationString}
             </p>
           )}
@@ -123,14 +123,14 @@ export function CruiseHomePage() {
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-10 pt-6">
+      <div className="px-page pb-10 pt-6">
         {/* Welcome card */}
-        <div className="card-shadow mb-8 rounded-[5px] bg-card px-6 py-7">
-          <h2 className="mb-2 font-serif text-[22px] font-normal text-foreground">
+        <div className="card-shadow mb-section rounded-default bg-card p-card">
+          <h2 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">
             {venue?.welcome_heading ?? "Welcome aboard."}
           </h2>
           <p
-            className={`text-sm leading-relaxed text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
+            className={`text-body leading-[var(--cf-body-line-height)] text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
           >
             {venue?.welcome_body ??
               "We\u2019re glad you\u2019re here. Everything you need for your voyage is right below."}
@@ -139,7 +139,7 @@ export function CruiseHomePage() {
             <div className="flex justify-end">
               <a
                 href={`tel:${venue.phone.replace(/\D/g, "")}`}
-                className="inline-flex items-center gap-2 whitespace-nowrap rounded-[5px] border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary no-underline"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline"
               >
                 <Phone size={15} />
                 {venue.phone_label ?? "Call the Bridge"}
@@ -149,19 +149,20 @@ export function CruiseHomePage() {
         </div>
 
         {/* Your Voyage section */}
-        <div className="mb-8">
+        <div className="mb-section">
           <SectionDivider title="Your Voyage" />
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-card-gap">
             {navItems.map((item) => (
               <button
                 key={item.label}
                 onClick={() => router.push(item.href)}
-                className="card-shadow flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-[5px] border-none bg-card p-0 text-left transition-transform duration-150 ease-out active:scale-[0.98]"
-                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+                className="card-shadow flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-default border-none bg-card p-0 text-left transition-transform ease-out active:scale-[var(--cf-press-scale)]"
+                style={{ transitionDuration: "var(--cf-press-duration)" }}
+                onMouseDown={(e) => (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)}
                 onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                onTouchStart={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+                onTouchStart={(e) => (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)}
                 onTouchEnd={(e) => (e.currentTarget.style.transform = "scale(1)")}
               >
                 <div
@@ -171,10 +172,10 @@ export function CruiseHomePage() {
                   }}
                 />
                 <div className="min-w-0 flex-1 py-4">
-                  <div className="mb-0.5 text-[15px] font-semibold text-foreground">
+                  <div className="mb-0.5 text-cta-button font-semibold text-foreground">
                     {item.label}
                   </div>
-                  <div className="text-[13px] leading-snug text-muted-foreground">
+                  <div className="text-description leading-snug text-muted-foreground">
                     {item.sublabel}
                   </div>
                 </div>
@@ -199,7 +200,7 @@ export function CruiseHomePage() {
 
         {/* Links section */}
         {links.length > 0 && (
-          <div className="mb-8">
+          <div className="mb-section">
             <SectionDivider title="Links" />
             <div className="flex flex-col gap-2">
               {links.map((link) => (
@@ -208,7 +209,7 @@ export function CruiseHomePage() {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-[5px] bg-card px-4 py-3 text-[15px] font-medium text-primary no-underline card-shadow"
+                  className="flex items-center justify-between rounded-default bg-card px-4 py-3 text-cta-button font-medium text-primary no-underline card-shadow"
                 >
                   {link.label}
                   <ArrowRight size={16} className="shrink-0 text-primary" />

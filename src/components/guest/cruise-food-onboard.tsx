@@ -22,7 +22,7 @@ function RestaurantRow({ restaurant, slug }: { restaurant: CruiseRestaurant; slu
   return (
     <Link
       href={`/${slug}/food-onboard/${restaurant.id}`}
-      className="card-shadow flex items-center gap-3 overflow-hidden rounded-[5px] bg-card no-underline"
+      className="card-shadow flex items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
     >
       {/* Thumbnail */}
       <div className="h-[72px] w-[72px] shrink-0 overflow-hidden">
@@ -44,7 +44,7 @@ function RestaurantRow({ restaurant, slug }: { restaurant: CruiseRestaurant; slu
 
       {/* Info */}
       <div className="min-w-0 flex-1 py-3">
-        <p className="m-0 font-serif text-[16px] font-semibold leading-tight text-foreground">
+        <p className="m-0 font-serif text-card-title-sm font-semibold leading-tight text-foreground">
           {restaurant.name}
         </p>
         {metaParts.length > 0 && (
@@ -90,11 +90,11 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
   const SectionHeader = ({ number, title }: { number: string; title: string }) => (
     <div className="pb-2 pt-6">
       <div className="flex items-baseline gap-2">
-        <span className="text-xs font-medium text-primary">{number}</span>
-        <span className="text-xs text-muted-foreground">·</span>
-        <h2 className="m-0 font-serif text-2xl font-normal text-foreground">{title}</h2>
+        <span className="text-section-number font-medium text-primary">{number}</span>
+        <span className="text-section-number text-muted-foreground">·</span>
+        <h2 className="m-0 font-serif text-section-heading font-normal text-foreground">{title}</h2>
       </div>
-      <div className="-ml-5 mt-2 h-px w-[calc(60%+20px)] bg-primary" />
+      <div className="-ml-page mt-2 h-px w-[calc(60%+var(--cf-page-padding))] bg-primary" />
     </div>
   );
 
@@ -124,7 +124,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-10 pt-4">
+      <div className="px-page pb-10 pt-4">
         {/* Header card */}
         <div className="card-shadow relative mb-2 rounded-[5px] bg-card px-4 py-6 text-center">
           <span
@@ -143,11 +143,11 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
             className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25"
             style={{ bottom: 10, right: 10 }}
           />
-          <h1 className="m-0 font-serif text-[26px] font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
             Food Onboard
           </h1>
           <div className="mx-auto my-3 h-[1px] w-15 bg-foreground/25" />
-          <p className="m-0 text-[13px] text-muted-foreground">Dining venues on {venue.name}</p>
+          <p className="m-0 text-description text-muted-foreground">Dining venues on {venue.name}</p>
         </div>
 
         {restaurants.length === 0 ? (
@@ -159,7 +159,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
             {sitDown.length > 0 && (
               <div>
                 <SectionHeader number="01" title="Sit Down Restaurants" />
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-card-gap">
                   {sitDown.map((r) => (
                     <RestaurantRow key={r.id} restaurant={r} slug={slug} />
                   ))}
@@ -173,7 +173,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
                   number={sitDown.length > 0 ? "02" : "01"}
                   title="Walk Up Eateries"
                 />
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-card-gap">
                   {walkUp.map((r) => (
                     <RestaurantRow key={r.id} restaurant={r} slug={slug} />
                   ))}

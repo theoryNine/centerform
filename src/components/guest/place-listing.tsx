@@ -105,18 +105,18 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
       <div
         className={`relative z-10 bg-background ${place.image_url ? "-mt-6 rounded-t-xl" : ""}`}
       >
-        <div className="px-5 pb-10 pt-6">
+        <div className="px-page pb-10 pt-6">
           {/* Name + tagline */}
-          <h1 className="m-0 font-serif text-[28px] font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
             {place.name}
           </h1>
           {place.tagline && (
-            <p className="m-0 mt-1 text-[13px] text-muted-foreground">{place.tagline}</p>
+            <p className="m-0 mt-1 text-description text-muted-foreground">{place.tagline}</p>
           )}
 
           {/* Description */}
           {place.description && (
-            <p className="m-0 mt-4 text-[14px] leading-relaxed text-foreground">
+            <p className="m-0 mt-4 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
               {place.description}
             </p>
           )}
@@ -128,7 +128,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 rounded-[5px] bg-primary px-4 py-3 text-[14px] font-medium text-primary-foreground no-underline"
+                className="flex items-center justify-center gap-1.5 rounded-default bg-primary px-4 py-3 text-body-sm font-medium text-primary-foreground no-underline"
               >
                 {ctaLabel} →
               </a>
@@ -146,7 +146,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                   href={mapsHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[14px] text-primary no-underline"
+                  className="text-body-sm text-primary no-underline"
                 >
                   {place.address}
                 </a>
@@ -158,7 +158,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                 <p className="m-0 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Hours
                 </p>
-                <p className="m-0 text-[14px] text-foreground">{place.hours}</p>
+                <p className="m-0 text-body-sm text-foreground">{place.hours}</p>
               </div>
             )}
 
@@ -167,7 +167,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                 <p className="m-0 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Price
                 </p>
-                <p className="m-0 text-[14px] text-foreground">{priceLabel}</p>
+                <p className="m-0 text-body-sm text-foreground">{priceLabel}</p>
               </div>
             )}
 
@@ -178,7 +178,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                 </p>
                 <a
                   href={`tel:${place.phone.replace(/\D/g, "")}`}
-                  className="text-[14px] text-primary no-underline"
+                  className="text-body-sm text-primary no-underline"
                 >
                   {place.phone}
                 </a>
@@ -189,12 +189,12 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
           {/* What to know */}
           {place.tips && place.tips.length > 0 && (
             <div className="mt-6">
-              <h2 className="m-0 mb-3 font-serif text-[20px] font-normal text-foreground">
+              <h2 className="m-0 mb-3 font-serif text-card-title-md font-normal text-foreground">
                 What to know
               </h2>
               <ul className="m-0 list-none p-0">
                 {place.tips.map((tip, i) => (
-                  <li key={i} className="mb-2 flex gap-2.5 text-[14px] leading-snug text-foreground">
+                  <li key={i} className="mb-2 flex gap-2.5 text-body-sm leading-snug text-foreground">
                     <span className="mt-px shrink-0 font-medium text-primary">·</span>
                     <span>{tip}</span>
                   </li>

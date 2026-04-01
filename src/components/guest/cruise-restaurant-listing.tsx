@@ -82,9 +82,9 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-10 pt-5">
+      <div className="px-page pb-10 pt-5">
         {/* Name + meta */}
-        <h1 className="m-0 font-serif text-[28px] font-normal leading-tight text-foreground">
+        <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
           {restaurant.name}
         </h1>
 
@@ -95,20 +95,20 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
         )}
 
         {restaurant.description && (
-          <p className="mt-4 text-[15px] leading-relaxed text-foreground">
+          <p className="mt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
             {restaurant.description}
           </p>
         )}
 
         {/* Details */}
         {(restaurant.hours || restaurant.phone || restaurant.website) && (
-          <div className="card-shadow mt-5 rounded-[5px] bg-card">
+          <div className="card-shadow mt-5 rounded-default bg-card">
             {restaurant.hours && (
               <div className="flex items-start justify-between border-b border-border px-4 py-3">
                 <span className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
                   Hours
                 </span>
-                <span className="text-right text-[14px] text-foreground">{restaurant.hours}</span>
+                <span className="text-right text-body-sm text-foreground">{restaurant.hours}</span>
               </div>
             )}
             {restaurant.deck && (
@@ -116,7 +116,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                 <span className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
                   Deck
                 </span>
-                <span className="text-[14px] text-foreground">{restaurant.deck}</span>
+                <span className="text-body-sm text-foreground">{restaurant.deck}</span>
               </div>
             )}
             {restaurant.phone && (
@@ -126,7 +126,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                 </span>
                 <a
                   href={`tel:${restaurant.phone.replace(/\D/g, "")}`}
-                  className="text-[14px] font-medium text-primary no-underline"
+                  className="text-body-sm font-medium text-primary no-underline"
                 >
                   {restaurant.phone}
                 </a>
@@ -142,7 +142,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
               href={restaurant.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center rounded-[5px] border border-primary px-4 py-3 text-[14px] font-semibold text-primary no-underline"
+              className="flex items-center justify-center rounded-default border border-primary px-4 py-3 text-body-sm font-semibold text-primary no-underline"
             >
               Reserve a Table →
             </a>

@@ -38,10 +38,95 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-serif: "Cormorant Garamond", Georgia, serif;
+
+  /* ── Design token → Tailwind mappings ─────────────────────── */
+
+  /* Spacing: px-page, mb-section, p-card, gap-card-gap, mb-heading-gap, etc. */
+  --spacing-page: var(--cf-page-padding);
+  --spacing-section: var(--cf-section-gap);
+  --spacing-card: var(--cf-card-padding);
+  --spacing-card-compact: var(--cf-card-padding-compact);
+  --spacing-card-gap: var(--cf-card-gap);
+  --spacing-heading-gap: var(--cf-heading-to-content);
+  --spacing-breath: var(--cf-breath-mark-width);
+
+  /* Radius: rounded-default, rounded-chip */
+  --radius-default: var(--cf-radius-default);
+  --radius-chip: var(--cf-radius-chip);
+
+  /* Typography: text-hotel-name, text-body, text-label, etc. */
+  --text-hotel-name: var(--cf-text-hotel-name);
+  --text-page-title: var(--cf-text-page-title);
+  --text-section-heading: var(--cf-text-section-heading);
+  --text-card-title-lg: var(--cf-text-card-title-lg);
+  --text-card-title-md: var(--cf-text-card-title-md);
+  --text-card-title-sm: var(--cf-text-card-title-sm);
+  --text-concierge-heading: var(--cf-text-concierge-heading);
+  --text-header-nav: var(--cf-text-header-nav);
+  --text-body: var(--cf-text-body);
+  --text-body-sm: var(--cf-text-body-sm);
+  --text-description: var(--cf-text-description);
+  --text-label: var(--cf-text-label);
+  --text-chip: var(--cf-text-chip);
+  --text-cta-button: var(--cf-text-cta-button);
+  --text-cta-link: var(--cf-text-cta-link);
+  --text-section-number: var(--cf-text-section-number);
 }
 
 :root {
   --radius: 0.625rem;
+
+  /* ── Design tokens (source of truth) ──────────────────────── */
+
+  /* Typography — font families */
+  --cf-font-display: "Cormorant Garamond", serif;
+  --cf-font-body: "DM Sans", sans-serif;
+
+  /* Typography — font sizes (display / Cormorant Garamond) */
+  --cf-text-hotel-name: 30px;        /* 28–32px  homepage hero name */
+  --cf-text-page-title: 26px;        /* mini-hero page titles */
+  --cf-text-section-heading: 24px;   /* numbered section headings */
+  --cf-text-card-title-lg: 22px;     /* 22–24px  venue names, card titles */
+  --cf-text-card-title-md: 19px;     /* 18–20px  card titles in lists, timeline stops */
+  --cf-text-card-title-sm: 16px;     /* 16–17px  compact cards, photo-on-left titles */
+  --cf-text-concierge-heading: 22px; /* "Or just ask.", "Something else?" */
+  --cf-text-header-nav: 20px;        /* sticky header venue name */
+
+  /* Typography — font sizes (body / DM Sans) */
+  --cf-text-body: 15px;              /* concierge notes, body text */
+  --cf-text-body-sm: 14px;           /* practical details, secondary text */
+  --cf-text-description: 13px;       /* card subtitles, descriptions */
+  --cf-text-label: 11px;             /* 11–12px  uppercase info labels */
+  --cf-text-chip: 14px;              /* suggestion chips */
+  --cf-text-cta-button: 15px;        /* outline button text */
+  --cf-text-cta-link: 14px;          /* 13–14px  text link CTAs */
+  --cf-text-section-number: 13px;    /* "01" prefix in section headings */
+
+  /* Typography — other */
+  --cf-text-label-spacing: 1px;      /* 0.5–1px  letter-spacing on uppercase labels */
+  --cf-body-line-height: 1.65;       /* 1.6–1.7  body line height */
+
+  /* Spacing */
+  --cf-page-padding: 20px;           /* side padding on all pages */
+  --cf-section-gap: 40px;            /* between major sections */
+  --cf-heading-to-content: 16px;     /* section heading to first item */
+  --cf-card-gap: 14px;               /* 12–16px  between cards in a list */
+  --cf-card-padding: 20px;           /* internal card padding */
+  --cf-card-padding-compact: 13px;   /* 12–14px  compact cards (timeline) */
+  --cf-accordion-row-height: 52px;
+  --cf-breath-mark-width: 40px;      /* centered decorative divider */
+
+  /* Radius */
+  --cf-radius-default: 4px;          /* cards, buttons, containers, photos */
+  --cf-radius-chip: 20px;            /* suggestion chips, meal period pills */
+  --cf-radius-archway-tr: 70px;      /* 60–80px  organic archway, top-right */
+  --cf-radius-archway-br: 70px;      /* 60–80px  organic archway, bottom-right */
+
+  /* Interactive */
+  --cf-touch-target-min: 44px;       /* minimum tappable area */
+  --cf-press-scale: 0.98;            /* card press state */
+  --cf-press-duration: 150ms;        /* press state transition */
+  --cf-fade-duration: 200ms;         /* scroll-reveal header fade */
   --background: #F5F0E8;
   --foreground: #2D2A26;
   --card: #FFFFFF;

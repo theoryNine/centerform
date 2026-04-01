@@ -70,20 +70,20 @@ function CollectionHeader({
   subtitle: string | null;
 }) {
   return (
-    <div className="card-shadow relative mb-5 rounded-[5px] bg-card px-4 py-6 text-center">
+    <div className="card-shadow relative mb-5 rounded-default bg-card px-4 py-6 text-center">
       {/* Corner brackets */}
       <span className="absolute inline-block h-4 w-4 border-l-2 border-t-2 border-foreground/25" style={{ top: 10, left: 10 }} />
       <span className="absolute inline-block h-4 w-4 border-r-2 border-t-2 border-foreground/25" style={{ top: 10, right: 10 }} />
       <span className="absolute inline-block h-4 w-4 border-b-2 border-l-2 border-foreground/25" style={{ bottom: 10, left: 10 }} />
       <span className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25" style={{ bottom: 10, right: 10 }} />
 
-      <h1 className="m-0 font-serif text-[26px] font-normal leading-tight text-foreground">
+      <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
         {title}
       </h1>
       {subtitle && (
         <>
           <div className="mx-auto my-3 h-[1.0px] w-15 bg-foreground/25" />
-          <p className="m-0 text-[13px] text-muted-foreground">{subtitle}</p>
+          <p className="m-0 text-description text-muted-foreground">{subtitle}</p>
         </>
       )}
     </div>
@@ -99,7 +99,7 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
     return (
       <div className="flex items-center gap-2">
         <div className="relative z-10 h-3 w-3 shrink-0 rounded-full bg-primary" />
-        <p className="m-0 text-[11px] font-semibold tracking-widest text-primary">
+        <p className="m-0 text-label font-semibold tracking-widest text-primary">
           {item.is_start ? "START" : "END"} · {place.name.toUpperCase()}
         </p>
       </div>
@@ -114,7 +114,7 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
       {/* Card */}
       <Link
         href={`/${slug}/explore/place/${place.id}`}
-        className="card-shadow mb-3 flex flex-1 items-center gap-3 overflow-hidden rounded-[5px] bg-card no-underline"
+        className="card-shadow mb-3 flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
       >
         {place.image_url && (
           <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
@@ -122,7 +122,7 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
           </div>
         )}
         <div className="min-w-0 flex-1 py-3 pr-2 pl-3">
-          <p className="m-0 font-serif text-[15px] font-semibold leading-tight text-foreground">
+          <p className="m-0 font-serif text-cta-button font-semibold leading-tight text-foreground">
             {place.name}
           </p>
           {place.description && (
@@ -173,7 +173,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
     place.category === "outdoors" || place.category === "attraction";
 
   return (
-    <div className="card-shadow overflow-hidden rounded-[5px] bg-card">
+    <div className="card-shadow overflow-hidden rounded-default bg-card">
       {/* Image */}
       <Link href={`/${slug}/explore/place/${place.id}`} className="block no-underline">
         <div className="aspect-[16/7] w-full overflow-hidden">
@@ -191,7 +191,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
       {/* Content */}
       <div className="px-4 pb-4 pt-3">
         <Link href={`/${slug}/explore/place/${place.id}`} className="no-underline">
-          <h2 className="m-0 font-serif text-[20px] font-normal leading-tight text-foreground">
+          <h2 className="m-0 font-serif text-card-title-md font-normal leading-tight text-foreground">
             {place.name}
           </h2>
         </Link>
@@ -203,7 +203,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
         )}
 
         {place.description && (
-          <p className="m-0 mt-2.5 text-[14px] leading-relaxed text-foreground">
+          <p className="m-0 mt-2.5 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
             {place.description}
           </p>
         )}
@@ -216,7 +216,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex justify-end text-[13px] font-medium text-primary no-underline"
+                className="flex justify-end text-description font-medium text-primary no-underline"
               >
                 {ctaLabel} →
               </a>
@@ -225,7 +225,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center rounded-[5px] border border-primary px-4 py-2.5 text-[13px] font-medium text-primary no-underline"
+                className="flex items-center justify-center rounded-default border border-primary px-4 py-2.5 text-description font-medium text-primary no-underline"
               >
                 {ctaLabel} →
               </a>
@@ -264,10 +264,10 @@ function SomethingElse({
 }) {
   return (
     <div className="mt-10">
-      <h2 className="m-0 mb-1 text-center font-serif text-[22px] font-normal text-foreground">
+      <h2 className="m-0 mb-1 text-center font-serif text-card-title-lg font-normal text-foreground">
         Something else?
       </h2>
-      <p className="m-0 mb-4 text-center text-[13px] text-muted-foreground">
+      <p className="m-0 mb-4 text-center text-description text-muted-foreground">
         Tell us what you&apos;re in the mood for.
       </p>
 
@@ -279,7 +279,7 @@ function SomethingElse({
 
       {otherCollections.length > 0 && (
         <div className="mt-6">
-          <p className="m-0 mb-3 text-center text-[13px] text-muted-foreground">
+          <p className="m-0 mb-3 text-center text-description text-muted-foreground">
             Or explore something else.
           </p>
           <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none">
@@ -287,7 +287,7 @@ function SomethingElse({
               <Link
                 key={c.id}
                 href={`/${slug}/explore/${c.id}`}
-                className="shrink-0 whitespace-nowrap rounded-full border border-border px-4 py-2 text-[13px] text-foreground no-underline"
+                className="shrink-0 whitespace-nowrap rounded-chip border border-border px-4 py-2 text-description text-foreground no-underline"
               >
                 {c.title}
               </Link>
@@ -354,11 +354,11 @@ export function ExploreCollectionPage({
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-10 pt-6">
+      <div className="px-page pb-10 pt-6">
         <CollectionHeader title={collection.title} subtitle={collection.subtitle} />
 
         {collection.description && (
-          <p className="mb-6 text-[14px] leading-relaxed text-foreground">
+          <p className="mb-6 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
             {collection.description}
           </p>
         )}

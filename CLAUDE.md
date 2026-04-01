@@ -63,7 +63,7 @@ src/
 
 Core tables (migrations in `supabase/migrations/`):
 
-- **venues** — venue profiles (name, slug, address, type, etc.)
+- **venues** — venue profiles (name, slug, address, type, etc.). Also holds editable welcome card content: `welcome_heading` (nullable, e.g. "Welcome."), `welcome_body` (nullable), `phone_label` (nullable, e.g. "Call the Front Desk"). Components fall back to hardcoded defaults when null. See migration `013_welcome_card_content.sql`.
 - **venue_themes** — per-venue color/font theming (1:1 with venues)
 - **venue_members** — links users to venues with roles (owner/admin/staff)
 - **services** — detailed venue service descriptions (WiFi instructions, housekeeping details, etc.)
@@ -129,10 +129,39 @@ Explore index         /:slug/explore
 - **Place listing** shows full detail for an individual `nearby_place` — hero image, metadata sections (address, hours, price, phone), tips bullets, and venue footer. Back button uses `history.back()` to return to whichever page linked here.
 - **`nearby_places.collection_id`** is the key field that makes an explore card a gateway to a collection rather than an individual place listing.
 
+## Design Token System
+
+All design tokens live in `src/app/globals.css` as `--cf-*` CSS custom properties on `:root`. They are the single source of truth — change a value there and it propagates everywhere. Tokens cover typography, spacing, radius, and interactive states.
+
+Tokens are registered in the `@theme inline {}` block so Tailwind generates real utility classes from them:
+
+| Token group | CSS var example | Tailwind utility |
+|---|---|---|
+| Font size | `--cf-text-hotel-name: 30px` | `text-hotel-name` |
+| Font size | `--cf-text-body: 15px` | `text-body` |
+| Font size | `--cf-text-description: 13px` | `text-description` |
+| Font size | `--cf-text-label: 11px` | `text-label` |
+| Font size | `--cf-text-cta-button: 15px` | `text-cta-button` |
+| Font size | `--cf-text-card-title-lg: 22px` | `text-card-title-lg` |
+| Spacing | `--cf-page-padding: 20px` | `px-page`, `-ml-page` |
+| Spacing | `--cf-section-gap: 40px` | `mb-section` |
+| Spacing | `--cf-card-padding: 20px` | `p-card` |
+| Spacing | `--cf-card-gap: 14px` | `gap-card-gap` |
+| Spacing | `--cf-heading-to-content: 16px` | `mb-heading-gap` |
+| Radius | `--cf-radius-default: 4px` | `rounded-default` |
+| Radius | `--cf-radius-chip: 20px` | `rounded-chip` |
+
+For tokens not suited to Tailwind utilities (line-height, letter-spacing, interactive values), use them directly as `var(--cf-...)` in arbitrary values or inline styles:
+- `leading-[var(--cf-body-line-height)]`
+- `tracking-[var(--cf-text-label-spacing)]`
+- `style={{ transitionDuration: "var(--cf-press-duration)" }}`
+
+`cruise-home.tsx` is the reference implementation. Apply the same token utilities when working on other guest components.
+
 ## Conventions
 
 - **Formatting**: Double quotes, semicolons, 2-space indent, trailing commas, 100 char width
-- **Styling**: Tailwind classes for layout; CSS variables for dynamic theming per venue/event
+- **Styling**: Tailwind classes for layout; CSS variables for dynamic theming per venue/event; `--cf-*` design tokens for all typography, spacing, radius, and interactive values (see Design Token System above)
 - **Components**: Follow shadcn/ui patterns with `data-slot` attributes and CVA variants
 - **Database queries**: Add to `src/lib/queries.ts` using the Supabase client pattern
 - **Path alias**: `@/*` maps to `src/*`

@@ -20,6 +20,9 @@ export interface Venue {
   logo_url: string | null;
   cover_image_url: string | null;
   venue_type: VenueType;
+  welcome_heading: string | null;
+  welcome_body: string | null;
+  phone_label: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;

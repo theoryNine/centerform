@@ -8,7 +8,7 @@ import { VenueFooter } from "@/components/guest/venue-footer";
 
 function CrewMemberCard({ member }: { member: CruiseCrewMember }) {
   return (
-    <div className="card-shadow flex items-start gap-4 rounded-[5px] bg-card p-4">
+    <div className="card-shadow flex items-start gap-4 rounded-default bg-card p-card">
       {/* Avatar */}
       <div className="h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full">
         {member.image_url ? (
@@ -31,14 +31,14 @@ function CrewMemberCard({ member }: { member: CruiseCrewMember }) {
 
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="m-0 font-serif text-[17px] font-semibold leading-tight text-foreground">
+        <p className="m-0 font-serif text-card-title-sm font-semibold leading-tight text-foreground">
           {member.name}
         </p>
-        <p className="m-0 mt-0.5 text-[11px] font-semibold uppercase tracking-widest text-primary">
+        <p className="m-0 mt-0.5 text-label font-semibold uppercase tracking-widest text-primary">
           {member.role}
         </p>
         {member.bio && (
-          <p className="m-0 mt-2 text-[13px] leading-relaxed text-muted-foreground">
+          <p className="m-0 mt-2 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
             {member.bio}
           </p>
         )}
@@ -93,9 +93,9 @@ export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-10 pt-4">
+      <div className="px-page pb-10 pt-4">
         {/* Header card */}
-        <div className="card-shadow relative mb-6 rounded-[5px] bg-card px-4 py-6 text-center">
+        <div className="card-shadow relative mb-6 rounded-default bg-card px-4 py-6 text-center">
           <span
             className="absolute inline-block h-4 w-4 border-l-2 border-t-2 border-foreground/25"
             style={{ top: 10, left: 10 }}
@@ -112,11 +112,11 @@ export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
             className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25"
             style={{ bottom: 10, right: 10 }}
           />
-          <h1 className="m-0 font-serif text-[26px] font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
             The Crew
           </h1>
           <div className="mx-auto my-3 h-[1px] w-15 bg-foreground/25" />
-          <p className="m-0 text-[13px] text-muted-foreground">Meet your group</p>
+          <p className="m-0 text-description text-muted-foreground">Meet your group</p>
         </div>
 
         {crew.length === 0 ? (
@@ -124,7 +124,7 @@ export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
             Crew information coming soon.
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-card-gap">
             {crew.map((member) => (
               <CrewMemberCard key={member.id} member={member} />
             ))}

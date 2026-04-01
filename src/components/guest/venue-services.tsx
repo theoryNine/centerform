@@ -160,7 +160,7 @@ function AccordionItem({
         onClick={onToggle}
         className="flex w-full cursor-pointer items-center justify-between border-none bg-none py-4 text-left"
       >
-        <span className="text-[15px] font-medium text-foreground">
+        <span className="text-cta-button font-medium text-foreground">
           {title}
         </span>
         <ChevronDown
@@ -197,7 +197,7 @@ function SectionTab({
   return (
     <button
       onClick={onClick}
-      className={`cursor-pointer rounded-full border-none px-4 py-2 text-[13px] font-medium transition-all duration-200 ease-out ${
+      className={`cursor-pointer rounded-chip border-none px-4 py-2 text-description font-medium transition-all duration-200 ease-out ${
         isActive
           ? "bg-primary text-primary-foreground"
           : "bg-transparent text-foreground"
@@ -363,7 +363,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
 
           {/* Title */}
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <h1 className="m-0 font-serif text-[26px] font-normal leading-tight text-foreground">
+            <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
               Your Room
               <br />
               &amp; Stay
@@ -414,7 +414,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
       </div>
 
       {/* Accordion sections */}
-      <div className="px-5 pb-10">
+      <div className="px-page pb-10">
         {sectionServices.map((section) => (
           <div
             key={section.id}
@@ -425,21 +425,21 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
             {/* Section header */}
             <div className="pb-2 pt-6">
               <div className="flex items-baseline gap-2">
-                <span className="text-xs font-medium text-primary">
+                <span className="text-section-number font-medium text-primary">
                   {section.number}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-section-number text-muted-foreground">
                   ·
                 </span>
-                <h2 className="m-0 font-serif text-2xl font-normal text-foreground">
+                <h2 className="m-0 font-serif text-section-heading font-normal text-foreground">
                   {section.title}
                 </h2>
               </div>
-              <div className="-ml-5 mt-2 h-px w-[calc(60%+20px)] bg-primary" />
+              <div className="-ml-page mt-2 h-px w-[calc(60%+var(--cf-page-padding))] bg-primary" />
             </div>
 
             {/* Accordion card */}
-            <div className="card-shadow rounded-[5px] bg-card px-5">
+            <div className="card-shadow rounded-default bg-card px-page">
               {section.services.length === 0 ? (
                 <div className="py-6 text-center text-[13px] text-muted-foreground">
                   No items yet.
@@ -466,7 +466,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
                         />
                       ) : (
                         service.description && (
-                          <p className="m-0 text-[13px] leading-relaxed text-muted-foreground">
+                          <p className="m-0 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
                             {service.description}
                           </p>
                         )

@@ -111,11 +111,11 @@ export function VenueHomePage() {
 
   // Section divider component for consistency
   const SectionDivider = ({ title }: { title: string }) => (
-    <div className="mb-4">
-      <h3 className="mb-2 font-serif text-[22px] font-normal text-foreground">
+    <div className="mb-heading-gap">
+      <h3 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">
         {title}
       </h3>
-      <div className="-ml-5 h-0.5 w-[calc(60%+20px)] bg-primary" />
+      <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
     </div>
   );
 
@@ -173,12 +173,12 @@ export function VenueHomePage() {
           <div
             className={`flex flex-1 flex-col items-center justify-center px-6 text-center ${envelopeDismissed ? "animate-fade-in" : ""}`}
           >
-            <h1 className="m-0 font-serif text-[28px] font-normal leading-tight text-foreground">
+            <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
               {venueName}
             </h1>
             <div className="my-3 mb-1.5 h-px w-8 bg-[#D0CBC3]" />
             {locationString && (
-              <p className="mt-2 text-[11px] font-extrabold uppercase tracking-[2px] text-muted-foreground">
+              <p className="mt-2 text-label font-extrabold uppercase tracking-[var(--cf-text-label-spacing)] text-muted-foreground">
                 {locationString}
               </p>
             )}
@@ -186,43 +186,44 @@ export function VenueHomePage() {
         </div>
 
         {/* Content area */}
-        <div className="px-5 pb-10 pt-6">
+        <div className="px-page pb-10 pt-6">
           {/* Welcome card */}
-          <div className="card-shadow mb-8 rounded-[5px] bg-card px-6 py-7">
-            <h2 className="mb-2 font-serif text-[22px] font-normal text-foreground">
-              Welcome.
+          <div className="card-shadow mb-section rounded-default bg-card p-card">
+            <h2 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">
+              {venue?.welcome_heading ?? "Welcome."}
             </h2>
             <p
-              className={`text-sm leading-relaxed text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
+              className={`text-body leading-[var(--cf-body-line-height)] text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
             >
-              We&apos;re glad you&apos;re here. Everything you need for your
-              stay is right below.
+              {venue?.welcome_body ??
+                "We\u2019re glad you\u2019re here. Everything you need for your stay is right below."}
             </p>
             {venue?.phone && (
               <div className="flex justify-end">
                 <a
                   href={`tel:${venue.phone.replace(/\D/g, "")}`}
-                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-[5px] border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary no-underline"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline"
                 >
                   <Phone size={15} />
-                  Call the Front Desk
+                  {venue.phone_label ?? "Call the Front Desk"}
                 </a>
               </div>
             )}
           </div>
 
           {/* Your Stay section */}
-          <div className="mb-8">
+          <div className="mb-section">
             <SectionDivider title="Your Stay" />
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-card-gap">
               {navItems.map((item) => (
                 <button
                   key={item.label}
                   onClick={() => router.push(item.href)}
-                  className="card-shadow flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-[5px] border-none bg-card p-0 text-left transition-transform duration-150 ease-out active:scale-[0.98]"
+                  className="card-shadow flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-default border-none bg-card p-0 text-left transition-transform ease-out active:scale-[var(--cf-press-scale)]"
+                  style={{ transitionDuration: "var(--cf-press-duration)" }}
                   onMouseDown={(e) =>
-                    (e.currentTarget.style.transform = "scale(0.98)")
+                    (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)
                   }
                   onMouseUp={(e) =>
                     (e.currentTarget.style.transform = "scale(1)")
@@ -231,7 +232,7 @@ export function VenueHomePage() {
                     (e.currentTarget.style.transform = "scale(1)")
                   }
                   onTouchStart={(e) =>
-                    (e.currentTarget.style.transform = "scale(0.98)")
+                    (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)
                   }
                   onTouchEnd={(e) =>
                     (e.currentTarget.style.transform = "scale(1)")
@@ -247,10 +248,10 @@ export function VenueHomePage() {
 
                   {/* Label */}
                   <div className="min-w-0 flex-1 py-4">
-                    <div className="mb-0.5 text-[15px] font-semibold text-foreground">
+                    <div className="mb-0.5 text-cta-button font-semibold text-foreground">
                       {item.label}
                     </div>
-                    <div className="text-[13px] leading-snug text-muted-foreground">
+                    <div className="text-description leading-snug text-muted-foreground">
                       {item.sublabel}
                     </div>
                   </div>
@@ -268,20 +269,20 @@ export function VenueHomePage() {
 
           {/* Tonight section */}
           {todayEvents.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-section">
               <SectionDivider title="Tonight" />
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-card-gap">
                 {todayEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="rounded-[5px] bg-foreground px-6 py-5"
+                    className="rounded-default bg-foreground px-6 py-5"
                   >
                     <div className="mb-1 text-base font-medium text-background">
                       {event.title} · {formatEventTime(event.start_time, event.end_time)}
                     </div>
                     {event.location && (
-                      <div className="text-[13px] text-background/60">
+                      <div className="text-description text-background/60">
                         {event.location}
                       </div>
                     )}
@@ -292,10 +293,10 @@ export function VenueHomePage() {
           )}
 
           {/* Your Concierge section */}
-          <div className="mb-8">
+          <div className="mb-section">
             <SectionDivider title="Concierge" />
 
-            <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="mb-4 text-body leading-[var(--cf-body-line-height)] text-muted-foreground">
               Ask us anything about your stay or the neighborhood.
             </p>
 
