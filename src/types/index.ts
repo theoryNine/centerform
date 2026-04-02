@@ -51,11 +51,20 @@ export interface VenueMember {
   created_at: string;
 }
 
+export type ServiceDetailsBlock =
+  | { type: "kv"; rows: { label: string; value: string; copy?: boolean }[] }
+  | { type: "bullets"; items: string[] }
+  | { type: "phone"; label: string; value: string }
+  | { type: "text"; content: string };
+
+export type ServiceDetails = ServiceDetailsBlock | ServiceDetailsBlock[];
+
 export interface Service {
   id: string;
   venue_id: string;
   name: string;
   description: string | null;
+  details: ServiceDetails | null;
   category: ServiceCategory;
   icon: string | null;
   display_order: number;

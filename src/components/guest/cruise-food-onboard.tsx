@@ -97,33 +97,33 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
         nameHref={`/${slug}`}
       />
 
-      {/* Content */}
-      <div className="px-page pb-10 pt-4">
-        {/* Header card */}
-        <div className="card-shadow relative mb-2 rounded-[5px] bg-card px-4 py-6 text-center">
-          <span
-            className="absolute inline-block h-4 w-4 border-l-2 border-t-2 border-foreground/25"
-            style={{ top: 10, left: 10 }}
-          />
-          <span
-            className="absolute inline-block h-4 w-4 border-r-2 border-t-2 border-foreground/25"
-            style={{ top: 10, right: 10 }}
-          />
-          <span
-            className="absolute inline-block h-4 w-4 border-b-2 border-l-2 border-foreground/25"
-            style={{ bottom: 10, left: 10 }}
-          />
-          <span
-            className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25"
-            style={{ bottom: 10, right: 10 }}
-          />
+      {/* Mini-hero */}
+      <div className="flex min-h-[180px] items-center pt-6">
+        <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
+          {venue.cover_image_url ? (
+            <img
+              src={venue.cover_image_url}
+              alt={venue.name}
+              className="size-full object-cover"
+            />
+          ) : (
+            <div
+              className="size-full"
+              style={{
+                background: "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 50%, #2980B9 100%)",
+              }}
+            />
+          )}
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
           <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
             Food Onboard
           </h1>
-          <div className="mx-auto my-3 h-[1px] w-15 bg-foreground/25" />
-          <p className="m-0 text-description text-muted-foreground">Dining venues on {venue.name}</p>
         </div>
+      </div>
 
+      {/* Content */}
+      <div className="px-page pb-10 pt-2">
         {restaurants.length === 0 ? (
           <div className="py-12 text-center text-[14px] text-muted-foreground">
             Dining information coming soon.

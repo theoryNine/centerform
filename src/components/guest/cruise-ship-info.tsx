@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronDown, Copy, Check } from "lucide-react";
-import type { Service, Venue } from "@/types";
+import type { Service, ServiceDetails, ServiceDetailsBlock, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 
 // Cruise-specific section config
@@ -64,6 +64,95 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
 
 // Re-export CopyButton for potential use
 export { CopyButton };
+
+function InlineBold({ text }: { text: string }) {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <strong key={i} className="font-semibold text-foreground">
+            {part}
+          </strong>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
+function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
+  if (block.type === "text") {
+    return (
+      <p className="m-0 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
+        <InlineBold text={block.content} />
+      </p>
+    );
+  }
+
+  if (block.type === "bullets") {
+    return (
+      <ul className="m-0 list-none p-0 flex flex-col gap-1">
+        {block.items.map((item, i) => (
+          <li key={i} className="flex items-start gap-2 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
+            <span className="mt-[5px] h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
+            <InlineBold text={item} />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (block.type === "phone") {
+    return (
+      <div className="flex items-center justify-between">
+        <span className="text-description text-muted-foreground">
+          <InlineBold text={block.label} />
+        </span>
+        <a
+          href={`tel:${block.value.replace(/\D/g, "")}`}
+          className="text-description font-semibold text-primary no-underline"
+        >
+          {block.value}
+        </a>
+      </div>
+    );
+  }
+
+  if (block.type === "kv") {
+    return (
+      <div className="flex flex-col gap-2">
+        {block.rows.map((row, i) => (
+          <div key={i} className="flex items-center justify-between gap-4">
+            <span className="text-description text-muted-foreground">
+              <InlineBold text={row.label} />
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-description font-medium text-foreground">
+                <InlineBold text={row.value} />
+              </span>
+              {row.copy && <CopyButton text={row.value} />}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function ServiceDetailsRenderer({ details }: { details: ServiceDetails }) {
+  const blocks = Array.isArray(details) ? details : [details];
+  return (
+    <div className="flex flex-col gap-3">
+      {blocks.map((block, i) => (
+        <ServiceDetailsBlock key={i} block={block} />
+      ))}
+    </div>
+  );
+}
 
 function AccordionItem({
   title,
@@ -353,11 +442,13 @@ export function CruiseShipInfoPage({ venue, services, slug }: CruiseShipInfoPage
                       isOpen={openItems.has(itemId)}
                       onToggle={() => toggleItem(itemId)}
                     >
-                      {service.description && (
+                      {service.details ? (
+                        <ServiceDetailsRenderer details={service.details} />
+                      ) : service.description ? (
                         <p className="m-0 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
                           {service.description}
                         </p>
-                      )}
+                      ) : null}
                     </AccordionItem>
                   );
                 })

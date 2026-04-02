@@ -148,7 +148,7 @@ export function CruiseHomePage() {
 
         {/* Your Voyage section */}
         <div className="mb-section">
-          <SectionDivider title="Your Voyage" />
+          <SectionDivider title="Our Voyage" />
 
           <div className="flex flex-col gap-card-gap">
             {navItems.map((item) => (

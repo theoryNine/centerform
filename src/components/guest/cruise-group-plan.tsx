@@ -84,11 +84,13 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
   // END marker (is_start items are handled as day headers, not rendered here)
   if (item.is_end) {
     return (
-      <div className="flex items-start gap-3">
-        <div className="w-[52px] shrink-0 pt-[2px] text-right text-label font-semibold text-muted-foreground">
-          {item.time_label ?? ""}
-        </div>
-        <div className="flex flex-1 items-center gap-2 pb-4">
+      <div className="pb-4">
+        {item.time_label && (
+          <p className="m-0 mb-1.5 relative z-10 bg-background text-label font-semibold text-foreground">
+            {item.time_label}
+          </p>
+        )}
+        <div className="flex items-center gap-2">
           <div className="relative z-10 h-3 w-3 shrink-0 rounded-full bg-primary" />
           <p className="m-0 text-label font-semibold tracking-widest text-primary">
             END · {item.title.toUpperCase()}
@@ -125,11 +127,13 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
   );
 
   return (
-    <div className="flex items-start gap-3">
-      <div className="w-[52px] shrink-0 pt-[6px] text-right text-label font-semibold text-muted-foreground">
-        {item.time_label ?? ""}
-      </div>
-      <div className="flex flex-1 items-start gap-3 pb-3">
+    <div className="pb-3">
+      {item.time_label && (
+        <p className="m-0 mb-2 relative z-10 bg-background text-label font-semibold text-foreground">
+          {item.time_label}
+        </p>
+      )}
+      <div className="flex items-start gap-3">
         <div className="relative z-10 mt-[10px] ml-[2px] h-2 w-2 shrink-0 rounded-full bg-muted-foreground/60" />
         {item.restaurant_id ? (
           <Link
@@ -322,7 +326,7 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
                     {/* Vertical line */}
                     <div
                       className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
-                      style={{ left: "calc(52px + 12px + 6px)" }}
+                      style={{ left: "6px" }}
                     />
                     <div className="flex flex-col">
                       {group.items.map((item) => (
@@ -339,7 +343,7 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
           <div className="relative">
             <div
               className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
-              style={{ left: "calc(52px + 12px + 6px)" }}
+              style={{ left: "6px" }}
             />
             <div className="flex flex-col">
               {items.map((item) => (
