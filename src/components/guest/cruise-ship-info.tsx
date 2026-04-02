@@ -205,11 +205,14 @@ export function CruiseShipInfoPage({ venue, services, slug }: CruiseShipInfoPage
         style={{ transform: showStickyNav ? "translateY(0)" : "translateY(-100%)" }}
       >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <div className="flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
+          <div className="relative flex items-center px-5 py-3">
+            <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
               <ArrowLeft size={20} />
             </Link>
-            <span className="font-serif text-base font-normal text-foreground">{shipName}</span>
+            <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+              <span className="font-serif text-[20px] font-normal text-foreground">{shipName}</span>
+            </div>
+            <div className="w-5 shrink-0" />
           </div>
           <div className="-mx-1 flex overflow-x-auto px-5 pb-3 scrollbar-none">
             {SECTION_CONFIG.map((section) => (
@@ -228,21 +231,24 @@ export function CruiseShipInfoPage({ venue, services, slug }: CruiseShipInfoPage
       {/* Main header */}
       <div ref={headerRef}>
         <div
-          className="flex items-center px-5"
+          className="relative flex items-center px-5"
           style={{
             paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
             paddingBottom: 12,
           }}
         >
-          <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
+          <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
             <ArrowLeft size={20} />
           </Link>
-          <Link
-            href={`/${slug}`}
-            className="font-serif text-base font-normal text-foreground no-underline"
-          >
-            {shipName}
-          </Link>
+          <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+            <Link
+              href={`/${slug}`}
+              className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
+            >
+              {shipName}
+            </Link>
+          </div>
+          <div className="w-5 shrink-0" />
         </div>
 
         {/* Hero */}

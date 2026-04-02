@@ -73,7 +73,7 @@ export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
 
       {/* Sticky header */}
       <div
-        className={`sticky top-0 z-30 pt-safe flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
+        className={`sticky top-0 z-30 pt-safe relative flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
           scrolled ? "border-b border-border" : "border-b border-transparent"
         }`}
         style={{ backgroundColor: "var(--background)" }}
@@ -81,10 +81,10 @@ export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
         <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
           <ArrowLeft size={20} />
         </Link>
-        <div className="flex-1 text-center">
+        <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
           <Link
             href={`/${slug}`}
-            className="font-serif text-[16px] font-normal text-foreground no-underline"
+            className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
           >
             {venue.name}
           </Link>

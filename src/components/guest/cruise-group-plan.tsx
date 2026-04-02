@@ -248,14 +248,14 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
       <div ref={headerRef} className="sticky top-0 z-30" style={{ backgroundColor: "var(--background)" }}>
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
           {/* Venue name row */}
-          <div className="flex items-center px-5 py-2">
+          <div className="relative flex items-center px-5 py-2">
             <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
               <ArrowLeft size={20} />
             </Link>
-            <div className="flex-1 text-center">
+            <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
               <Link
                 href={`/${slug}`}
-                className="font-serif text-[16px] font-normal text-foreground no-underline"
+                className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
               >
                 {venue.name}
               </Link>

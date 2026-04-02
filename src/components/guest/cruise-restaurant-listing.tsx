@@ -46,7 +46,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
 
       {/* Sticky header */}
       <div
-        className={`sticky top-0 z-30 pt-safe flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
+        className={`sticky top-0 z-30 pt-safe relative flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
           scrolled ? "border-b border-border" : "border-b border-transparent"
         }`}
         style={{ backgroundColor: "var(--background)" }}
@@ -57,8 +57,8 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
         >
           <ArrowLeft size={20} />
         </button>
-        <div className="flex-1 text-center">
-          <span className="font-serif text-[16px] font-normal text-foreground">{venue.name}</span>
+        <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+          <span className="font-serif text-[20px] font-normal text-foreground">{venue.name}</span>
         </div>
         <div className="w-5 shrink-0" />
       </div>
