@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import {
+  useWindowScroll,
+  ScrollRevealStickyHeader,
+  FloatingBackButton,
+} from "@/components/guest/sticky-header";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import type { CruiseRestaurant, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 
@@ -20,18 +23,7 @@ interface CruiseRestaurantListingProps {
 
 export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseRestaurantListingProps) {
   const router = useRouter();
-  const [scrolled, setScrolled] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => setScrolled(!entry.isIntersecting), {
-      threshold: 0,
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const scrolled = useWindowScroll();
 
   const metaParts = [
     restaurant.cuisine_type ?? null,
@@ -42,26 +34,13 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      <div ref={sentinelRef} className="h-0" />
-
-      {/* Sticky header */}
-      <div
-        className={`sticky top-0 z-30 pt-safe relative flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
-          scrolled ? "border-b border-border" : "border-b border-transparent"
-        }`}
-        style={{ backgroundColor: "var(--background)" }}
-      >
-        <button
-          onClick={() => router.back()}
-          className="shrink-0 cursor-pointer border-none bg-none p-0 text-primary"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-          <span className="font-serif text-[20px] font-normal text-foreground">{venue.name}</span>
-        </div>
-        <div className="w-5 shrink-0" />
-      </div>
+      <ScrollRevealStickyHeader
+        venueName={venue.name}
+        scrolled={scrolled}
+        onBack={() => router.back()}
+        nameHref={`/${slug}`}
+      />
+      <FloatingBackButton scrolled={scrolled} onBack={() => router.back()} />
 
       {/* Hero image */}
       <div className="aspect-[4/3] w-full overflow-hidden">

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
-import { ArrowLeft, User } from "lucide-react";
+import { User } from "lucide-react";
+import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
 import type { CruiseCrewMember, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 
@@ -54,43 +53,17 @@ interface CruiseCrewPageProps {
 }
 
 export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
-  const [scrolled, setScrolled] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => setScrolled(!entry.isIntersecting), {
-      threshold: 0,
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
     <div className="min-h-screen bg-background font-sans">
       <div ref={sentinelRef} className="h-0" />
-
-      {/* Sticky header */}
-      <div
-        className={`sticky top-0 z-30 pt-safe relative flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
-          scrolled ? "border-b border-border" : "border-b border-transparent"
-        }`}
-        style={{ backgroundColor: "var(--background)" }}
-      >
-        <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
-          <ArrowLeft size={20} />
-        </Link>
-        <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-          <Link
-            href={`/${slug}`}
-            className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
-          >
-            {venue.name}
-          </Link>
-        </div>
-        <div className="w-5 shrink-0" />
-      </div>
+      <StickyHeader
+        venueName={venue.name}
+        scrolled={scrolled}
+        backHref={`/${slug}`}
+        nameHref={`/${slug}`}
+      />
 
       {/* Content */}
       <div className="px-page pb-10 pt-4">

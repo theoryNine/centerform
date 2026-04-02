@@ -87,7 +87,6 @@ export function VenueHomePage() {
   }
 
   const cityName = venue?.city ?? "the Area";
-
   const navItems = [
     {
       label: "Your Room & Stay",
@@ -184,7 +183,6 @@ export function VenueHomePage() {
             )}
           </div>
         </div>
-
         {/* Content area */}
         <div className="px-page pb-10 pt-6">
           {/* Welcome card */}

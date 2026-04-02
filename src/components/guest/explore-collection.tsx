@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { ConciergePrompt } from "@/components/guest/concierge-prompt";
 import type {
@@ -314,44 +314,17 @@ export function ExploreCollectionPage({
   collection,
   otherCollections,
 }: ExploreCollectionPageProps) {
-  const [scrolled, setScrolled] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setScrolled(!entry.isIntersecting),
-      { threshold: 0 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
     <div className="min-h-screen bg-background font-sans">
       <div ref={sentinelRef} className="h-0" />
-
-      {/* Sticky header */}
-      <div
-        className={`sticky top-0 z-30 pt-safe flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
-          scrolled ? "border-b border-border" : "border-b border-transparent"
-        }`}
-        style={{ backgroundColor: "var(--background)" }}
-      >
-        <Link href={`/${slug}/explore`} className="shrink-0 text-primary no-underline">
-          <ArrowLeft size={20} />
-        </Link>
-        <div className="flex-1 text-center">
-          <Link
-            href={`/${slug}`}
-            className="font-serif text-[16px] font-normal text-foreground no-underline"
-          >
-            {venue.name}
-          </Link>
-        </div>
-        <div className="w-5 shrink-0" />
-      </div>
+      <StickyHeader
+        venueName={venue.name}
+        scrolled={scrolled}
+        backHref={`/${slug}/explore`}
+        nameHref={`/${slug}`}
+      />
 
       {/* Content */}
       <div className="px-page pb-10 pt-6">

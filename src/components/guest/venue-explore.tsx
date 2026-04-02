@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { ConciergePrompt } from "@/components/guest/concierge-prompt";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
@@ -249,48 +249,17 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
   const cityName = venue.city ?? "the Area";
   const sections = groupByArea(places);
 
-  // Track when page has scrolled past the sentinel to show header border
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setScrolled(!entry.isIntersecting),
-      { threshold: 0 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      {/* Sentinel — sits at top of page; when it scrolls out of view, header gets border */}
       <div ref={sentinelRef} className="h-0" />
-
-      {/* Sticky header */}
-      <div
-        className={`sticky top-0 z-30 pt-safe flex items-center px-5 pb-2 transition-[border-color] duration-200 ${scrolled ? "border-b border-border" : "border-b border-transparent"}`}
-        style={{ backgroundColor: "var(--background)" }}
-      >
-        <Link
-          href={`/${slug}`}
-          className="shrink-0 text-primary no-underline"
-        >
-          <ArrowLeft size={20} />
-        </Link>
-        <div className="flex-1 text-center">
-          <Link
-            href={`/${slug}`}
-            className="font-serif text-[16px] font-normal text-foreground no-underline"
-          >
-            {venueName}
-          </Link>
-        </div>
-        {/* Spacer to center the title */}
-        <div className="w-5 shrink-0" />
-      </div>
+      <StickyHeader
+        venueName={venueName}
+        scrolled={scrolled}
+        backHref={`/${slug}`}
+        nameHref={`/${slug}`}
+      />
 
       {/* Hero section with shaped image */}
       <div className="flex min-h-[200px] items-center pt-6">

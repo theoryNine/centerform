@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
@@ -38,19 +36,7 @@ interface PlaceListingProps {
 }
 
 export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
-  const [scrolled, setScrolled] = useState(false);
-  const heroSentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = heroSentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setScrolled(!entry.isIntersecting),
-      { threshold: 0 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { scrolled, sentinelRef } = useStickyScroll();
 
   const priceLabel = place.price_level ? "$".repeat(place.price_level) : null;
   const ctaLabel = place.cta_label ?? getCTALabel(place.category);
@@ -61,26 +47,13 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      {/* Sticky header — transparent over hero, solid after scroll */}
-      <div
-        className={`sticky top-0 z-30 pt-safe flex items-center px-5 pb-2 transition-[background-color,border-color] duration-200 ${
-          scrolled ? "border-b border-border" : "border-b border-transparent"
-        }`}
-        style={{ backgroundColor: scrolled ? "var(--background)" : "transparent" }}
-      >
-        <Link href={`/${slug}/explore`} className="shrink-0 text-primary no-underline" onClick={(e) => { e.preventDefault(); history.back(); }}>
-          <ArrowLeft size={20} />
-        </Link>
-        <div
-          className={`flex-1 text-center transition-opacity duration-200 ${scrolled ? "opacity-100" : "opacity-0"}`}
-        >
-          <span className="font-serif text-[16px] font-normal text-foreground">
-            {place.name}
-          </span>
-        </div>
-        {/* Spacer to balance back arrow */}
-        <div className="w-5 shrink-0" />
-      </div>
+      <div ref={sentinelRef} className="h-0" />
+      <StickyHeader
+        venueName={venue.name}
+        scrolled={scrolled}
+        onBack={() => history.back()}
+        nameHref={`/${slug}`}
+      />
 
       {/* Hero image */}
       {place.image_url ? (
@@ -97,9 +70,6 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
           style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A89878 100%)" }}
         />
       )}
-
-      {/* Sentinel — sits at bottom of hero; triggers header transition */}
-      <div ref={heroSentinelRef} className="h-0" />
 
       {/* Content — slides up slightly over image when image present */}
       <div

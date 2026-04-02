@@ -25,7 +25,6 @@ export function CruiseHomePage() {
   const locationParts = [venue?.city, venue?.state].filter(Boolean);
   const locationString =
     locationParts.length > 0 ? locationParts.join(" · ").toUpperCase() : "";
-
   const [links, setLinks] = useState<CruiseLink[]>([]);
 
   useEffect(() => {
@@ -121,7 +120,6 @@ export function CruiseHomePage() {
           )}
         </div>
       </div>
-
       {/* Content */}
       <div className="px-page pb-10 pt-6">
         {/* Welcome card */}
