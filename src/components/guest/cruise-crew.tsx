@@ -1,21 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { User } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
-import type { CruiseCrewMember, Venue } from "@/types";
+import type { Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { CREW } from "@/lib/cruise-crew-data";
 
-function CrewMemberCard({ member }: { member: CruiseCrewMember }) {
+function CrewTile({ name, photo, href }: { name: string; photo?: string; href: string }) {
   return (
-    <div className="card-shadow flex items-start gap-4 rounded-default bg-card p-card">
-      {/* Avatar */}
-      <div className="h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full">
-        {member.image_url ? (
-          <img
-            src={member.image_url}
-            alt={member.name}
-            className="size-full object-cover"
-          />
+    <Link href={href} className="card-shadow overflow-hidden rounded-default bg-card no-underline">
+      {/* Image */}
+      <div className="aspect-square w-full overflow-hidden">
+        {photo ? (
+          <img src={photo} alt={name} className="size-full object-cover object-top" />
         ) : (
           <div
             className="flex size-full items-center justify-center"
@@ -23,36 +21,27 @@ function CrewMemberCard({ member }: { member: CruiseCrewMember }) {
               background: "linear-gradient(135deg, #0E3A5C 0%, #2980B9 100%)",
             }}
           >
-            <User size={28} color="rgba(255,255,255,0.5)" />
+            <User size={32} color="rgba(255,255,255,0.4)" />
           </div>
         )}
       </div>
 
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <p className="m-0 font-serif text-card-title-sm font-semibold leading-tight text-foreground">
-          {member.name}
+      {/* Name */}
+      <div className="px-2 py-3 text-center">
+        <p className="m-0 font-serif text-cta-button font-normal leading-tight text-foreground">
+          {name}
         </p>
-        <p className="m-0 mt-0.5 text-label font-semibold uppercase tracking-widest text-primary">
-          {member.role}
-        </p>
-        {member.bio && (
-          <p className="m-0 mt-2 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
-            {member.bio}
-          </p>
-        )}
       </div>
-    </div>
+    </Link>
   );
 }
 
 interface CruiseCrewPageProps {
   venue: Venue;
-  crew: CruiseCrewMember[];
   slug: string;
 }
 
-export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
+export function CruiseCrewPage({ venue, slug }: CruiseCrewPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
@@ -65,44 +54,30 @@ export function CruiseCrewPage({ venue, crew, slug }: CruiseCrewPageProps) {
         nameHref={`/${slug}`}
       />
 
-      {/* Content */}
-      <div className="px-page pb-10 pt-4">
-        {/* Header card */}
-        <div className="card-shadow relative mb-6 rounded-default bg-card px-4 py-6 text-center">
-          <span
-            className="absolute inline-block h-4 w-4 border-l-2 border-t-2 border-foreground/25"
-            style={{ top: 10, left: 10 }}
-          />
-          <span
-            className="absolute inline-block h-4 w-4 border-r-2 border-t-2 border-foreground/25"
-            style={{ top: 10, right: 10 }}
-          />
-          <span
-            className="absolute inline-block h-4 w-4 border-b-2 border-l-2 border-foreground/25"
-            style={{ bottom: 10, left: 10 }}
-          />
-          <span
-            className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25"
-            style={{ bottom: 10, right: 10 }}
-          />
+      {/* Mini-hero */}
+      <div className="flex min-h-[180px] items-center pt-6">
+        <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
+          <img src="/crew/hero.png" alt="The Crew" className="size-full object-cover" />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
           <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
             The Crew
           </h1>
-          <div className="mx-auto my-3 h-[1px] w-15 bg-foreground/25" />
-          <p className="m-0 text-description text-muted-foreground">Meet your group</p>
         </div>
+      </div>
 
-        {crew.length === 0 ? (
-          <div className="py-12 text-center text-[14px] text-muted-foreground">
-            Crew information coming soon.
-          </div>
-        ) : (
-          <div className="flex flex-col gap-card-gap">
-            {crew.map((member) => (
-              <CrewMemberCard key={member.id} member={member} />
-            ))}
-          </div>
-        )}
+      {/* Content */}
+      <div className="px-page pb-10 pt-6">
+        <div className="grid grid-cols-2 gap-card-gap">
+          {CREW.map((member) => (
+            <CrewTile
+              key={member.slug}
+              name={member.name}
+              photo={member.photos[0]}
+              href={`/${slug}/the-crew/${member.slug}`}
+            />
+          ))}
+        </div>
 
         <div className="mt-10">
           <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />

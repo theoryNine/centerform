@@ -253,16 +253,6 @@ export async function getCruiseItineraryItems(venueId: string): Promise<CruiseIt
   return (data ?? []) as CruiseItineraryItem[];
 }
 
-export async function getCruiseCrew(venueId: string): Promise<CruiseCrewMember[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("cruise_crew")
-    .select("*")
-    .eq("venue_id", venueId)
-    .eq("is_active", true)
-    .order("display_order", { ascending: true });
-  return (data ?? []) as CruiseCrewMember[];
-}
 
 export async function getCruiseRestaurantById(restaurantId: string): Promise<CruiseRestaurant | null> {
   const supabase = await createClient();

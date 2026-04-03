@@ -1,5 +1,4 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getCruiseCrew } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseCrewPage } from "@/components/guest/cruise-crew";
 
@@ -15,7 +14,5 @@ export default async function TheCrewPage({
     notFound();
   }
 
-  const crew = await getCruiseCrew(resolved.data.id);
-
-  return <CruiseCrewPage venue={resolved.data} crew={crew} slug={slug} />;
+  return <CruiseCrewPage venue={resolved.data} slug={slug} />;
 }

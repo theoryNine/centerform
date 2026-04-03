@@ -165,47 +165,51 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
   const hasDays = dayGroups.length > 0;
 
   const [activeDay, setActiveDay] = useState<string>(dayGroups[0]?.id ?? "");
-  const [scrolled, setScrolled] = useState(false);
+  const [showStickyNav, setShowStickyNav] = useState(false);
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const mainHeaderRef = useRef<HTMLDivElement>(null);
+  const stickyNavRef = useRef<HTMLDivElement>(null);
   const pillContainerRef = useRef<HTMLDivElement>(null);
+  const stickyPillContainerRef = useRef<HTMLDivElement>(null);
   const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const stickyPillRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const headerRef = useRef<HTMLDivElement>(null);
   // Prevent scroll-spy from fighting a programmatic scroll-to
   const isScrollingTo = useRef(false);
 
-  // Border on scroll past header
+  // Show sticky nav when main header scrolls out of view
   useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setScrolled(!entry.isIntersecting),
-      { threshold: 0 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      if (mainHeaderRef.current) {
+        const rect = mainHeaderRef.current.getBoundingClientRect();
+        setShowStickyNav(rect.bottom <= 0);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Scroll active pill into view whenever activeDay changes
+  // Scroll active pill into view whenever activeDay changes (both pill rows)
   useEffect(() => {
-    const container = pillContainerRef.current;
-    const pill = pillRefs.current[activeDay];
-    if (!container || !pill) return;
-    const targetScroll = pill.offsetLeft - container.clientWidth / 2 + pill.offsetWidth / 2;
-    container.scrollTo({ left: targetScroll, behavior: "smooth" });
+    for (const [containerRef, refs] of [
+      [pillContainerRef, pillRefs] as const,
+      [stickyPillContainerRef, stickyPillRefs] as const,
+    ]) {
+      const container = containerRef.current;
+      const pill = refs.current[activeDay];
+      if (!container || !pill) continue;
+      const targetScroll = pill.offsetLeft - container.clientWidth / 2 + pill.offsetWidth / 2;
+      container.scrollTo({ left: targetScroll, behavior: "smooth" });
+    }
   }, [activeDay]);
 
   // Scroll-spy: update active pill as sections enter the viewport
   useEffect(() => {
     if (!hasDays) return;
 
-    // Fire when the top of a section enters the top ~40% of the visible area
-    // (accounting for the sticky header via rootMargin)
     const observer = new IntersectionObserver(
       (entries) => {
         if (isScrollingTo.current) return;
-        // Find the topmost intersecting section
         const intersecting = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -225,78 +229,125 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
     return () => observer.disconnect();
   }, [hasDays, dayGroups]);
 
-  const scrollToDay = useCallback(
-    (groupId: string) => {
-      setActiveDay(groupId);
-      const section = sectionRefs.current[groupId];
-      if (!section) return;
+  const scrollToDay = useCallback((groupId: string) => {
+    setActiveDay(groupId);
+    const section = sectionRefs.current[groupId];
+    if (!section) return;
 
-      isScrollingTo.current = true;
-      const headerHeight = headerRef.current?.offsetHeight ?? 90;
-      const top = section.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
-      window.scrollTo({ top, behavior: "smooth" });
+    isScrollingTo.current = true;
+    const stickyHeight = stickyNavRef.current?.offsetHeight ?? 90;
+    const top = section.getBoundingClientRect().top + window.scrollY - stickyHeight - 16;
+    window.scrollTo({ top, behavior: "smooth" });
 
-      // Re-enable scroll-spy after scroll settles
-      setTimeout(() => {
-        isScrollingTo.current = false;
-      }, 900);
-    },
-    [],
-  );
+    setTimeout(() => {
+      isScrollingTo.current = false;
+    }, 900);
+  }, []);
+
+  const pillRow = (
+    containerRef: React.RefObject<HTMLDivElement | null>,
+    refs: React.RefObject<Record<string, HTMLButtonElement | null>>,
+  ) =>
+    hasDays ? (
+      <div ref={containerRef} className="flex gap-2 overflow-x-auto px-5 pb-3 scrollbar-none">
+        {dayGroups.map((group) => (
+          <button
+            key={group.id}
+            ref={(el) => {
+              refs.current[group.id] = el;
+            }}
+            onClick={() => scrollToDay(group.id)}
+            className={`shrink-0 cursor-pointer whitespace-nowrap rounded-chip border-none px-4 py-2 text-description font-medium transition-all duration-200 ease-out ${
+              activeDay === group.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-card text-foreground"
+            }`}
+          >
+            {group.label}
+          </button>
+        ))}
+      </div>
+    ) : null;
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      <div ref={sentinelRef} className="h-0" />
-
-      {/* Sticky header — venue name + day pills together */}
-      <div ref={headerRef} className="sticky top-0 z-30" style={{ backgroundColor: "var(--background)" }}>
+      {/* Sticky nav — slides in when main header scrolls out of view */}
+      <div
+        ref={stickyNavRef}
+        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
+        style={{ transform: showStickyNav ? "translateY(0)" : "translateY(-100%)" }}
+      >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          {/* Venue name row */}
-          <div className="relative flex items-center px-5 py-2">
+          <div className="relative flex items-center px-5 py-3">
             <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
               <ArrowLeft size={20} />
             </Link>
             <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-              <Link
-                href={`/${slug}`}
-                className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
-              >
-                {venue.name}
-              </Link>
+              <span className="font-serif text-[20px] font-normal text-foreground">{venue.name}</span>
             </div>
             <div className="w-5 shrink-0" />
           </div>
-
-          {/* Day pills */}
-          {hasDays && (
-            <div
-              ref={pillContainerRef}
-              className="flex gap-2 overflow-x-auto px-5 pb-3 scrollbar-none"
-            >
-              {dayGroups.map((group) => (
-                <button
-                  key={group.id}
-                  ref={(el) => {
-                    pillRefs.current[group.id] = el;
-                  }}
-                  onClick={() => scrollToDay(group.id)}
-                  className={`shrink-0 cursor-pointer whitespace-nowrap rounded-chip border-none px-4 py-2 text-description font-medium transition-all duration-200 ease-out ${
-                    activeDay === group.id
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-foreground"
-                  }`}
-                >
-                  {group.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Border */}
-          <div
-            className={`h-px transition-colors duration-200 ${scrolled ? "bg-border" : "bg-transparent"}`}
-          />
+          {pillRow(stickyPillContainerRef, stickyPillRefs)}
+          <div className="h-px bg-border" />
         </div>
+      </div>
+
+      {/* Main header (scrolls with page) */}
+      <div ref={mainHeaderRef}>
+        <div
+          className="relative flex items-center px-5"
+          style={{
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
+            paddingBottom: 12,
+          }}
+        >
+          <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
+            <ArrowLeft size={20} />
+          </Link>
+          <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+            <Link
+              href={`/${slug}`}
+              className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
+            >
+              {venue.name}
+            </Link>
+          </div>
+          <div className="w-5 shrink-0" />
+        </div>
+
+        {/* Hero */}
+        <div className="flex min-h-[180px] items-center">
+          <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
+            {venue.cover_image_url ? (
+              <img
+                src={venue.cover_image_url}
+                alt={venue.name}
+                className="size-full object-cover"
+              />
+            ) : (
+              <div
+                className="flex size-full items-center justify-center"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
+                }}
+              >
+                <span className="font-serif text-[40px] font-light text-white/50">
+                  {venue.name.charAt(0)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
+              Group Plan
+            </h1>
+          </div>
+        </div>
+
+        {/* Day pills (inline) */}
+        <div className="pt-5 pb-1">{pillRow(pillContainerRef, pillRefs)}</div>
       </div>
 
       {/* Content — all days on one page */}
