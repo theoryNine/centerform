@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { Phone, ArrowRight, Anchor } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { WelcomeSplash } from "@/components/guest/welcome-splash";
 import { createClient } from "@/lib/supabase/client";
 import type { CruiseLink } from "@/types";
 
@@ -25,6 +26,24 @@ export function CruiseHomePage() {
   const locationParts = [venue?.city, venue?.state].filter(Boolean);
   const locationString =
     locationParts.length > 0 ? locationParts.join(" · ").toUpperCase() : "";
+  // Welcome splash state — show only once per cruise venue
+  const splashKey = `splash-dismissed:${slug}`;
+  const [splashDismissed, setSplashDismissed] = useState(false);
+  const [splashVisible, setSplashVisible] = useState(true);
+
+  useEffect(() => {
+    if (localStorage.getItem(splashKey)) {
+      setSplashDismissed(true);
+      setSplashVisible(false);
+    }
+  }, [splashKey]);
+
+  function handleSplashEnter() {
+    setSplashDismissed(true);
+    localStorage.setItem(splashKey, "1");
+    setTimeout(() => setSplashVisible(false), 500);
+  }
+
   const [links, setLinks] = useState<CruiseLink[]>([]);
 
   useEffect(() => {
@@ -72,11 +91,44 @@ export function CruiseHomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <>
+      {/* Welcome splash overlay */}
+      {splashVisible && (
+        <div
+          className="fixed inset-0 z-[100] transition-opacity duration-500 ease-out"
+          style={{ opacity: splashDismissed ? 0 : 1 }}
+        >
+          <WelcomeSplash
+            name={shipName}
+            tagline="Welcome aboard. We're glad you're here."
+            coverImageUrl={venue?.cover_image_url ?? undefined}
+            fallbackContent={
+              <div
+                className="flex size-full items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
+                }}
+              >
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: "radial-gradient(ellipse at 60% 50%, rgba(41,128,185,0.4) 0%, rgba(14,58,92,0.6) 100%)",
+                  }}
+                />
+                <Anchor size={48} className="relative z-[1]" color="rgba(173,216,230,0.4)" />
+              </div>
+            }
+            variant={venue?.splash_variant ?? "oversized"}
+            onEnter={handleSplashEnter}
+          />
+        </div>
+      )}
+
+      <div className="min-h-screen bg-background font-sans">
       {/* Header */}
       <div className="flex min-h-[280px] items-center pt-[calc(env(safe-area-inset-top,0px)+32px)]">
         {/* Image — flush left, rounded right */}
-        <div className="relative h-[280px] w-[45%] min-w-[160px] max-w-[220px] shrink-0 overflow-hidden rounded-r-[50%]">
+        <div className={`relative h-[280px] w-[45%] min-w-[160px] max-w-[220px] shrink-0 overflow-hidden rounded-r-[50%] ${splashDismissed ? "animate-slide-in-left" : ""}`}>
           {venue?.cover_image_url ? (
             <img
               src={venue.cover_image_url}
@@ -108,7 +160,7 @@ export function CruiseHomePage() {
         </div>
 
         {/* Ship name and location */}
-        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+        <div className={`flex flex-1 flex-col items-center justify-center px-6 text-center ${splashDismissed ? "animate-fade-in" : ""}`}>
           <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
             {shipName}
           </h1>
@@ -221,5 +273,6 @@ export function CruiseHomePage() {
         <div className="h-safe-bottom" />
       </div>
     </div>
+    </>
   );
 }

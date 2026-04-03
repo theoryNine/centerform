@@ -1,4 +1,5 @@
 export type VenueType = "hotel" | "resort" | "museum" | "event_space" | "cruise" | "other";
+export type SplashVariant = "oversized" | "text";
 export type MemberRole = "owner" | "admin" | "staff";
 export type ServiceCategory = "room_service" | "spa" | "concierge" | "dining" | "transportation" | "activities" | "other" | "welcome_aboard" | "ship_amenities" | "ship_entertainment";
 export type PlaceCategory = "restaurant" | "bar" | "cafe" | "attraction" | "shopping" | "entertainment" | "outdoors" | "other";
@@ -23,6 +24,7 @@ export interface Venue {
   welcome_heading: string | null;
   welcome_body: string | null;
   phone_label: string | null;
+  splash_variant: SplashVariant;
   is_active: boolean;
   created_at: string;
   updated_at: string;
