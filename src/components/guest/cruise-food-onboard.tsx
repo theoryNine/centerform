@@ -53,11 +53,6 @@ function RestaurantRow({ restaurant, slug }: { restaurant: CruiseRestaurant; slu
             {metaParts.join(" · ")}
           </p>
         )}
-        {restaurant.description && (
-          <p className="m-0 mt-1 text-[12px] leading-snug text-muted-foreground line-clamp-1">
-            {restaurant.description}
-          </p>
-        )}
       </div>
 
       <ArrowRight size={16} className="mr-4 shrink-0 text-primary" />
