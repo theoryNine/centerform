@@ -107,7 +107,7 @@ export function CruiseCrewListing({ venue, member, slug }: CruiseCrewListingProp
           </p>
         </div>
 
-        <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />
+        <VenueFooter venueName={venue.name} address={venue.ship_name} phone={venue.phone} />
       </div>
 
       <div className="h-safe-bottom" />
