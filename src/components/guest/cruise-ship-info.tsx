@@ -86,7 +86,7 @@ function InlineBold({ text }: { text: string }) {
 function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
   if (block.type === "text") {
     return (
-      <p className="m-0 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
+      <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
         <InlineBold text={block.content} />
       </p>
     );
@@ -96,7 +96,7 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
     return (
       <ul className="m-0 list-none p-0 flex flex-col gap-1">
         {block.items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
+          <li key={i} className="flex items-start gap-2 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
             <span className="mt-[5px] h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
             <InlineBold text={item} />
           </li>
@@ -108,12 +108,12 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
   if (block.type === "phone") {
     return (
       <div className="flex items-center justify-between">
-        <span className="text-description text-muted-foreground">
+        <span className="text-body-sm text-muted-foreground">
           <InlineBold text={block.label} />
         </span>
         <a
           href={`tel:${block.value.replace(/\D/g, "")}`}
-          className="text-description font-semibold text-primary no-underline"
+          className="text-body-sm font-semibold text-primary no-underline"
         >
           {block.value}
         </a>
@@ -126,11 +126,11 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
       <div className="flex flex-col gap-2">
         {block.rows.map((row, i) => (
           <div key={i} className="flex items-center justify-between gap-4">
-            <span className="text-description text-muted-foreground">
+            <span className="text-body-sm text-muted-foreground">
               <InlineBold text={row.label} />
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-description font-medium text-foreground">
+              <span className="text-body-sm font-medium text-foreground">
                 <InlineBold text={row.value} />
               </span>
               {row.copy && <CopyButton text={row.value} />}
@@ -211,7 +211,7 @@ function SectionTab({
   return (
     <button
       onClick={onClick}
-      className={`cursor-pointer rounded-chip border-none px-4 py-2 text-description font-medium transition-all duration-200 ease-out ${
+      className={`cursor-pointer rounded-chip border-none px-4 py-2 text-body-sm font-medium transition-all duration-200 ease-out ${
         isActive ? "bg-primary text-primary-foreground" : "bg-transparent text-foreground"
       }`}
     >
@@ -435,7 +435,7 @@ export function CruiseShipInfoPage({ venue, services, slug }: CruiseShipInfoPage
                       {service.details ? (
                         <ServiceDetailsRenderer details={service.details} />
                       ) : service.description ? (
-                        <p className="m-0 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
+                        <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
                           {service.description}
                         </p>
                       ) : null}

@@ -81,7 +81,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
             {place.name}
           </h1>
           {place.tagline && (
-            <p className="m-0 mt-1 text-description text-muted-foreground">{place.tagline}</p>
+            <p className="m-0 mt-1 text-body-sm text-muted-foreground">{place.tagline}</p>
           )}
 
           {/* Description */}

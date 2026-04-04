@@ -111,7 +111,7 @@ function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
 
       {/* Text below image */}
       <div className="px-3 py-2.5">
-        <p className="m-0 text-description font-semibold leading-tight text-foreground">
+        <p className="m-0 text-body-sm font-semibold leading-tight text-foreground">
           {place.name}
         </p>
         {place.description && (
@@ -226,7 +226,7 @@ function AreaSectionView({
         <div className="mt-3 flex justify-end">
           <Link
             href={areaHref}
-            className="flex items-center gap-1 text-description font-medium text-primary no-underline"
+            className="flex items-center gap-1 text-body-sm font-medium text-primary no-underline"
           >
             {section.name.startsWith("Beyond")
               ? `See more ${section.name.replace("Beyond", "beyond")}`

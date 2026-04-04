@@ -34,7 +34,7 @@ export function NavCard({ label, sublabel, href, imageUrl }: NavCardProps) {
       </div>
       <div className="min-w-0 flex-1 py-4">
         <div className="mb-0.5 font-serif text-card-title-lg font-bold text-foreground">{label}</div>
-        <div className="text-description leading-snug text-muted-foreground">{sublabel}</div>
+        <div className="text-body-sm leading-snug text-muted-foreground">{sublabel}</div>
       </div>
       <ArrowRight size={18} color="var(--primary, #1A7A6D)" className="mr-3 shrink-0" />
     </button>

@@ -10,11 +10,11 @@ export function VenueFooter({ venueName, address, phone }: VenueFooterProps) {
       <div className="mb-1 font-serif text-body-sm font-medium text-foreground">
         {venueName}
       </div>
-      {address && <p className="mb-1 text-description text-muted-foreground">{address}</p>}
+      {address && <p className="mb-1 text-body-sm text-muted-foreground">{address}</p>}
       {phone && (
         <a
           href={`tel:${phone.replace(/\D/g, "")}`}
-          className="text-description font-medium text-primary no-underline"
+          className="text-body-sm font-medium text-primary no-underline"
         >
           {phone}
         </a>

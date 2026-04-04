@@ -198,7 +198,7 @@ function SectionTab({
   return (
     <button
       onClick={onClick}
-      className={`cursor-pointer rounded-chip border-none px-4 py-2 text-description font-medium transition-all duration-200 ease-out ${
+      className={`cursor-pointer rounded-chip border-none px-4 py-2 text-body-sm font-medium transition-all duration-200 ease-out ${
         isActive
           ? "bg-primary text-primary-foreground"
           : "bg-transparent text-foreground"
@@ -450,7 +450,7 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
                         />
                       ) : (
                         service.description && (
-                          <p className="m-0 text-description leading-[var(--cf-body-line-height)] text-muted-foreground">
+                          <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
                             {service.description}
                           </p>
                         )
