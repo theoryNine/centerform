@@ -85,9 +85,15 @@ function InlineBold({ text }: { text: string }) {
 
 function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
   if (block.type === "text") {
+    const lines = block.content.split("\n");
     return (
       <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
-        <InlineBold text={block.content} />
+        {lines.map((line, i) => (
+          <span key={i}>
+            {i > 0 && <br />}
+            <InlineBold text={line} />
+          </span>
+        ))}
       </p>
     );
   }
