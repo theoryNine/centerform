@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
+import { NavCard } from "@/components/guest/nav-card";
 import type { CruiseRestaurant, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { PageHero } from "@/components/guest/page-hero";
@@ -13,51 +12,14 @@ function formatPrice(priceLevel: number | null): string | null {
   return "$".repeat(priceLevel);
 }
 
-function RestaurantRow({ restaurant, slug }: { restaurant: CruiseRestaurant; slug: string }) {
-  const metaParts = [
-    restaurant.cuisine_type ?? null,
-    restaurant.deck ? `Deck ${restaurant.deck}` : null,
-    formatPrice(restaurant.price_level),
-  ].filter(Boolean);
-
-  return (
-    <Link
-      href={`/${slug}/food-onboard/${restaurant.id}`}
-      className="card-shadow flex items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
-    >
-      {/* Thumbnail */}
-      <div className="w-[25%] shrink-0 self-stretch overflow-hidden">
-        {restaurant.image_url ? (
-          <img
-            src={restaurant.image_url}
-            alt={restaurant.name}
-            className="size-full object-cover"
-          />
-        ) : (
-          <div
-            className="size-full"
-            style={{
-              background: "linear-gradient(135deg, #0E3A5C 0%, #2980B9 100%)",
-            }}
-          />
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="min-w-0 flex-1 py-3">
-        <p className="m-0 font-serif text-card-title-sm font-semibold leading-tight text-foreground">
-          {restaurant.name}
-        </p>
-        {metaParts.length > 0 && (
-          <p className="m-0 mt-0.5 text-[10px] font-semibold tracking-widest text-muted-foreground">
-            {metaParts.join(" · ")}
-          </p>
-        )}
-      </div>
-
-      <ArrowRight size={16} className="mr-4 shrink-0 text-primary" />
-    </Link>
-  );
+function restaurantSubLabel(r: CruiseRestaurant): string {
+  return [
+    r.cuisine_type ?? null,
+    r.deck ? `Deck ${r.deck}` : null,
+    formatPrice(r.price_level),
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 interface CruiseFoodOnboardPageProps {
@@ -120,7 +82,13 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
                 <SectionHeader number="01" title="Sit Down Restaurants" />
                 <div className="flex flex-col gap-card-gap">
                   {sitDown.map((r) => (
-                    <RestaurantRow key={r.id} restaurant={r} slug={slug} />
+                    <NavCard
+                      key={r.id}
+                      label={r.name}
+                      sublabel={restaurantSubLabel(r)}
+                      href={`/${slug}/food-onboard/${r.id}`}
+                      imageUrl={r.image_url ?? undefined}
+                    />
                   ))}
                 </div>
               </div>
@@ -134,7 +102,13 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
                 />
                 <div className="flex flex-col gap-card-gap">
                   {walkUp.map((r) => (
-                    <RestaurantRow key={r.id} restaurant={r} slug={slug} />
+                    <NavCard
+                      key={r.id}
+                      label={r.name}
+                      sublabel={restaurantSubLabel(r)}
+                      href={`/${slug}/food-onboard/${r.id}`}
+                      imageUrl={r.image_url ?? undefined}
+                    />
                   ))}
                 </div>
               </div>
