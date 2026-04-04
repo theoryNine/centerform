@@ -67,7 +67,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
           />
         }
         title="Food Onboard"
-        className="pt-6"
+        className="pt-8"
       />
 
       {/* Content */}

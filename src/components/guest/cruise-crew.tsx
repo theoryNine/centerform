@@ -67,7 +67,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription }: CruiseCrewPageP
           />
         }
         title="The Crew"
-        className="pt-6"
+        className="pt-8"
       />
 
       {/* Content */}

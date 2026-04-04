@@ -276,7 +276,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription }: Venue
         title={<>Explore<br />{cityName} & Beyond</>}
         animated
         textAlign="left"
-        className="min-h-[200px] pt-6"
+        className="min-h-[200px] pt-8"
       />
 
       {/* Content */}
