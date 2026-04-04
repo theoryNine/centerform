@@ -382,25 +382,9 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: C
         </div>
 
         {/* Subheader */}
-        {venue.address && (
+        {venue.ship_name && (
           <div className="px-5 py-4 text-xs text-muted-foreground">
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                [venue.address, venue.city, venue.state].filter(Boolean).join(", "),
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium leading-snug text-primary no-underline"
-            >
-              {venue.address}
-              {venue.city && (
-                <>
-                  <br />
-                  {venue.city}
-                  {venue.state ? `, ${venue.state}` : ""}
-                </>
-              )}
-            </a>
+            <span className="font-medium leading-snug text-primary">{venue.ship_name}</span>
           </div>
         )}
       </div>
@@ -462,7 +446,7 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: C
       </div>
 
       <div className="px-5">
-        <VenueFooter venueName={shipName} address={venue.address} phone={venue.phone} />
+        <VenueFooter venueName={shipName} address={venue.ship_name} phone={venue.phone} />
       </div>
 
       <div className="h-safe-bottom" />

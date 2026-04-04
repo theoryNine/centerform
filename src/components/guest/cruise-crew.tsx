@@ -89,7 +89,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription }: CruiseCrewPageP
         </div>
 
         <div className="mt-10">
-          <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />
+          <VenueFooter venueName={venue.name} address={venue.ship_name} phone={venue.phone} />
         </div>
 
         <div className="h-safe-bottom" />

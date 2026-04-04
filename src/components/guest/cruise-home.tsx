@@ -24,9 +24,7 @@ export function CruiseHomePage() {
   const venue = resolved.type === "venue" ? resolved.data : null;
   const shipName = venue?.name ?? formatVenueName(slug);
 
-  const locationParts = [venue?.city, venue?.state].filter(Boolean);
-  const locationString =
-    locationParts.length > 0 ? locationParts.join(" · ").toUpperCase() : "";
+  const locationString = venue?.ship_name?.toUpperCase() ?? "";
   // Welcome splash state — show only once per cruise venue
   const splashKey = `splash-dismissed:${slug}`;
   const [splashDismissed, setSplashDismissed] = useState(false);
@@ -215,7 +213,7 @@ export function CruiseHomePage() {
           </div>
         )}
 
-        <VenueFooter venueName={shipName} address={venue?.address} phone={venue?.phone} />
+        <VenueFooter venueName={shipName} address={venue?.ship_name} phone={venue?.phone} />
         <div className="h-safe-bottom" />
       </div>
     </div>

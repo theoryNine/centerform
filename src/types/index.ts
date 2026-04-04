@@ -24,6 +24,7 @@ export interface Venue {
   welcome_heading: string | null;
   welcome_body: string | null;
   phone_label: string | null;
+  ship_name: string | null;
   splash_variant: SplashVariant;
   is_active: boolean;
   created_at: string;
