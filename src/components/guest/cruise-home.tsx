@@ -32,11 +32,6 @@ export function CruiseHomePage() {
   const [splashDismissed, setSplashDismissed] = useState(false);
   const [splashVisible, setSplashVisible] = useState(true);
 
-  // Safari mobile adjusts initial scroll position past safe-area padding — reset to top
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   useEffect(() => {
     if (localStorage.getItem(splashKey)) {
       setSplashDismissed(true);
@@ -124,7 +119,9 @@ export function CruiseHomePage() {
       )}
 
       <div className="min-h-screen bg-background font-sans">
-      {/* Header */}
+        {/* Safe-area spacer: real DOM element so Safari doesn't skip it on initial load */}
+        <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
+        {/* Header */}
       <PageHero
         imageUrl={venue?.cover_image_url}
         imageAlt={shipName}

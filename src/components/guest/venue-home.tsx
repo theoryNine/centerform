@@ -51,11 +51,6 @@ export function VenueHomePage() {
   const [splashDismissed, setSplashDismissed] = useState(false);
   const [splashVisible, setSplashVisible] = useState(true);
 
-  // Safari mobile adjusts initial scroll position past safe-area padding — reset to top
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   useEffect(() => {
     if (localStorage.getItem(splashKey)) {
       setSplashDismissed(true);
@@ -149,6 +144,8 @@ export function VenueHomePage() {
 
       {/* Main scrollable page */}
       <div className="min-h-screen bg-background font-sans">
+        {/* Safe-area spacer: real DOM element so Safari doesn't skip it on initial load */}
+        <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
         {/* Header section with shaped image */}
         <PageHero
           imageUrl={venue?.cover_image_url}

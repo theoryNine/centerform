@@ -39,8 +39,7 @@ export function PageHero({
 
   return (
     <div
-      className={cn("flex items-center", isHome ? "min-h-[280px]" : "min-h-[180px]", className)}
-      style={isHome ? { paddingTop: "calc(env(safe-area-inset-top, 0px) + 32px)" } : undefined}
+      className={cn("flex items-center", isHome ? "min-h-[280px] pt-8" : "min-h-[180px]", className)}
     >
       {/* Image — flush left, rounded right */}
       <div
