@@ -73,7 +73,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
       {/* Content */}
       <div className="px-page pb-10 pt-2">
         {pageDescription && (
-          <p className="mb-0 mt-2 text-body leading-[var(--cf-body-line-height)] text-foreground">
+          <p className="mb-6 mt-2 text-body leading-[var(--cf-body-line-height)] text-foreground">
             {pageDescription}
           </p>
         )}

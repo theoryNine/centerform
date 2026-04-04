@@ -408,7 +408,7 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: C
       {/* Accordion sections */}
       <div className="px-page pb-10">
         {pageDescription && (
-          <p className="mb-0 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
+          <p className="mb-6 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
             {pageDescription}
           </p>
         )}

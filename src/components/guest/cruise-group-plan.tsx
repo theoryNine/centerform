@@ -87,7 +87,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
     return (
       <div className="pb-4">
         {item.time_label && (
-          <p className="m-0 mb-1.5 relative z-10 bg-background text-label font-semibold text-foreground">
+          <p className="m-0 mb-1.5 relative z-10 bg-background text-body-sm font-semibold text-foreground">
             {item.time_label}
           </p>
         )}
@@ -109,7 +109,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
         </div>
       )}
       <div className={`min-w-0 flex-1 py-3 pl-3 ${item.restaurant_id ? "pr-2" : "pr-3"}`}>
-        <p className="m-0 font-serif text-cta-button font-semibold leading-tight text-foreground">
+        <p className="m-0 font-serif text-card-title-lg font-bold text-foreground">
           {item.title}
         </p>
         {item.location && (
@@ -118,7 +118,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           </p>
         )}
         {item.description && (
-          <p className="m-0 mt-1 text-[12px] leading-snug text-muted-foreground line-clamp-2">
+          <p className="m-0 mt-1 text-body-sm leading-snug text-muted-foreground line-clamp-2">
             {item.description}
           </p>
         )}
@@ -130,7 +130,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
   return (
     <div className="pb-3">
       {item.time_label && (
-        <p className="m-0 mb-2 relative z-10 bg-background text-label font-semibold text-foreground">
+        <p className="m-0 mb-2 relative z-10 bg-background text-body-sm font-semibold text-foreground">
           {item.time_label}
         </p>
       )}
@@ -338,17 +338,18 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription }: Cru
           className="pt-8"
         />
 
+        {pageDescription && (
+          <p className="mb-0 px-page pt-5 text-body leading-[var(--cf-body-line-height)] text-foreground">
+            {pageDescription}
+          </p>
+        )}
+
         {/* Day pills (inline) */}
         <div className="pt-5 pb-1">{pillRow(pillContainerRef, pillRefs)}</div>
       </div>
 
       {/* Content — all days on one page */}
       <div className="px-page pb-10 pt-5">
-        {pageDescription && (
-          <p className="mb-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription}
-          </p>
-        )}
         {items.length === 0 ? (
           <div className="py-12 text-center text-[14px] text-muted-foreground">
             Itinerary coming soon.
