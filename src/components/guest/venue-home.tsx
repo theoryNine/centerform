@@ -223,7 +223,7 @@ export function VenueHomePage() {
                       {event.title} · {formatEventTime(event.start_time, event.end_time)}
                     </div>
                     {event.location && (
-                      <div className="text-description text-background/60">
+                      <div className="text-body-sm text-background/60">
                         {event.location}
                       </div>
                     )}

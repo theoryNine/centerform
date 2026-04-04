@@ -65,7 +65,6 @@
   --text-header-nav: var(--cf-text-header-nav);
   --text-body: var(--cf-text-body);
   --text-body-sm: var(--cf-text-body-sm);
-  --text-description: var(--cf-text-description);
   --text-label: var(--cf-text-label);
   --text-chip: var(--cf-text-chip);
   --text-cta-button: var(--cf-text-cta-button);
@@ -94,8 +93,7 @@
 
   /* Typography — font sizes (body / DM Sans) */
   --cf-text-body: 15px;              /* concierge notes, body text */
-  --cf-text-body-sm: 14px;           /* practical details, secondary text */
-  --cf-text-description: 13px;       /* card subtitles, descriptions */
+  --cf-text-body-sm: 14px;           /* practical details, secondary text, card subtitles */
   --cf-text-label: 11px;             /* 11–12px  uppercase info labels */
   --cf-text-chip: 14px;              /* suggestion chips */
   --cf-text-cta-button: 15px;        /* outline button text */

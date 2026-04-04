@@ -83,7 +83,7 @@ function CollectionHeader({
       {subtitle && (
         <>
           <div className="mx-auto my-3 h-[1.0px] w-15 bg-foreground/25" />
-          <p className="m-0 text-description text-muted-foreground">{subtitle}</p>
+          <p className="m-0 text-body-sm text-muted-foreground">{subtitle}</p>
         </>
       )}
     </div>
@@ -216,7 +216,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex justify-end text-description font-medium text-primary no-underline"
+                className="flex justify-end text-body-sm font-medium text-primary no-underline"
               >
                 {ctaLabel} →
               </a>
@@ -225,7 +225,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center rounded-default border border-primary px-4 py-2.5 text-description font-medium text-primary no-underline"
+                className="flex items-center justify-center rounded-default border border-primary px-4 py-2.5 text-body-sm font-medium text-primary no-underline"
               >
                 {ctaLabel} →
               </a>
@@ -267,7 +267,7 @@ function SomethingElse({
       <h2 className="m-0 mb-1 text-center font-serif text-card-title-lg font-normal text-foreground">
         Something else?
       </h2>
-      <p className="m-0 mb-4 text-center text-description text-muted-foreground">
+      <p className="m-0 mb-4 text-center text-body-sm text-muted-foreground">
         Tell us what you&apos;re in the mood for.
       </p>
 
@@ -279,7 +279,7 @@ function SomethingElse({
 
       {otherCollections.length > 0 && (
         <div className="mt-6">
-          <p className="m-0 mb-3 text-center text-description text-muted-foreground">
+          <p className="m-0 mb-3 text-center text-body-sm text-muted-foreground">
             Or explore something else.
           </p>
           <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none">
@@ -287,7 +287,7 @@ function SomethingElse({
               <Link
                 key={c.id}
                 href={`/${slug}/explore/${c.id}`}
-                className="shrink-0 whitespace-nowrap rounded-chip border border-border px-4 py-2 text-description text-foreground no-underline"
+                className="shrink-0 whitespace-nowrap rounded-chip border border-border px-4 py-2 text-body-sm text-foreground no-underline"
               >
                 {c.title}
               </Link>

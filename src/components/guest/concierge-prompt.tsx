@@ -29,7 +29,7 @@ export function ConciergePrompt({
           <button
             key={chip}
             onClick={() => router.push(`/${slug}/concierge`)}
-            className="cursor-pointer whitespace-nowrap rounded-chip border border-border bg-transparent px-4 py-2 text-description text-foreground transition-colors duration-150 ease-out hover:bg-secondary"
+            className="cursor-pointer whitespace-nowrap rounded-chip border border-border bg-transparent px-4 py-2 text-body-sm text-foreground transition-colors duration-150 ease-out hover:bg-secondary"
           >
             {chip}
           </button>
