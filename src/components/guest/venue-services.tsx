@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ChevronDown, Copy, Check } from "lucide-react";
 import type { Service, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { PageHero } from "@/components/guest/page-hero";
 
 // Section definitions — maps service categories to display sections
 const SECTION_CONFIG = [
@@ -338,38 +339,21 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
         </div>
 
         {/* Hero: image + title */}
-        <div className="flex min-h-[180px] items-center">
-          {/* Image — flush left, rounded right */}
-          <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
-            {venue.cover_image_url ? (
-              <img
-                src={venue.cover_image_url}
-                alt={venueName}
-                className="size-full object-cover"
-              />
-            ) : (
-              <div
-                className="flex size-full items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A09680 100%)",
-                }}
-              >
-                <span className="font-serif text-[40px] font-light text-white/50">
-                  {venueName.charAt(0)}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Title */}
-          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
-              Your Room
-              <br />
-              &amp; Stay
-            </h1>
-          </div>
-        </div>
+        <PageHero
+          imageUrl={venue.cover_image_url}
+          imageAlt={venueName}
+          fallbackNode={
+            <div
+              className="flex size-full items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A09680 100%)" }}
+            >
+              <span className="font-serif text-[40px] font-light text-white/50">
+                {venueName.charAt(0)}
+              </span>
+            </div>
+          }
+          title={<>Your Room<br />&amp; Stay</>}
+        />
 
         {/* Section tabs (inline, before subheader) */}
         <div className="flex px-5 pt-5">

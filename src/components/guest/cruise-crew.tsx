@@ -6,6 +6,7 @@ import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header"
 import type { Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { CREW } from "@/lib/cruise-crew-data";
+import { PageHero } from "@/components/guest/page-hero";
 
 function CrewTile({ name, photo, href }: { name: string; photo?: string; href: string }) {
   return (
@@ -55,16 +56,18 @@ export function CruiseCrewPage({ venue, slug }: CruiseCrewPageProps) {
       />
 
       {/* Mini-hero */}
-      <div className="flex min-h-[180px] items-center pt-6">
-        <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
-          <img src="/crew/hero.png" alt="The Crew" className="size-full object-cover" />
-        </div>
-        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-          <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
-            The Crew
-          </h1>
-        </div>
-      </div>
+      <PageHero
+        imageUrl="/crew/hero.png"
+        imageAlt="The Crew"
+        fallbackNode={
+          <div
+            className="size-full"
+            style={{ background: "linear-gradient(135deg, #0E3A5C 0%, #2980B9 100%)" }}
+          />
+        }
+        title="The Crew"
+        className="pt-6"
+      />
 
       {/* Content */}
       <div className="px-page pb-10 pt-6">

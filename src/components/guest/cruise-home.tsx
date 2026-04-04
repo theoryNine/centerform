@@ -6,6 +6,7 @@ import { useSlug } from "@/components/slug-context";
 import { Phone, ArrowRight, Anchor } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { WelcomeSplash } from "@/components/guest/welcome-splash";
+import { PageHero } from "@/components/guest/page-hero";
 import { createClient } from "@/lib/supabase/client";
 import type { CruiseLink } from "@/types";
 
@@ -126,52 +127,32 @@ export function CruiseHomePage() {
 
       <div className="min-h-screen bg-background font-sans">
       {/* Header */}
-      <div className="flex min-h-[280px] items-center pt-[calc(env(safe-area-inset-top,0px)+32px)]">
-        {/* Image — flush left, rounded right */}
-        <div className={`relative h-[280px] w-[45%] min-w-[160px] max-w-[220px] shrink-0 overflow-hidden rounded-r-[50%] ${splashDismissed ? "animate-slide-in-left" : ""}`}>
-          {venue?.cover_image_url ? (
-            <img
-              src={venue.cover_image_url}
-              alt={shipName}
-              className="size-full object-cover"
-            />
-          ) : (
+      <PageHero
+        imageUrl={venue?.cover_image_url}
+        imageAlt={shipName}
+        fallbackNode={
+          <div
+            className="flex size-full items-center justify-center"
+            style={{
+              background:
+                "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
+            }}
+          >
             <div
-              className="flex size-full items-center justify-center"
+              className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
+                  "radial-gradient(ellipse at 60% 50%, rgba(41,128,185,0.4) 0%, rgba(14,58,92,0.6) 100%)",
               }}
-            >
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 60% 50%, rgba(41,128,185,0.4) 0%, rgba(14,58,92,0.6) 100%)",
-                }}
-              />
-              <Anchor
-                size={48}
-                className="relative z-[1]"
-                color="rgba(173,216,230,0.4)"
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Ship name and location */}
-        <div className={`flex flex-1 flex-col items-center justify-center px-6 text-center ${splashDismissed ? "animate-fade-in" : ""}`}>
-          <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
-            {shipName}
-          </h1>
-          <div className="my-3 mb-1.5 h-px w-8 bg-[#D0CBC3]" />
-          {locationString && (
-            <p className="mt-2 text-label font-extrabold uppercase tracking-[var(--cf-text-label-spacing)] text-muted-foreground">
-              {locationString}
-            </p>
-          )}
-        </div>
-      </div>
+            />
+            <Anchor size={48} className="relative z-[1]" color="rgba(173,216,230,0.4)" />
+          </div>
+        }
+        title={shipName}
+        subtitle={locationString || undefined}
+        size="home"
+        animated={splashDismissed}
+      />
       {/* Content */}
       <div className="px-page pb-10 pt-6">
         {/* Welcome card */}
