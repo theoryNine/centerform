@@ -26,7 +26,7 @@ function RestaurantRow({ restaurant, slug }: { restaurant: CruiseRestaurant; slu
       className="card-shadow flex items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
     >
       {/* Thumbnail */}
-      <div className="h-[72px] w-[72px] shrink-0 overflow-hidden">
+      <div className="h-[72px] w-[25%] shrink-0 overflow-hidden">
         {restaurant.image_url ? (
           <img
             src={restaurant.image_url}
