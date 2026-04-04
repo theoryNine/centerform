@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { CruiseItineraryItem, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { PageHero } from "@/components/guest/page-hero";
 
 // ─── Day grouping ────────────────────────────────────────────────────────────
 
@@ -316,35 +317,24 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
         </div>
 
         {/* Hero */}
-        <div className="flex min-h-[180px] items-center">
-          <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
-            {venue.cover_image_url ? (
-              <img
-                src={venue.cover_image_url}
-                alt={venue.name}
-                className="size-full object-cover"
-              />
-            ) : (
-              <div
-                className="flex size-full items-center justify-center"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
-                }}
-              >
-                <span className="font-serif text-[40px] font-light text-white/50">
-                  {venue.name.charAt(0)}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
-              Group Plan
-            </h1>
-          </div>
-        </div>
+        <PageHero
+          imageUrl={venue.cover_image_url}
+          imageAlt={venue.name}
+          fallbackNode={
+            <div
+              className="flex size-full items-center justify-center"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
+              }}
+            >
+              <span className="font-serif text-[40px] font-light text-white/50">
+                {venue.name.charAt(0)}
+              </span>
+            </div>
+          }
+          title="Group Plan"
+        />
 
         {/* Day pills (inline) */}
         <div className="pt-5 pb-1">{pillRow(pillContainerRef, pillRefs)}</div>

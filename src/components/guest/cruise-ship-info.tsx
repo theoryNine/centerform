@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ChevronDown, Copy, Check } from "lucide-react";
 import type { Service, ServiceDetails, ServiceDetailsBlock, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { PageHero } from "@/components/guest/page-hero";
 
 // Cruise-specific section config
 const SECTION_CONFIG = [
@@ -341,35 +342,24 @@ export function CruiseShipInfoPage({ venue, services, slug }: CruiseShipInfoPage
         </div>
 
         {/* Hero */}
-        <div className="flex min-h-[180px] items-center">
-          <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
-            {venue.cover_image_url ? (
-              <img
-                src={venue.cover_image_url}
-                alt={shipName}
-                className="size-full object-cover"
-              />
-            ) : (
-              <div
-                className="flex size-full items-center justify-center"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
-                }}
-              >
-                <span className="font-serif text-[40px] font-light text-white/50">
-                  {shipName.charAt(0)}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
-              Ship Info
-            </h1>
-          </div>
-        </div>
+        <PageHero
+          imageUrl={venue.cover_image_url}
+          imageAlt={shipName}
+          fallbackNode={
+            <div
+              className="flex size-full items-center justify-center"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 40%, #2980B9 70%, #1A3A5C 100%)",
+              }}
+            >
+              <span className="font-serif text-[40px] font-light text-white/50">
+                {shipName.charAt(0)}
+              </span>
+            </div>
+          }
+          title="Ship Info"
+        />
 
         {/* Section tabs (inline) */}
         <div className="-mx-1 flex overflow-x-auto px-5 pt-5 pb-1 scrollbar-none">

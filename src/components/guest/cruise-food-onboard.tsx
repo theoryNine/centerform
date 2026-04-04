@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
 import type { CruiseRestaurant, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { PageHero } from "@/components/guest/page-hero";
 
 function formatPrice(priceLevel: number | null): string | null {
   if (priceLevel === 0) return "FREE";
@@ -98,29 +99,18 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
       />
 
       {/* Mini-hero */}
-      <div className="flex min-h-[180px] items-center pt-6">
-        <div className="relative h-[180px] w-2/5 min-w-[140px] max-w-[180px] shrink-0 overflow-hidden rounded-r-[50%]">
-          {venue.cover_image_url ? (
-            <img
-              src={venue.cover_image_url}
-              alt={venue.name}
-              className="size-full object-cover"
-            />
-          ) : (
-            <div
-              className="size-full"
-              style={{
-                background: "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 50%, #2980B9 100%)",
-              }}
-            />
-          )}
-        </div>
-        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-          <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
-            Food Onboard
-          </h1>
-        </div>
-      </div>
+      <PageHero
+        imageUrl={venue.cover_image_url}
+        imageAlt={venue.name}
+        fallbackNode={
+          <div
+            className="size-full"
+            style={{ background: "linear-gradient(135deg, #0E3A5C 0%, #1A5C8A 50%, #2980B9 100%)" }}
+          />
+        }
+        title="Food Onboard"
+        className="pt-6"
+      />
 
       {/* Content */}
       <div className="px-page pb-10 pt-2">

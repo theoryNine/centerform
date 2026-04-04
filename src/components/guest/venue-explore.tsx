@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { ConciergePrompt } from "@/components/guest/concierge-prompt";
+import { PageHero } from "@/components/guest/page-hero";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 interface AreaSection {
@@ -262,35 +263,20 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
       />
 
       {/* Hero section with shaped image */}
-      <div className="flex min-h-[200px] items-center pt-6">
-        {/* Image — flush left, rounded right */}
-        <div className="relative h-[180px] w-[38%] min-w-[130px] max-w-[180px] shrink-0 animate-slide-in-left overflow-hidden rounded-r-[50%]">
-          {venue.cover_image_url ? (
-            <img
-              src={venue.cover_image_url}
-              alt={venueName}
-              className="size-full object-cover"
-            />
-          ) : (
-            <div
-              className="size-full"
-              style={{
-                background:
-                  "linear-gradient(135deg, #3A5A7C 0%, #2C4A6C 40%, #1E3A5C 100%)",
-              }}
-            />
-          )}
-        </div>
-
-        {/* Title */}
-        <div className="flex flex-1 flex-col justify-center px-5 animate-fade-in">
-          <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
-            Explore
-            <br />
-            {cityName} & Beyond
-          </h1>
-        </div>
-      </div>
+      <PageHero
+        imageUrl={venue.cover_image_url}
+        imageAlt={venueName}
+        fallbackNode={
+          <div
+            className="size-full"
+            style={{ background: "linear-gradient(135deg, #3A5A7C 0%, #2C4A6C 40%, #1E3A5C 100%)" }}
+          />
+        }
+        title={<>Explore<br />{cityName} & Beyond</>}
+        animated
+        textAlign="left"
+        className="min-h-[200px] pt-6"
+      />
 
       {/* Content */}
       <div className="px-page pb-10 pt-6">

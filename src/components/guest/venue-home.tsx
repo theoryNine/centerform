@@ -9,6 +9,7 @@ import type { VenueEvent } from "@/types";
 import { Phone, ArrowRight } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { ConciergePrompt } from "@/components/guest/concierge-prompt";
+import { PageHero } from "@/components/guest/page-hero";
 
 function formatVenueName(slug: string) {
   return slug
@@ -157,52 +158,32 @@ export function VenueHomePage() {
       {/* Main scrollable page */}
       <div className="min-h-screen bg-background font-sans">
         {/* Header section with shaped image */}
-        <div className="flex min-h-[280px] items-center pt-[calc(env(safe-area-inset-top,0px)+32px)]">
-          {/* Image container — flush left, rounded right */}
-          <div
-            className={`relative h-[280px] w-[45%] min-w-[160px] max-w-[220px] shrink-0 overflow-hidden rounded-r-[50%] ${splashDismissed ? "animate-slide-in-left" : ""}`}
-          >
-            {venue?.cover_image_url ? (
-              <img
-                src={venue.cover_image_url}
-                alt={venueName}
-                className="size-full object-cover"
-              />
-            ) : (
+        <PageHero
+          imageUrl={venue?.cover_image_url}
+          imageAlt={venueName}
+          fallbackNode={
+            <div
+              className="flex size-full items-center justify-center"
+              style={{
+                background: "linear-gradient(135deg, #8B6914 0%, #5C4A1E 30%, #3A3520 60%, #2A2A1A 100%)",
+              }}
+            >
               <div
-                className="flex size-full items-center justify-center"
+                className="absolute inset-0"
                 style={{
-                  background: "linear-gradient(135deg, #8B6914 0%, #5C4A1E 30%, #3A3520 60%, #2A2A1A 100%)",
+                  background: "radial-gradient(ellipse at 60% 50%, rgba(212,160,60,0.3) 0%, rgba(139,80,20,0.2) 40%, rgba(42,36,20,0.6) 100%)",
                 }}
-              >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: "radial-gradient(ellipse at 60% 50%, rgba(212,160,60,0.3) 0%, rgba(139,80,20,0.2) 40%, rgba(42,36,20,0.6) 100%)",
-                  }}
-                />
-                <span className="relative z-[1] font-serif text-5xl font-light text-[rgba(212,180,131,0.4)]">
-                  {venueName.charAt(0)}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Venue name and location */}
-          <div
-            className={`flex flex-1 flex-col items-center justify-center px-6 text-center ${splashDismissed ? "animate-fade-in" : ""}`}
-          >
-            <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
-              {venueName}
-            </h1>
-            <div className="my-3 mb-1.5 h-px w-8 bg-[#D0CBC3]" />
-            {locationString && (
-              <p className="mt-2 text-label font-extrabold uppercase tracking-[var(--cf-text-label-spacing)] text-muted-foreground">
-                {locationString}
-              </p>
-            )}
-          </div>
-        </div>
+              />
+              <span className="relative z-[1] font-serif text-5xl font-light text-[rgba(212,180,131,0.4)]">
+                {venueName.charAt(0)}
+              </span>
+            </div>
+          }
+          title={venueName}
+          subtitle={locationString || undefined}
+          size="home"
+          animated={splashDismissed}
+        />
         {/* Content area */}
         <div className="px-page pb-10 pt-6">
           {/* Welcome card */}
