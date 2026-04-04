@@ -1,5 +1,5 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getNearbyPlaces } from "@/lib/queries";
+import { getNearbyPlaces, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { VenueExplorePage } from "@/components/guest/venue-explore";
 
@@ -16,7 +16,10 @@ export default async function ExplorePage({
   }
 
   const venue = resolved.data;
-  const places = await getNearbyPlaces(venue.id);
+  const [places, pageDescription] = await Promise.all([
+    getNearbyPlaces(venue.id),
+    getVenuePageDescription(venue.id, "explore"),
+  ]);
 
-  return <VenueExplorePage slug={slug} venue={venue} places={places} />;
+  return <VenueExplorePage slug={slug} venue={venue} places={places} pageDescription={pageDescription} />;
 }

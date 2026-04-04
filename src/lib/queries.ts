@@ -265,6 +265,20 @@ export async function getCruiseRestaurantById(restaurantId: string): Promise<Cru
   return data as CruiseRestaurant | null;
 }
 
+export async function getVenuePageDescription(
+  venueId: string,
+  pageSlug: string,
+): Promise<string | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_page_descriptions")
+    .select("body")
+    .eq("venue_id", venueId)
+    .eq("page_slug", pageSlug)
+    .single();
+  return data?.body ?? null;
+}
+
 export async function getCruiseLinks(venueId: string): Promise<CruiseLink[]> {
   const supabase = await createClient();
   const { data } = await supabase

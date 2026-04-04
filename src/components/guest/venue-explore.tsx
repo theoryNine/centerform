@@ -243,9 +243,10 @@ interface VenueExplorePageProps {
   slug: string;
   venue: VenueWithTheme;
   places: NearbyPlace[];
+  pageDescription?: string | null;
 }
 
-export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps) {
+export function VenueExplorePage({ slug, venue, places, pageDescription }: VenueExplorePageProps) {
   const venueName = venue.name;
   const cityName = venue.city ?? "the Area";
   const sections = groupByArea(places);
@@ -280,12 +281,13 @@ export function VenueExplorePage({ slug, venue, places }: VenueExplorePageProps)
 
       {/* Content */}
       <div className="px-page pb-10 pt-6">
-        {/* Message card */}
-        <div className="card-shadow mb-section rounded-default bg-card px-card py-5">
-          <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
-            These are the places we&apos;d send a friend.
-          </p>
-        </div>
+        {pageDescription && (
+          <div className="card-shadow mb-section rounded-default bg-card px-card py-5">
+            <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
+              {pageDescription}
+            </p>
+          </div>
+        )}
 
         {/* Area sections */}
         {sections.length === 0 ? (

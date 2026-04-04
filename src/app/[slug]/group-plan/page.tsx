@@ -1,5 +1,5 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getCruiseItineraryItems } from "@/lib/queries";
+import { getCruiseItineraryItems, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseGroupPlanPage } from "@/components/guest/cruise-group-plan";
 
@@ -15,7 +15,17 @@ export default async function GroupPlanPage({
     notFound();
   }
 
-  const items = await getCruiseItineraryItems(resolved.data.id);
+  const [items, pageDescription] = await Promise.all([
+    getCruiseItineraryItems(resolved.data.id),
+    getVenuePageDescription(resolved.data.id, "group-plan"),
+  ]);
 
-  return <CruiseGroupPlanPage venue={resolved.data} items={items} slug={slug} />;
+  return (
+    <CruiseGroupPlanPage
+      venue={resolved.data}
+      items={items}
+      slug={slug}
+      pageDescription={pageDescription}
+    />
+  );
 }

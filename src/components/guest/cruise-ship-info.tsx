@@ -230,9 +230,10 @@ interface CruiseShipInfoPageProps {
   venue: Venue;
   services: Service[];
   slug: string;
+  pageDescription?: string | null;
 }
 
-export function CruiseShipInfoPage({ venue, services, slug }: CruiseShipInfoPageProps) {
+export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: CruiseShipInfoPageProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [showStickyNav, setShowStickyNav] = useState(false);
   const [activeSection, setActiveSection] = useState("welcome");
@@ -405,6 +406,11 @@ export function CruiseShipInfoPage({ venue, services, slug }: CruiseShipInfoPage
 
       {/* Accordion sections */}
       <div className="px-page pb-10">
+        {pageDescription && (
+          <p className="mb-0 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
+            {pageDescription}
+          </p>
+        )}
         {sectionServices.map((section) => (
           <div
             key={section.id}

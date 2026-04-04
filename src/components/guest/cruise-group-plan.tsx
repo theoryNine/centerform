@@ -159,9 +159,10 @@ interface CruiseGroupPlanPageProps {
   venue: Venue;
   items: CruiseItineraryItem[];
   slug: string;
+  pageDescription?: string | null;
 }
 
-export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageProps) {
+export function CruiseGroupPlanPage({ venue, items, slug, pageDescription }: CruiseGroupPlanPageProps) {
   const dayGroups = groupByDay(items);
   const hasDays = dayGroups.length > 0;
 
@@ -342,6 +343,11 @@ export function CruiseGroupPlanPage({ venue, items, slug }: CruiseGroupPlanPageP
 
       {/* Content — all days on one page */}
       <div className="px-page pb-10 pt-5">
+        {pageDescription && (
+          <p className="mb-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
+            {pageDescription}
+          </p>
+        )}
         {items.length === 0 ? (
           <div className="py-12 text-center text-[14px] text-muted-foreground">
             Itinerary coming soon.

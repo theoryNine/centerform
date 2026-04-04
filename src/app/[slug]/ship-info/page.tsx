@@ -1,5 +1,5 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getVenueServices } from "@/lib/queries";
+import { getVenueServices, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseShipInfoPage } from "@/components/guest/cruise-ship-info";
 
@@ -15,7 +15,17 @@ export default async function ShipInfoPage({
     notFound();
   }
 
-  const services = await getVenueServices(resolved.data.id);
+  const [services, pageDescription] = await Promise.all([
+    getVenueServices(resolved.data.id),
+    getVenuePageDescription(resolved.data.id, "ship-info"),
+  ]);
 
-  return <CruiseShipInfoPage venue={resolved.data} services={services} slug={slug} />;
+  return (
+    <CruiseShipInfoPage
+      venue={resolved.data}
+      services={services}
+      slug={slug}
+      pageDescription={pageDescription}
+    />
+  );
 }
