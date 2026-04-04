@@ -316,6 +316,17 @@ export interface CruiseCrewMember {
   updated_at: string;
 }
 
+// --- Venue page descriptions ---
+
+export interface VenuePageDescription {
+  id: string;
+  venue_id: string;
+  page_slug: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // --- Shared types ---
 
 export interface ThemeColors {

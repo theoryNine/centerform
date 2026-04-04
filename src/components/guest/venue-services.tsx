@@ -213,9 +213,10 @@ interface VenueServicesPageProps {
   venue: Venue;
   services: Service[];
   slug: string;
+  pageDescription?: string | null;
 }
 
-export function VenueServicesPage({ venue, services, slug }: VenueServicesPageProps) {
+export function VenueServicesPage({ venue, services, slug, pageDescription }: VenueServicesPageProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [showStickyNav, setShowStickyNav] = useState(false);
   const [activeSection, setActiveSection] = useState("room");
@@ -399,6 +400,11 @@ export function VenueServicesPage({ venue, services, slug }: VenueServicesPagePr
 
       {/* Accordion sections */}
       <div className="px-page pb-10">
+        {pageDescription && (
+          <p className="mb-0 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
+            {pageDescription}
+          </p>
+        )}
         {sectionServices.map((section) => (
           <div
             key={section.id}

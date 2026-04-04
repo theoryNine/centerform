@@ -26,9 +26,10 @@ interface CruiseFoodOnboardPageProps {
   venue: Venue;
   restaurants: CruiseRestaurant[];
   slug: string;
+  pageDescription?: string | null;
 }
 
-export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOnboardPageProps) {
+export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescription }: CruiseFoodOnboardPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
 
   const sitDown = restaurants.filter((r) => r.restaurant_type === "sit_down");
@@ -38,7 +39,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
     <div className="pb-2 pt-6">
       <div className="flex items-baseline gap-2">
         <span className="text-section-number font-medium text-primary">{number}</span>
-        <span className="text-section-number text-muted-foreground">·</span>
+        <span className="text-section-number text-foreground">·</span>
         <h2 className="m-0 font-serif text-section-heading font-normal text-foreground">{title}</h2>
       </div>
       <div className="-ml-page mt-2 h-px w-[calc(60%+var(--cf-page-padding))] bg-primary" />
@@ -71,6 +72,11 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug }: CruiseFoodOn
 
       {/* Content */}
       <div className="px-page pb-10 pt-2">
+        {pageDescription && (
+          <p className="mb-0 mt-2 text-body leading-[var(--cf-body-line-height)] text-foreground">
+            {pageDescription}
+          </p>
+        )}
         {restaurants.length === 0 ? (
           <div className="py-12 text-center text-[14px] text-muted-foreground">
             Dining information coming soon.
