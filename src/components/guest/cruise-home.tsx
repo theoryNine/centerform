@@ -32,6 +32,11 @@ export function CruiseHomePage() {
   const [splashDismissed, setSplashDismissed] = useState(false);
   const [splashVisible, setSplashVisible] = useState(true);
 
+  // Safari mobile adjusts initial scroll position past safe-area padding — reset to top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     if (localStorage.getItem(splashKey)) {
       setSplashDismissed(true);
