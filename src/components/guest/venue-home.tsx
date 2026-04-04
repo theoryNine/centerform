@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { WelcomeSplash } from "@/components/guest/welcome-splash";
 import { createClient } from "@/lib/supabase/client";
 import type { VenueEvent } from "@/types";
-import { Phone, ArrowRight } from "lucide-react";
+import { Phone } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { ConciergePrompt } from "@/components/guest/concierge-prompt";
 import { PageHero } from "@/components/guest/page-hero";
+import { NavCard, SectionDivider } from "@/components/guest/nav-card";
 
 function formatVenueName(slug: string) {
   return slug
@@ -36,7 +37,6 @@ function formatEventTime(startTime: string, endTime: string | null): string {
 
 export function VenueHomePage() {
   const { slug } = useParams<{ slug: string }>();
-  const router = useRouter();
   const resolved = useSlug();
   const venue = resolved.type === "venue" ? resolved.data : null;
   const venueName = venue?.name ?? formatVenueName(slug);
@@ -93,31 +93,18 @@ export function VenueHomePage() {
       label: "Your Room & Stay",
       sublabel: "Amenities, services, and requests",
       href: `/${slug}/services`,
-      image: "/images/room-placeholder.jpg",
     },
     {
       label: "Dining",
       sublabel: venue?.name ? `At ${venue.name}` : "Restaurants and cafes",
       href: `/${slug}/dining`,
-      image: "/images/dining-placeholder.jpg",
     },
     {
       label: `Explore ${cityName}`,
       sublabel: "Let us show you around town",
       href: `/${slug}/explore`,
-      image: "/images/explore-placeholder.jpg",
     },
   ];
-
-  // Section divider component for consistency
-  const SectionDivider = ({ title }: { title: string }) => (
-    <div className="mb-heading-gap">
-      <h3 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">
-        {title}
-      </h3>
-      <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
-    </div>
-  );
 
   return (
     <>
@@ -216,52 +203,7 @@ export function VenueHomePage() {
 
             <div className="flex flex-col gap-card-gap">
               {navItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => router.push(item.href)}
-                  className="card-shadow flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-default border-none bg-card p-0 text-left transition-transform ease-out active:scale-[var(--cf-press-scale)]"
-                  style={{ transitionDuration: "var(--cf-press-duration)" }}
-                  onMouseDown={(e) =>
-                    (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)
-                  }
-                  onMouseUp={(e) =>
-                    (e.currentTarget.style.transform = "scale(1)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.transform = "scale(1)")
-                  }
-                  onTouchStart={(e) =>
-                    (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)
-                  }
-                  onTouchEnd={(e) =>
-                    (e.currentTarget.style.transform = "scale(1)")
-                  }
-                >
-                  {/* Thumbnail — flush to card edges */}
-                  <div
-                    className="w-[88px] shrink-0 self-stretch overflow-hidden"
-                    style={{
-                      background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)",
-                    }}
-                  />
-
-                  {/* Label */}
-                  <div className="min-w-0 flex-1 py-4">
-                    <div className="mb-0.5 text-cta-button font-semibold text-foreground">
-                      {item.label}
-                    </div>
-                    <div className="text-description leading-snug text-muted-foreground">
-                      {item.sublabel}
-                    </div>
-                  </div>
-
-                  {/* Arrow */}
-                  <ArrowRight
-                    size={18}
-                    color="var(--primary, #1A7A6D)"
-                    className="mr-3 shrink-0"
-                  />
-                </button>
+                <NavCard key={item.label} {...item} />
               ))}
             </div>
           </div>

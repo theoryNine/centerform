@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { Phone, ArrowRight, Anchor } from "lucide-react";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { WelcomeSplash } from "@/components/guest/welcome-splash";
 import { PageHero } from "@/components/guest/page-hero";
+import { NavCard, SectionDivider } from "@/components/guest/nav-card";
 import { createClient } from "@/lib/supabase/client";
 import type { CruiseLink } from "@/types";
 
@@ -19,7 +20,6 @@ function formatVenueName(slug: string) {
 
 export function CruiseHomePage() {
   const { slug } = useParams<{ slug: string }>();
-  const router = useRouter();
   const resolved = useSlug();
   const venue = resolved.type === "venue" ? resolved.data : null;
   const shipName = venue?.name ?? formatVenueName(slug);
@@ -83,13 +83,6 @@ export function CruiseHomePage() {
       href: `/${slug}/the-crew`,
     },
   ];
-
-  const SectionDivider = ({ title }: { title: string }) => (
-    <div className="mb-heading-gap">
-      <h3 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">{title}</h3>
-      <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
-    </div>
-  );
 
   return (
     <>
@@ -185,37 +178,7 @@ export function CruiseHomePage() {
 
           <div className="flex flex-col gap-card-gap">
             {navItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => router.push(item.href)}
-                className="card-shadow flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-default border-none bg-card p-0 text-left transition-transform ease-out active:scale-[var(--cf-press-scale)]"
-                style={{ transitionDuration: "var(--cf-press-duration)" }}
-                onMouseDown={(e) => (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)}
-                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                onTouchStart={(e) => (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)}
-                onTouchEnd={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              >
-                <div
-                  className="w-[88px] shrink-0 self-stretch overflow-hidden"
-                  style={{
-                    background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)",
-                  }}
-                />
-                <div className="min-w-0 flex-1 py-4">
-                  <div className="mb-0.5 text-cta-button font-semibold text-foreground">
-                    {item.label}
-                  </div>
-                  <div className="text-description leading-snug text-muted-foreground">
-                    {item.sublabel}
-                  </div>
-                </div>
-                <ArrowRight
-                  size={18}
-                  color="var(--primary, #1A7A6D)"
-                  className="mr-3 shrink-0"
-                />
-              </button>
+              <NavCard key={item.label} {...item} />
             ))}
           </div>
         </div>
