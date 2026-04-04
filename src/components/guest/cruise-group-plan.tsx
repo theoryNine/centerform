@@ -91,8 +91,9 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
             {item.time_label}
           </p>
         )}
-        <div className="flex items-center gap-2">
-          <div className="relative z-10 h-3 w-3 shrink-0 rounded-full bg-primary" />
+        <div className="relative pl-[60px] flex items-center">
+          <div className="absolute left-[24px] z-10 h-3 w-3 rounded-full bg-primary" />
+          <div className="absolute left-[36px] top-1/2 h-px w-[24px] -translate-y-1/2 bg-primary/30" />
           <p className="m-0 text-label font-semibold tracking-widest text-primary">
             END · {item.title.toUpperCase()}
           </p>
@@ -134,8 +135,9 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           {item.time_label}
         </p>
       )}
-      <div className="flex items-start gap-3">
-        <div className="relative z-10 mt-[10px] ml-[2px] h-2 w-2 shrink-0 rounded-full bg-muted-foreground/60" />
+      <div className="relative pl-[60px]">
+        <div className="absolute left-[26px] top-[10px] z-10 h-2 w-2 rounded-full bg-muted-foreground/60" />
+        <div className="absolute left-[34px] top-[13px] h-px w-[26px] bg-muted-foreground/25" />
         {item.restaurant_id ? (
           <Link
             href={`/${slug}/food-onboard/${item.restaurant_id}`}
@@ -375,7 +377,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription }: Cru
                     {/* Vertical line */}
                     <div
                       className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
-                      style={{ left: "6px" }}
+                      style={{ left: "30px" }}
                     />
                     <div className="flex flex-col">
                       {group.items.map((item) => (
@@ -392,7 +394,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription }: Cru
           <div className="relative">
             <div
               className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
-              style={{ left: "6px" }}
+              style={{ left: "30px" }}
             />
             <div className="flex flex-col">
               {items.map((item) => (
