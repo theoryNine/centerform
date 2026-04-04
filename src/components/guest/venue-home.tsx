@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
-import { WelcomeEnvelope } from "@/components/guest/welcome-envelope";
+import { WelcomeSplash } from "@/components/guest/welcome-splash";
 import { createClient } from "@/lib/supabase/client";
 import type { VenueEvent } from "@/types";
 import { Phone, ArrowRight } from "lucide-react";
@@ -45,17 +45,17 @@ export function VenueHomePage() {
   const locationString =
     locationParts.length > 0 ? locationParts.join(" · ").toUpperCase() : "";
 
-  // Welcome envelope state — show only once per venue
-  const envelopeKey = `envelope-dismissed:${slug}`;
-  const [envelopeDismissed, setEnvelopeDismissed] = useState(false);
-  const [envelopeVisible, setEnvelopeVisible] = useState(true);
+  // Welcome splash state — show only once per venue
+  const splashKey = `splash-dismissed:${slug}`;
+  const [splashDismissed, setSplashDismissed] = useState(false);
+  const [splashVisible, setSplashVisible] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem(envelopeKey)) {
-      setEnvelopeDismissed(true);
-      setEnvelopeVisible(false);
+    if (localStorage.getItem(splashKey)) {
+      setSplashDismissed(true);
+      setSplashVisible(false);
     }
-  }, [envelopeKey]);
+  }, [splashKey]);
 
   // Today's events
   const [todayEvents, setTodayEvents] = useState<VenueEvent[]>([]);
@@ -80,10 +80,10 @@ export function VenueHomePage() {
       });
   }, [venue?.id]);
 
-  function handleEnvelopeEnter() {
-    setEnvelopeDismissed(true);
-    localStorage.setItem(envelopeKey, "1");
-    setTimeout(() => setEnvelopeVisible(false), 500);
+  function handleSplashEnter() {
+    setSplashDismissed(true);
+    localStorage.setItem(splashKey, "1");
+    setTimeout(() => setSplashVisible(false), 500);
   }
 
   const cityName = venue?.city ?? "the Area";
@@ -120,16 +120,36 @@ export function VenueHomePage() {
 
   return (
     <>
-      {/* Welcome envelope overlay */}
-      {envelopeVisible && (
+      {/* Welcome splash overlay */}
+      {splashVisible && (
         <div
           className="fixed inset-0 z-[100] transition-opacity duration-500 ease-out"
-          style={{ opacity: envelopeDismissed ? 0 : 1 }}
+          style={{ opacity: splashDismissed ? 0 : 1 }}
         >
-          <WelcomeEnvelope
-            hotelName={venueName}
-            tagline="Your stay begins here"
-            onEnter={handleEnvelopeEnter}
+          <WelcomeSplash
+            name={venueName}
+            tagline="Welcome, we're glad you're here"
+            coverImageUrl={venue?.cover_image_url ?? undefined}
+            fallbackContent={
+              <div
+                className="flex size-full items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg, #8B6914 0%, #5C4A1E 30%, #3A3520 60%, #2A2A1A 100%)",
+                }}
+              >
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: "radial-gradient(ellipse at 60% 50%, rgba(212,160,60,0.3) 0%, rgba(139,80,20,0.2) 40%, rgba(42,36,20,0.6) 100%)",
+                  }}
+                />
+                <span className="relative z-[1] font-serif text-5xl font-light text-[rgba(212,180,131,0.4)]">
+                  {venueName.charAt(0)}
+                </span>
+              </div>
+            }
+            variant={venue?.splash_variant ?? "text"}
+            onEnter={handleSplashEnter}
           />
         </div>
       )}
@@ -140,7 +160,7 @@ export function VenueHomePage() {
         <div className="flex min-h-[280px] items-center pt-[calc(env(safe-area-inset-top,0px)+32px)]">
           {/* Image container — flush left, rounded right */}
           <div
-            className={`relative h-[280px] w-[45%] min-w-[160px] max-w-[220px] shrink-0 overflow-hidden rounded-r-[50%] ${envelopeDismissed ? "animate-slide-in-left" : ""}`}
+            className={`relative h-[280px] w-[45%] min-w-[160px] max-w-[220px] shrink-0 overflow-hidden rounded-r-[50%] ${splashDismissed ? "animate-slide-in-left" : ""}`}
           >
             {venue?.cover_image_url ? (
               <img
@@ -170,7 +190,7 @@ export function VenueHomePage() {
 
           {/* Venue name and location */}
           <div
-            className={`flex flex-1 flex-col items-center justify-center px-6 text-center ${envelopeDismissed ? "animate-fade-in" : ""}`}
+            className={`flex flex-1 flex-col items-center justify-center px-6 text-center ${splashDismissed ? "animate-fade-in" : ""}`}
           >
             <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
               {venueName}
