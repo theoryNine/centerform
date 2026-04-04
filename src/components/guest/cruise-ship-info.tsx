@@ -383,8 +383,8 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: C
 
         {/* Subheader */}
         {venue.ship_name && (
-          <div className="px-5 py-4 text-xs text-muted-foreground">
-            <span className="font-medium leading-snug text-primary">{venue.ship_name}</span>
+          <div className="px-5 py-4 text-muted-foreground">
+            <span className="text-body font-medium leading-snug text-primary">{venue.ship_name}</span>
           </div>
         )}
       </div>
