@@ -24,8 +24,8 @@ export function WelcomeSplashOversized({
     <div className="relative size-full overflow-hidden bg-background font-sans">
       {/* Image — absolutely positioned, bleeds off top and bottom edges */}
       <div
-        className="absolute left-0 overflow-hidden rounded-r-[50%]"
-        style={{ top: "-40px", height: "115%", width: "85%" }}
+        className="absolute overflow-hidden rounded-r-[50%]"
+        style={{ top: "-290px", height: "115%", width: "95%", left: "-40px" }}
       >
         {coverImageUrl ? (
           <img src={coverImageUrl} alt={name} className="size-full object-cover" />
@@ -60,12 +60,12 @@ export function WelcomeSplashOversized({
             <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
               {name}
             </h1>
-            <div className="mx-auto my-3 h-px w-10 bg-foreground/20" />
             {tagline && (
               <p className="m-0 text-body leading-[var(--cf-body-line-height)] text-muted-foreground">
                 {tagline}
               </p>
             )}
+            <div className="mx-auto my-3 h-px w-10 bg-foreground/20" />
           </div>
 
           <div className="flex justify-center">
