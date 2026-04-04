@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   useWindowScroll,
@@ -75,6 +75,13 @@ function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
 export function CruiseCrewListing({ venue, member, slug }: CruiseCrewListingProps) {
   const router = useRouter();
   const scrolled = useWindowScroll();
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background font-sans">
