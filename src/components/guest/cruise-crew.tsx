@@ -73,7 +73,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription }: CruiseCrewPageP
       {/* Content */}
       <div className="px-page pb-10 pt-6">
         {pageDescription && (
-          <p className="mb-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
+          <p className="mb-6 text-body leading-[var(--cf-body-line-height)] text-foreground">
             {pageDescription}
           </p>
         )}
