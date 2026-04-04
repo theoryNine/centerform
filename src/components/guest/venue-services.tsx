@@ -354,6 +354,7 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
             </div>
           }
           title={<>Your Room<br />&amp; Stay</>}
+          className="pt-8"
         />
 
         {/* Section tabs (inline, before subheader) */}

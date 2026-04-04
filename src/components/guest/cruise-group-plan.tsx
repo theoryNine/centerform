@@ -335,6 +335,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription }: Cru
             </div>
           }
           title="Group Plan"
+          className="pt-8"
         />
 
         {/* Day pills (inline) */}

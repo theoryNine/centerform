@@ -366,6 +366,7 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: C
             </div>
           }
           title="Ship Info"
+          className="pt-8"
         />
 
         {/* Section tabs (inline) */}
