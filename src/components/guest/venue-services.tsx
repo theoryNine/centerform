@@ -357,18 +357,6 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
           className="pt-8"
         />
 
-        {/* Section tabs (inline, before subheader) */}
-        <div className="flex px-5 pt-5">
-          {SECTION_CONFIG.map((section) => (
-            <SectionTab
-              key={section.id}
-              section={section}
-              isActive={activeSection === section.id}
-              onClick={() => scrollToSection(section.id)}
-            />
-          ))}
-        </div>
-
         {/* Subheader: address, hours, checkout */}
         <div className="flex justify-between gap-4 px-5 py-4 text-xs text-muted-foreground">
           <div>
