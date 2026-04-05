@@ -369,24 +369,6 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: C
           className="pt-8"
         />
 
-        {/* Section tabs (inline) */}
-        <div className="-mx-1 flex overflow-x-auto px-5 pt-5 pb-1 scrollbar-none">
-          {SECTION_CONFIG.map((section) => (
-            <SectionTab
-              key={section.id}
-              section={section}
-              isActive={activeSection === section.id}
-              onClick={() => scrollToSection(section.id)}
-            />
-          ))}
-        </div>
-
-        {/* Subheader */}
-        {venue.ship_name && (
-          <div className="px-5 py-4 text-muted-foreground">
-            <span className="text-body font-medium leading-snug text-primary">{venue.ship_name}</span>
-          </div>
-        )}
       </div>
 
       {/* Accordion sections */}
