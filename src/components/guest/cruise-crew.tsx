@@ -77,8 +77,9 @@ export function CruiseCrewPage({ venue, slug, pageDescription }: CruiseCrewPageP
             {pageDescription}
           </p>
         )}
+        {/* Featured members */}
         <div className="grid grid-cols-2 gap-card-gap">
-          {CREW.map((member) => (
+          {CREW.filter((m) => m.slug === "adam" || m.slug === "ansel").map((member) => (
             <CrewTile
               key={member.slug}
               name={member.name}
@@ -86,6 +87,23 @@ export function CruiseCrewPage({ venue, slug, pageDescription }: CruiseCrewPageP
               href={`/${slug}/the-crew/${member.slug}`}
             />
           ))}
+        </div>
+
+        {/* Divider */}
+        <div className="my-6 h-px bg-primary" />
+
+        {/* Rest of crew (alphabetical) */}
+        <div className="grid grid-cols-2 gap-card-gap">
+          {CREW.filter((m) => m.slug !== "adam" && m.slug !== "ansel")
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((member) => (
+              <CrewTile
+                key={member.slug}
+                name={member.name}
+                photo={member.photos[0]}
+                href={`/${slug}/the-crew/${member.slug}`}
+              />
+            ))}
         </div>
 
         <div className="mt-10">
