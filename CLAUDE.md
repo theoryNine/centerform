@@ -116,7 +116,7 @@ The Crew          /:slug/the-crew                 (cruise-crew.tsx)
 
 **Cruise home** fetches `cruise_daily_welcome` and `cruise_links` client-side on mount. The welcome card displays the most recent `cruise_daily_welcome` entry where `effective_at <= NOW()`, falling back to `venue.welcome_heading/body` then hardcoded defaults. Multiple entries per day are supported for time-of-day updates (e.g. a morning message and a Scarlet Night evening message). All timestamps are stored in UTC.
 
-**Sample cruise**: "Ansel & Adam's Anniversary" at slug `ansel-adam` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migrations `012_sample_anniversary_cruise.sql` and `019_sample_cruise_daily_welcome.sql`.
+**Sample cruise**: "Adam & Ansel's Anniversary" at slug `adam-ansel` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migrations `012_sample_anniversary_cruise.sql` and `019_sample_cruise_daily_welcome.sql`.
 
 ## Explore Page Architecture
 
