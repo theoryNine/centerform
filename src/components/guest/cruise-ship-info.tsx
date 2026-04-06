@@ -1,11 +1,15 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, Copy, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { Service, ServiceDetails, ServiceDetailsBlock, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { PageHero } from "@/components/guest/page-hero";
+import { CopyButton } from "@/components/guest/copy-button";
+import { AccordionItem } from "@/components/guest/accordion-item";
+import { SectionHeader } from "@/components/guest/section-header";
+import { useStickyNav } from "@/hooks/use-sticky-nav";
 
 // Cruise-specific section config
 const SECTION_CONFIG = [
@@ -31,40 +35,6 @@ const SECTION_CONFIG = [
     categories: ["ship_entertainment"] as string[],
   },
 ];
-
-function CopyButton({ text, label }: { text: string; label?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      const el = document.createElement("textarea");
-      el.value = text;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [text]);
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="inline-flex cursor-pointer items-center gap-1 border-none bg-none p-0 text-[13px] font-semibold text-primary"
-    >
-      {label && <span>{label}</span>}
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-    </button>
-  );
-}
-
-// Re-export CopyButton for potential use
-export { CopyButton };
 
 function InlineBold({ text }: { text: string }) {
   const parts = text.split(/\*\*(.+?)\*\*/g);
@@ -100,9 +70,12 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
 
   if (block.type === "bullets") {
     return (
-      <ul className="m-0 list-none p-0 flex flex-col gap-1">
+      <ul className="m-0 flex flex-col gap-1 list-none p-0">
         {block.items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
+          <li
+            key={i}
+            className="flex items-start gap-2 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground"
+          >
             <span className="mt-[5px] h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
             <InlineBold text={item} />
           </li>
@@ -161,50 +134,6 @@ function ServiceDetailsRenderer({ details }: { details: ServiceDetails }) {
   );
 }
 
-function AccordionItem({
-  title,
-  children,
-  isOpen,
-  onToggle,
-}: {
-  title: string;
-  children: React.ReactNode;
-  isOpen: boolean;
-  onToggle: () => void;
-}) {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState(0);
-
-  useEffect(() => {
-    if (contentRef.current) {
-      setContentHeight(contentRef.current.scrollHeight);
-    }
-  }, [isOpen, children]);
-
-  return (
-    <div className="-mx-5 border-b border-border px-5">
-      <button
-        onClick={onToggle}
-        className="flex w-full cursor-pointer items-center justify-between border-none bg-none py-4 text-left"
-      >
-        <span className="text-cta-button font-medium text-foreground">{title}</span>
-        <ChevronDown
-          size={18}
-          className={`shrink-0 text-muted-foreground transition-transform duration-[250ms] ease-out ${isOpen ? "rotate-180" : "rotate-0"}`}
-        />
-      </button>
-      <div
-        className="overflow-hidden transition-[height] duration-[250ms] ease-out"
-        style={{ height: isOpen ? contentHeight : 0 }}
-      >
-        <div ref={contentRef} className="pb-4">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function SectionTab({
   section,
   isActive,
@@ -234,20 +163,21 @@ interface CruiseShipInfoPageProps {
   heroImageUrl?: string | null;
 }
 
-export function CruiseShipInfoPage({ venue, services, slug, pageDescription, heroImageUrl }: CruiseShipInfoPageProps) {
+export function CruiseShipInfoPage({
+  venue,
+  services,
+  slug,
+  pageDescription,
+  heroImageUrl,
+}: CruiseShipInfoPageProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
-  const [showStickyNav, setShowStickyNav] = useState(false);
   const [activeSection, setActiveSection] = useState("welcome");
-  const headerRef = useRef<HTMLDivElement>(null);
+  const { showStickyNav, headerRef } = useStickyNav();
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  // Section tracking — update active tab as sections scroll into view
   useEffect(() => {
     const handleScroll = () => {
-      if (headerRef.current) {
-        const rect = headerRef.current.getBoundingClientRect();
-        setShowStickyNav(rect.bottom <= 0);
-      }
-
       const sections = SECTION_CONFIG.map((s) => ({
         id: s.id,
         el: sectionRefs.current[s.id],
@@ -369,7 +299,6 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription, her
           title="Ship Info"
           className="pt-8"
         />
-
       </div>
 
       {/* Accordion sections */}
@@ -386,16 +315,7 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription, her
               sectionRefs.current[section.id] = el;
             }}
           >
-            <div className="pb-2 pt-6">
-              <div className="flex items-baseline gap-2">
-                <span className="text-section-number font-medium text-primary">{section.number}</span>
-                <span className="text-section-number text-muted-foreground">·</span>
-                <h2 className="m-0 font-serif text-section-heading font-normal text-foreground">
-                  {section.title}
-                </h2>
-              </div>
-              <div className="-ml-page mt-2 h-px w-[calc(60%+var(--cf-page-padding))] bg-primary" />
-            </div>
+            <SectionHeader number={section.number} title={section.title} />
 
             <div className="card-shadow rounded-default bg-card px-page">
               {section.services.length === 0 ? (

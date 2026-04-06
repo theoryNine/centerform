@@ -2,10 +2,14 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, Copy, Check } from "lucide-react";
+import { ArrowLeft, Copy, Check } from "lucide-react";
 import type { Service, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { PageHero } from "@/components/guest/page-hero";
+import { CopyButton } from "@/components/guest/copy-button";
+import { AccordionItem } from "@/components/guest/accordion-item";
+import { SectionHeader } from "@/components/guest/section-header";
+import { useStickyNav } from "@/hooks/use-sticky-nav";
 
 // Section definitions — maps service categories to display sections
 const SECTION_CONFIG = [
@@ -31,38 +35,6 @@ const SECTION_CONFIG = [
     categories: ["transportation"] as string[],
   },
 ];
-
-function CopyButton({ text, label }: { text: string; label?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback for older browsers
-      const el = document.createElement("textarea");
-      el.value = text;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [text]);
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="inline-flex cursor-pointer items-center gap-1 border-none bg-none p-0 text-[13px] font-semibold text-primary"
-    >
-      {label && <span>{label}</span>}
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-    </button>
-  );
-}
 
 function parseWifiInfo(description: string): { network: string; password: string } | null {
   // Matches "Network: X — Password: Y" or "Network: X - Password: Y"
@@ -97,9 +69,7 @@ function WifiContent({ network, password }: { network: string; password: string 
           Network
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-base font-semibold text-foreground">
-            {network}
-          </span>
+          <span className="text-base font-semibold text-foreground">{network}</span>
         </div>
       </div>
 
@@ -115,9 +85,7 @@ function WifiContent({ network, password }: { network: string; password: string 
           <div className="mb-1 text-[10px] font-bold uppercase tracking-[1.5px] text-muted-foreground">
             Password
           </div>
-          <span className="text-base font-semibold text-foreground">
-            {password}
-          </span>
+          <span className="text-base font-semibold text-foreground">{password}</span>
         </div>
         <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
           {copied ? (
@@ -131,52 +99,6 @@ function WifiContent({ network, password }: { network: string; password: string 
           )}
         </span>
       </button>
-    </div>
-  );
-}
-
-function AccordionItem({
-  title,
-  children,
-  isOpen,
-  onToggle,
-}: {
-  title: string;
-  children: React.ReactNode;
-  isOpen: boolean;
-  onToggle: () => void;
-}) {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState(0);
-
-  useEffect(() => {
-    if (contentRef.current) {
-      setContentHeight(contentRef.current.scrollHeight);
-    }
-  }, [isOpen, children]);
-
-  return (
-    <div className="-mx-5 border-b border-border px-5">
-      <button
-        onClick={onToggle}
-        className="flex w-full cursor-pointer items-center justify-between border-none bg-none py-4 text-left"
-      >
-        <span className="text-cta-button font-medium text-foreground">
-          {title}
-        </span>
-        <ChevronDown
-          size={18}
-          className={`shrink-0 text-muted-foreground transition-transform duration-[250ms] ease-out ${isOpen ? "rotate-180" : "rotate-0"}`}
-        />
-      </button>
-      <div
-        className="overflow-hidden transition-[height] duration-[250ms] ease-out"
-        style={{ height: isOpen ? contentHeight : 0 }}
-      >
-        <div ref={contentRef} className="pb-4">
-          {children}
-        </div>
-      </div>
     </div>
   );
 }
@@ -199,9 +121,7 @@ function SectionTab({
     <button
       onClick={onClick}
       className={`cursor-pointer rounded-chip border-none px-4 py-2 text-body-sm font-medium transition-all duration-200 ease-out ${
-        isActive
-          ? "bg-primary text-primary-foreground"
-          : "bg-transparent text-foreground"
+        isActive ? "bg-primary text-primary-foreground" : "bg-transparent text-foreground"
       }`}
     >
       {section.label}
@@ -218,20 +138,13 @@ interface VenueServicesPageProps {
 
 export function VenueServicesPage({ venue, services, slug, pageDescription }: VenueServicesPageProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
-  const [showStickyNav, setShowStickyNav] = useState(false);
   const [activeSection, setActiveSection] = useState("room");
-  const headerRef = useRef<HTMLDivElement>(null);
+  const { showStickyNav, headerRef } = useStickyNav();
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Scroll listener for sticky nav visibility
+  // Section tracking — separate from sticky nav visibility
   useEffect(() => {
     const handleScroll = () => {
-      if (headerRef.current) {
-        const rect = headerRef.current.getBoundingClientRect();
-        setShowStickyNav(rect.bottom <= 0);
-      }
-
-      // Determine active section based on scroll position
       const sections = SECTION_CONFIG.map((s) => ({
         id: s.id,
         el: sectionRefs.current[s.id],
@@ -293,15 +206,10 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
           {/* Sticky header row */}
           <div className="flex items-center px-5 py-3">
-            <Link
-              href={`/${slug}`}
-              className="mr-3 flex items-center text-primary no-underline"
-            >
+            <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
               <ArrowLeft size={20} />
             </Link>
-            <span className="font-serif text-base font-normal text-foreground">
-              {venueName}
-            </span>
+            <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
           </div>
 
           {/* Section tabs */}
@@ -324,11 +232,11 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
       {/* Main header area */}
       <div ref={headerRef}>
         {/* Top bar with back arrow and venue name */}
-        <div className="flex items-center px-5" style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}>
-          <Link
-            href={`/${slug}`}
-            className="mr-3 flex items-center text-primary no-underline"
-          >
+        <div
+          className="flex items-center px-5"
+          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
+        >
+          <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
             <ArrowLeft size={20} />
           </Link>
           <Link
@@ -380,9 +288,7 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
           </div>
           <div className="text-right leading-relaxed">
             <div>Front Desk: 7am–10pm</div>
-            <div className="font-semibold text-foreground">
-              Check out by 11:00 AM
-            </div>
+            <div className="font-semibold text-foreground">Check out by 11:00 AM</div>
           </div>
         </div>
       </div>
@@ -401,21 +307,7 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
               sectionRefs.current[section.id] = el;
             }}
           >
-            {/* Section header */}
-            <div className="pb-2 pt-6">
-              <div className="flex items-baseline gap-2">
-                <span className="text-section-number font-medium text-primary">
-                  {section.number}
-                </span>
-                <span className="text-section-number text-muted-foreground">
-                  ·
-                </span>
-                <h2 className="m-0 font-serif text-section-heading font-normal text-foreground">
-                  {section.title}
-                </h2>
-              </div>
-              <div className="-ml-page mt-2 h-px w-[calc(60%+var(--cf-page-padding))] bg-primary" />
-            </div>
+            <SectionHeader number={section.number} title={section.title} />
 
             {/* Accordion card */}
             <div className="card-shadow rounded-default bg-card px-page">
@@ -439,10 +331,7 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
                       onToggle={() => toggleItem(itemId)}
                     >
                       {wifiInfo ? (
-                        <WifiContent
-                          network={wifiInfo.network}
-                          password={wifiInfo.password}
-                        />
+                        <WifiContent network={wifiInfo.network} password={wifiInfo.password} />
                       ) : (
                         service.description && (
                           <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">

@@ -6,6 +6,7 @@ import { FloatingBackButton } from "@/components/guest/sticky-header";
 import type { Venue } from "@/types";
 import type { CrewMember } from "@/lib/cruise-crew-data";
 import { VenueFooter } from "@/components/guest/venue-footer";
+import { CornerBracketCard } from "@/components/guest/corner-bracket-card";
 
 interface CruiseCrewListingProps {
   venue: Venue;
@@ -86,13 +87,7 @@ export function CruiseCrewListing({ venue, member }: CruiseCrewListingProps) {
 
       {/* Name card — half over the image, half below */}
       <div className="-mt-12 relative z-10 px-page pb-10">
-        <div className="card-shadow relative rounded-default bg-card px-4 py-6 text-center mb-10">
-          {/* Corner brackets */}
-          <span className="absolute inline-block h-4 w-4 border-l-2 border-t-2 border-foreground/25" style={{ top: 10, left: 10 }} />
-          <span className="absolute inline-block h-4 w-4 border-r-2 border-t-2 border-foreground/25" style={{ top: 10, right: 10 }} />
-          <span className="absolute inline-block h-4 w-4 border-b-2 border-l-2 border-foreground/25" style={{ bottom: 10, left: 10 }} />
-          <span className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25" style={{ bottom: 10, right: 10 }} />
-
+        <CornerBracketCard className="mb-10">
           <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
             {member.name}
           </h1>
@@ -100,7 +95,7 @@ export function CruiseCrewListing({ venue, member }: CruiseCrewListingProps) {
           <p className="m-0 text-label font-semibold uppercase tracking-[var(--cf-text-label-spacing)] text-muted-foreground">
             The Crew
           </p>
-        </div>
+        </CornerBracketCard>
 
         <VenueFooter venueName={venue.name} address={venue.ship_name} phone={venue.phone} />
       </div>

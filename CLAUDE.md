@@ -42,6 +42,13 @@ src/
 ├── components/
 │   ├── ui/                 # shadcn/ui components
 │   └── guest/              # Page-specific components
+│       ├── # — Shared primitives —
+│       ├── accordion-item.tsx      # Animated expand/collapse row (used in services + ship-info)
+│       ├── copy-button.tsx         # Inline copy-to-clipboard button with check feedback
+│       ├── corner-bracket-card.tsx # Card wrapper with decorative corner bracket spans
+│       ├── loading-spinner.tsx     # Fixed full-screen loading overlay
+│       ├── section-header.tsx      # Numbered section header with primary underline (e.g. "01 · Title")
+│       ├── # — Page components —
 │       ├── venue-home.tsx          # Hotel homepage
 │       ├── venue-services.tsx      # Hotel services accordion
 │       ├── cruise-home.tsx         # Cruise homepage
@@ -54,11 +61,14 @@ src/
 ├── lib/
 │   ├── auth.ts             # NextAuth config
 │   ├── queries.ts          # Supabase query functions
-│   ├── utils.ts            # cn() utility
+│   ├── utils.ts            # cn() utility + formatPrice()
 │   ├── slug-resolver.ts    # Route resolution (venue vs event)
 │   └── supabase/           # Supabase clients (server.ts, client.ts, middleware.ts)
 ├── types/index.ts          # All TypeScript interfaces
-└── hooks/                  # React hooks
+└── hooks/
+    ├── use-debounce.ts
+    ├── use-press-scale.ts  # Returns press event handlers (scale animation, no re-render)
+    └── use-sticky-nav.ts   # Returns { showStickyNav, headerRef } scroll-past-header state
 ```
 
 ## Database Schema
@@ -162,6 +172,21 @@ For tokens not suited to Tailwind utilities (line-height, letter-spacing, intera
 - `style={{ transitionDuration: "var(--cf-press-duration)" }}`
 
 `cruise-home.tsx` is the reference implementation. Apply the same token utilities when working on other guest components.
+
+## Shared Guest Primitives
+
+Before adding inline UI patterns to a guest component, check if a shared primitive already exists:
+
+| Need | Use |
+|---|---|
+| Price display (`FREE` / `$$$`) | `formatPrice(priceLevel)` from `@/lib/utils` |
+| Full-screen loading overlay | `<LoadingSpinner />` from `@/components/guest/loading-spinner` |
+| Inline clipboard copy button | `<CopyButton text={...} label={...} />` from `@/components/guest/copy-button` |
+| Animated accordion row | `<AccordionItem title isOpen onToggle>` from `@/components/guest/accordion-item` |
+| Card with decorative corner brackets | `<CornerBracketCard className?>` from `@/components/guest/corner-bracket-card` |
+| Numbered section header + underline | `<SectionHeader number="01" title="..." />` from `@/components/guest/section-header` |
+| Button press scale animation | `const p = usePressScale(); <button {...p}>` from `@/hooks/use-press-scale` |
+| Sticky nav visibility on scroll | `const { showStickyNav, headerRef } = useStickyNav()` from `@/hooks/use-sticky-nav` |
 
 ## Conventions
 

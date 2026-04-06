@@ -5,6 +5,8 @@ import { ArrowRight } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { ConciergePrompt } from "@/components/guest/concierge-prompt";
+import { CornerBracketCard } from "@/components/guest/corner-bracket-card";
+import { formatPrice } from "@/lib/utils";
 import type {
   ExploreCollectionWithItems,
   CollectionItemWithPlace,
@@ -30,11 +32,6 @@ function formatCategory(category: PlaceCategory): string {
   return labels[category];
 }
 
-function formatPrice(priceLevel: number | null): string | null {
-  if (priceLevel === 0) return "FREE";
-  if (!priceLevel) return null;
-  return "$".repeat(priceLevel);
-}
 
 function getCTALabel(place: NearbyPlace): string {
   if (place.cta_label) return place.cta_label;
@@ -70,13 +67,7 @@ function CollectionHeader({
   subtitle: string | null;
 }) {
   return (
-    <div className="card-shadow relative mb-5 rounded-default bg-card px-4 py-6 text-center">
-      {/* Corner brackets */}
-      <span className="absolute inline-block h-4 w-4 border-l-2 border-t-2 border-foreground/25" style={{ top: 10, left: 10 }} />
-      <span className="absolute inline-block h-4 w-4 border-r-2 border-t-2 border-foreground/25" style={{ top: 10, right: 10 }} />
-      <span className="absolute inline-block h-4 w-4 border-b-2 border-l-2 border-foreground/25" style={{ bottom: 10, left: 10 }} />
-      <span className="absolute inline-block h-4 w-4 border-b-2 border-r-2 border-foreground/25" style={{ bottom: 10, right: 10 }} />
-
+    <CornerBracketCard className="mb-5">
       <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
         {title}
       </h1>
@@ -86,7 +77,7 @@ function CollectionHeader({
           <p className="m-0 text-body-sm text-muted-foreground">{subtitle}</p>
         </>
       )}
-    </div>
+    </CornerBracketCard>
   );
 }
 

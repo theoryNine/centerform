@@ -6,12 +6,9 @@ import { NavCard } from "@/components/guest/nav-card";
 import type { CruiseRestaurant, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/venue-footer";
 import { PageHero } from "@/components/guest/page-hero";
-
-function formatPrice(priceLevel: number | null): string | null {
-  if (priceLevel === 0) return "FREE";
-  if (!priceLevel) return null;
-  return "$".repeat(priceLevel);
-}
+import { LoadingSpinner } from "@/components/guest/loading-spinner";
+import { SectionHeader } from "@/components/guest/section-header";
+import { formatPrice } from "@/lib/utils";
 
 function restaurantSubLabel(r: CruiseRestaurant): string {
   return [
@@ -44,17 +41,6 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
 
   const sitDown = restaurants.filter((r) => r.restaurant_type === "sit_down");
   const walkUp = restaurants.filter((r) => r.restaurant_type === "walk_up");
-
-  const SectionHeader = ({ number, title }: { number: string; title: string }) => (
-    <div className="pb-2 pt-6">
-      <div className="flex items-baseline gap-2">
-        <span className="text-section-number font-medium text-primary">{number}</span>
-        <span className="text-section-number text-foreground">·</span>
-        <h2 className="m-0 font-serif text-section-heading font-normal text-foreground">{title}</h2>
-      </div>
-      <div className="-ml-page mt-2 h-px w-[calc(60%+var(--cf-page-padding))] bg-primary" />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -141,23 +127,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
         <div className="h-safe-bottom" />
       </div>
 
-      {/* Loading overlay — visible until all restaurant images have loaded */}
-      {!allLoaded && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-          <svg
-            className="animate-spin"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="rgba(45,42,38,0.25)"
-            strokeWidth="2"
-            strokeLinecap="round"
-          >
-            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-          </svg>
-        </div>
-      )}
+      {!allLoaded && <LoadingSpinner />}
     </div>
   );
 }
