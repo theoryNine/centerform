@@ -18,5 +18,5 @@ export default async function CrewMemberPage({
   const member = CREW.find((m) => m.slug === name);
   if (!member) notFound();
 
-  return <CruiseCrewListing venue={resolved.data} member={member} slug={slug} />;
+  return <CruiseCrewListing venue={resolved.data} member={member} />;
 }
