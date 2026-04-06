@@ -83,7 +83,7 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
             key={i}
             className="flex items-start gap-2 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground"
           >
-            <span className="mt-[5px] h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
+            <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
             <InlineBold text={item} />
           </li>
         ))}
