@@ -29,12 +29,14 @@ export function CruiseHomePage() {
   const splashKey = `splash-dismissed:${slug}`;
   const [splashDismissed, setSplashDismissed] = useState(false);
   const [splashVisible, setSplashVisible] = useState(false);
+  const [splashWasShown, setSplashWasShown] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem(splashKey)) {
       setSplashDismissed(true);
     } else {
       setSplashVisible(true);
+      setSplashWasShown(true);
     }
   }, [splashKey]);
 
@@ -177,7 +179,7 @@ export function CruiseHomePage() {
         title={shipName}
         subtitle={locationString || undefined}
         size="home"
-        animated={splashDismissed}
+        animated={splashWasShown && splashDismissed}
       />
       {/* Content */}
       <div className="px-page pb-10 pt-6">

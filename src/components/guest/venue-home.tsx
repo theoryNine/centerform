@@ -50,12 +50,14 @@ export function VenueHomePage() {
   const splashKey = `splash-dismissed:${slug}`;
   const [splashDismissed, setSplashDismissed] = useState(false);
   const [splashVisible, setSplashVisible] = useState(false);
+  const [splashWasShown, setSplashWasShown] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem(splashKey)) {
       setSplashDismissed(true);
     } else {
       setSplashVisible(true);
+      setSplashWasShown(true);
     }
   }, [splashKey]);
 
@@ -172,7 +174,7 @@ export function VenueHomePage() {
           title={venueName}
           subtitle={locationString || undefined}
           size="home"
-          animated={splashDismissed}
+          animated={splashWasShown && splashDismissed}
         />
         {/* Content area */}
         <div className="px-page pb-10 pt-6">
