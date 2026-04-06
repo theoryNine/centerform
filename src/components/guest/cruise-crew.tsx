@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { User } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
@@ -8,26 +9,35 @@ import { VenueFooter } from "@/components/guest/venue-footer";
 import { CREW } from "@/lib/cruise-crew-data";
 import { PageHero } from "@/components/guest/page-hero";
 
-function CrewTile({ name, photo, href }: { name: string; photo?: string; href: string }) {
+function CrewTile({
+  name,
+  photo,
+  href,
+  onLoad,
+}: {
+  name: string;
+  photo?: string;
+  href: string;
+  onLoad?: () => void;
+}) {
   return (
     <Link href={href} className="card-shadow overflow-hidden rounded-default bg-card no-underline">
-      {/* Image */}
-      <div className="aspect-square w-full overflow-hidden">
-        {photo ? (
-          <img src={photo} alt={name} className="size-full object-cover object-top" />
-        ) : (
-          <div
-            className="flex size-full items-center justify-center"
-            style={{
-              background: "linear-gradient(135deg, #0E3A5C 0%, #2980B9 100%)",
-            }}
-          >
-            <User size={32} color="rgba(255,255,255,0.4)" />
-          </div>
+      <div className="relative aspect-square w-full overflow-hidden">
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ background: "linear-gradient(135deg, #0E3A5C 0%, #2980B9 100%)" }}
+        >
+          <User size={32} color="rgba(255,255,255,0.4)" />
+        </div>
+        {photo && (
+          <img
+            src={photo}
+            alt={name}
+            onLoad={onLoad}
+            className="absolute inset-0 size-full object-cover object-top"
+          />
         )}
       </div>
-
-      {/* Name */}
       <div className="px-2 py-3 text-center">
         <p className="m-0 font-serif text-cta-button font-normal leading-tight text-foreground">
           {name}
@@ -47,6 +57,19 @@ interface CruiseCrewPageProps {
 export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: CruiseCrewPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
 
+  const totalWithPhotos = CREW.filter((m) => m.photos[0]).length;
+  const [loadedCount, setLoadedCount] = useState(0);
+  const allLoaded = loadedCount >= totalWithPhotos;
+
+  const handleImageLoad = useCallback(() => {
+    setLoadedCount((n) => n + 1);
+  }, []);
+
+  const featuredCrew = CREW.filter((m) => m.slug === "adam" || m.slug === "ansel");
+  const restCrew = CREW.filter((m) => m.slug !== "adam" && m.slug !== "ansel").sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <div ref={sentinelRef} className="h-0" />
@@ -57,7 +80,6 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
         nameHref={`/${slug}`}
       />
 
-      {/* Mini-hero */}
       <PageHero
         imageUrl={heroImageUrl ?? "/crew/hero.jpg"}
         imageAlt="The Crew"
@@ -71,48 +93,62 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
         className="pt-8"
       />
 
-      {/* Content */}
       <div className="px-page pb-10 pt-6">
         {pageDescription && (
           <p className="mb-6 text-body leading-[var(--cf-body-line-height)] text-foreground">
             {pageDescription}
           </p>
         )}
-        {/* Featured members */}
+
         <div className="grid grid-cols-2 gap-card-gap">
-          {CREW.filter((m) => m.slug === "adam" || m.slug === "ansel").map((member) => (
+          {featuredCrew.map((member) => (
             <CrewTile
               key={member.slug}
               name={member.name}
               photo={member.photos[0]}
               href={`/${slug}/the-crew/${member.slug}`}
+              onLoad={handleImageLoad}
             />
           ))}
         </div>
 
-        {/* Divider */}
         <div className="my-6 h-px bg-primary" />
 
-        {/* Rest of crew (alphabetical) */}
         <div className="grid grid-cols-2 gap-card-gap">
-          {CREW.filter((m) => m.slug !== "adam" && m.slug !== "ansel")
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((member) => (
-              <CrewTile
-                key={member.slug}
-                name={member.name}
-                photo={member.photos[0]}
-                href={`/${slug}/the-crew/${member.slug}`}
-              />
-            ))}
+          {restCrew.map((member) => (
+            <CrewTile
+              key={member.slug}
+              name={member.name}
+              photo={member.photos[0]}
+              href={`/${slug}/the-crew/${member.slug}`}
+              onLoad={handleImageLoad}
+            />
+          ))}
         </div>
 
         <div className="mt-10">
           <VenueFooter venueName={venue.name} address={venue.ship_name} phone={venue.phone} />
         </div>
-
         <div className="h-safe-bottom" />
       </div>
+
+      {/* Loading overlay — visible until all crew photos have loaded */}
+      {!allLoaded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+          <svg
+            className="animate-spin"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(45,42,38,0.25)"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          </svg>
+        </div>
+      )}
     </div>
   );
 }
