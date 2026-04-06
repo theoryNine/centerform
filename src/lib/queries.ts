@@ -319,3 +319,14 @@ export async function getCruiseLinks(venueId: string): Promise<CruiseLink[]> {
     .order("display_order", { ascending: true });
   return (data ?? []) as CruiseLink[];
 }
+
+export async function getCruiseNavImage(venueId: string, navKey: string): Promise<string | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cruise_nav_images")
+    .select("image_url")
+    .eq("venue_id", venueId)
+    .eq("nav_key", navKey)
+    .maybeSingle();
+  return data?.image_url ?? null;
+}

@@ -231,9 +231,10 @@ interface CruiseShipInfoPageProps {
   services: Service[];
   slug: string;
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
 }
 
-export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: CruiseShipInfoPageProps) {
+export function CruiseShipInfoPage({ venue, services, slug, pageDescription, heroImageUrl }: CruiseShipInfoPageProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [showStickyNav, setShowStickyNav] = useState(false);
   const [activeSection, setActiveSection] = useState("welcome");
@@ -350,7 +351,7 @@ export function CruiseShipInfoPage({ venue, services, slug, pageDescription }: C
 
         {/* Hero */}
         <PageHero
-          imageUrl={venue.cover_image_url}
+          imageUrl={heroImageUrl ?? venue.cover_image_url}
           imageAlt={shipName}
           fallbackNode={
             <div

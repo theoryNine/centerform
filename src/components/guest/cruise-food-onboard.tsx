@@ -27,9 +27,10 @@ interface CruiseFoodOnboardPageProps {
   restaurants: CruiseRestaurant[];
   slug: string;
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
 }
 
-export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescription }: CruiseFoodOnboardPageProps) {
+export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescription, heroImageUrl }: CruiseFoodOnboardPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
 
   const sitDown = restaurants.filter((r) => r.restaurant_type === "sit_down");
@@ -58,7 +59,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
 
       {/* Mini-hero */}
       <PageHero
-        imageUrl={venue.cover_image_url}
+        imageUrl={heroImageUrl ?? venue.cover_image_url}
         imageAlt={venue.name}
         fallbackNode={
           <div

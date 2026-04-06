@@ -1,5 +1,5 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getVenueServices, getVenuePageDescription } from "@/lib/queries";
+import { getVenueServices, getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseShipInfoPage } from "@/components/guest/cruise-ship-info";
 
@@ -15,9 +15,10 @@ export default async function ShipInfoPage({
     notFound();
   }
 
-  const [services, pageDescription] = await Promise.all([
+  const [services, pageDescription, heroImageUrl] = await Promise.all([
     getVenueServices(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "ship-info"),
+    getCruiseNavImage(resolved.data.id, "ship-info"),
   ]);
 
   return (
@@ -26,6 +27,7 @@ export default async function ShipInfoPage({
       services={services}
       slug={slug}
       pageDescription={pageDescription}
+      heroImageUrl={heroImageUrl}
     />
   );
 }

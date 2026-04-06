@@ -41,9 +41,10 @@ interface CruiseCrewPageProps {
   venue: Venue;
   slug: string;
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
 }
 
-export function CruiseCrewPage({ venue, slug, pageDescription }: CruiseCrewPageProps) {
+export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: CruiseCrewPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
@@ -58,7 +59,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription }: CruiseCrewPageP
 
       {/* Mini-hero */}
       <PageHero
-        imageUrl="/crew/hero.png"
+        imageUrl={heroImageUrl ?? "/crew/hero.png"}
         imageAlt="The Crew"
         fallbackNode={
           <div

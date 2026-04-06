@@ -140,9 +140,10 @@ interface CruiseGroupPlanPageProps {
   items: CruiseItineraryItem[];
   slug: string;
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
 }
 
-export function CruiseGroupPlanPage({ venue, items, slug, pageDescription }: CruiseGroupPlanPageProps) {
+export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroImageUrl }: CruiseGroupPlanPageProps) {
   const dayGroups = groupByDay(items);
   const hasDays = dayGroups.length > 0;
 
@@ -299,7 +300,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription }: Cru
 
         {/* Hero */}
         <PageHero
-          imageUrl={venue.cover_image_url}
+          imageUrl={heroImageUrl ?? venue.cover_image_url}
           imageAlt={venue.name}
           fallbackNode={
             <div

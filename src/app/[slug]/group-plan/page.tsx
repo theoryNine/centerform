@@ -1,5 +1,5 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getCruiseItineraryItems, getVenuePageDescription } from "@/lib/queries";
+import { getCruiseItineraryItems, getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseGroupPlanPage } from "@/components/guest/cruise-group-plan";
 
@@ -15,9 +15,10 @@ export default async function GroupPlanPage({
     notFound();
   }
 
-  const [items, pageDescription] = await Promise.all([
+  const [items, pageDescription, heroImageUrl] = await Promise.all([
     getCruiseItineraryItems(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "group-plan"),
+    getCruiseNavImage(resolved.data.id, "group-plan"),
   ]);
 
   return (
@@ -26,6 +27,7 @@ export default async function GroupPlanPage({
       items={items}
       slug={slug}
       pageDescription={pageDescription}
+      heroImageUrl={heroImageUrl}
     />
   );
 }
