@@ -73,7 +73,7 @@ Core tables (migrations in `supabase/migrations/`):
 - **explore_collection_items** — ordered join table linking a collection to its `nearby_places`. Supports `time_label`, `is_start`, and `is_end` for the timeline variant
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
 - **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.)
-- **cruise_restaurants** — dining venues on a cruise ship. `restaurant_type`: `sit_down` | `walk_up`. Linked from `cruise_itinerary_items` via optional `restaurant_id` FK.
+- **cruise_restaurants** — dining venues on a cruise ship. `restaurant_type`: `sit_down` | `walk_up`. Linked from `cruise_itinerary_items` via optional `restaurant_id` FK. `hours` is plain text — use `\n`-separated lines for multi-period hours (e.g. `"Brunch: 8am–1pm\nDinner: 5:30pm–9:30pm"`), rendered as stacked lines in the UI. `menu_links` is a nullable JSONB array of `{label: string, url: string}` objects rendered as secondary text links on the restaurant detail page.
 - **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item to a restaurant detail page.
 - **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
