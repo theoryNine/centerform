@@ -49,11 +49,13 @@ export function CruiseHomePage() {
   useEffect(() => {
     if (!venue?.id) return;
     const supabase = createClient();
+    const now = new Date().toISOString();
     supabase
       .from("cruise_daily_welcome")
       .select("*")
       .eq("venue_id", venue.id)
-      .lte("effective_at", new Date().toISOString())
+      .lte("effective_at", now)
+      .or(`expires_at.is.null,expires_at.gt.${now}`)
       .order("effective_at", { ascending: false })
       .limit(1)
       .maybeSingle()

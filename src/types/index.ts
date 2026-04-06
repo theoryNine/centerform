@@ -314,6 +314,7 @@ export interface CruiseDailyWelcome {
   id: string;
   venue_id: string;
   effective_at: string;
+  expires_at: string | null;
   heading: string;
   body: string;
   created_at: string;

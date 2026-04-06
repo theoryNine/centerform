@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseCrewMember, CruiseDailyWelcome, CruiseLink } from "@/types";
+import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseDailyWelcome, CruiseLink } from "@/types";
 
 export async function getVenueBySlug(slug: string) {
   const supabase = await createClient();
@@ -296,11 +296,13 @@ export async function getCruiseDailyWelcome(
   venueId: string,
 ): Promise<CruiseDailyWelcome | null> {
   const supabase = await createClient();
+  const now = new Date().toISOString();
   const { data } = await supabase
     .from("cruise_daily_welcome")
     .select("*")
     .eq("venue_id", venueId)
-    .lte("effective_at", new Date().toISOString())
+    .lte("effective_at", now)
+    .or(`expires_at.is.null,expires_at.gt.${now}`)
     .order("effective_at", { ascending: false })
     .limit(1)
     .maybeSingle();
