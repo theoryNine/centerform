@@ -33,6 +33,7 @@ export default function RootPage() {
   const [pressed, setPressed] = useState(false);
   const [options, setOptions] = useState<SearchOption[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const router = useRouter();
   const abortRef = useRef<AbortController | null>(null);
@@ -49,6 +50,7 @@ export default function RootPage() {
     if (debouncedQuery.length < 2) {
       setOptions([]);
       setShowDropdown(false);
+      setIsLoading(false);
       return;
     }
 
@@ -56,6 +58,7 @@ export default function RootPage() {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
+    setIsLoading(true);
 
     const supabase = createClient();
     const filter = `name.ilike.%${debouncedQuery}%,slug.ilike.%${debouncedQuery}%`;
@@ -93,6 +96,7 @@ export default function RootPage() {
       const merged = [...venues, ...events];
       setOptions(merged);
       setShowDropdown(merged.length > 0);
+      setIsLoading(false);
       setHighlightedIndex(-1);
     });
 
@@ -210,12 +214,12 @@ export default function RootPage() {
             className="w-full bg-white/5 px-4 py-3 font-[inherit] text-sm text-[#e8dcc8] outline-none transition-[border-color,border-radius] duration-200 ease-out"
             style={{
               border: `1px solid ${focused ? "rgba(212,180,131,0.4)" : "rgba(196,180,152,0.15)"}`,
-              borderRadius: showDropdown ? "20px 20px 0 0" : 100,
+              borderRadius: showDropdown || isLoading ? "20px 20px 0 0" : 100,
             }}
           />
 
           {/* Autocomplete dropdown */}
-          {showDropdown && options.length > 0 && (
+          {(isLoading || showDropdown) && (
             <ul
               ref={dropdownRef}
               className="absolute inset-x-0 top-full z-10 m-0 list-none overflow-hidden rounded-b-2xl border border-t-0 border-[rgba(212,180,131,0.4)] bg-[rgba(30,26,22,0.98)] p-0"
@@ -223,38 +227,58 @@ export default function RootPage() {
                 borderTop: "1px solid rgba(196,180,152,0.1)",
               }}
             >
-              {options.map((option, i) => (
-                <li
-                  key={`${option.type}-${option.slug}`}
-                  onMouseDown={() => selectVenue(option.slug)}
-                  onMouseEnter={() => setHighlightedIndex(i)}
-                  className="cursor-pointer px-4 py-2.5 transition-colors duration-100 ease-out"
-                  style={{
-                    background:
-                      highlightedIndex === i
-                        ? "rgba(212,180,131,0.12)"
-                        : "transparent",
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#e8dcc8]">
-                      {option.name}
-                    </span>
-                    <span
-                      className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide"
-                      style={{
-                        color: option.type === "event" ? "#b39ddb" : "#6bcba0",
-                        background: option.type === "event" ? "rgba(179,157,219,0.12)" : "rgba(107,203,160,0.12)",
-                      }}
-                    >
-                      {option.type === "event" ? "Event" : "Venue"}
-                    </span>
-                  </div>
-                  <div className="mt-0.5 text-[11px] text-[#6B5D4D]">
-                    {option.city || ""}
-                  </div>
+              {isLoading ? (
+                <li className="flex items-center justify-center px-4 py-4">
+                  <svg
+                    className="animate-spin"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="rgba(212,180,131,0.5)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                  </svg>
                 </li>
-              ))}
+              ) : (
+                options.map((option, i) => (
+                  <li
+                    key={`${option.type}-${option.slug}`}
+                    onMouseDown={() => selectVenue(option.slug)}
+                    onMouseEnter={() => setHighlightedIndex(i)}
+                    className="cursor-pointer px-4 py-2.5 transition-colors duration-100 ease-out"
+                    style={{
+                      background:
+                        highlightedIndex === i
+                          ? "rgba(212,180,131,0.12)"
+                          : "transparent",
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#e8dcc8]">
+                        {option.name}
+                      </span>
+                      <span
+                        className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide"
+                        style={{
+                          color: option.type === "event" ? "#b39ddb" : "#6bcba0",
+                          background:
+                            option.type === "event"
+                              ? "rgba(179,157,219,0.12)"
+                              : "rgba(107,203,160,0.12)",
+                        }}
+                      >
+                        {option.type === "event" ? "Event" : "Venue"}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-[#6B5D4D]">
+                      {option.city || ""}
+                    </div>
+                  </li>
+                ))
+              )}
             </ul>
           )}
         </div>
