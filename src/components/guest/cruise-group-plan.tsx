@@ -119,7 +119,11 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
         <div className="absolute left-[26px] top-[10px] z-10 h-2 w-2 rounded-full bg-muted-foreground/60" />
         <div className="absolute left-[34px] top-[13px] h-px w-[26px] bg-muted-foreground/25" />
         <Link
-          href={`/${slug}/group-plan/${item.id}`}
+          href={
+            item.restaurant_id
+              ? `/${slug}/food-onboard/${item.restaurant_id}`
+              : `/${slug}/group-plan/${item.id}`
+          }
           className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
         >
           {cardContent}
