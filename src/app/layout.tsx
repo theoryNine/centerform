@@ -16,7 +16,6 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "Centerform",
   description: "Your digital concierge",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
