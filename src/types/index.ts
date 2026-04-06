@@ -256,6 +256,11 @@ export interface ExploreCollectionWithItems extends ExploreCollection {
 
 export type CruiseRestaurantType = "sit_down" | "walk_up";
 
+export interface CruiseMenuLink {
+  label: string;
+  url: string;
+}
+
 export interface CruiseRestaurant {
   id: string;
   venue_id: string;
@@ -268,6 +273,7 @@ export interface CruiseRestaurant {
   phone: string | null;
   website: string | null;
   price_level: number | null;
+  menu_links: CruiseMenuLink[] | null;
   restaurant_type: CruiseRestaurantType;
   is_featured: boolean;
   display_order: number;
