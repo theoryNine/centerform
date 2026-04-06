@@ -79,6 +79,7 @@ Core tables (migrations in `supabase/migrations/`):
 - **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry — it renders as a regular tappable card like all other items. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item to a restaurant detail page.
 - **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
+- **cruise_nav_images** — optional hero images for the four nav tiles on the cruise homepage. One row per tile per venue: `nav_key` is one of `"ship-info"` | `"food-onboard"` | `"group-plan"` | `"the-crew"` (matching the route segment). Unique constraint on `(venue_id, nav_key)`. Fetched client-side on mount alongside `cruise_links`; passed as `imageUrl` to `NavCard`.
 - **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, and `body`. The query fetches the most recent row where `effective_at <= NOW()`, so multiple entries per day are supported (e.g. a morning and an evening message). Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_anniversary_cruise.sql`.
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
 - **standalone_event_themes** — theming for standalone events
@@ -190,8 +191,10 @@ venue-assets/
     │   └── {restaurant-id}/        # cruise_restaurants images
     ├── itinerary/
     │   └── {item-id}/              # cruise_itinerary_items images
-    └── crew/
-        └── {crew-id}/              # cruise_crew member photos
+    ├── crew/
+    │   └── {crew-id}/              # cruise_crew member photos
+    └── nav/
+        └── {nav-key}               # cruise_nav_images (ship-info, food-onboard, group-plan, the-crew)
 ```
 
 **`event-assets`** — standalone event image assets

@@ -310,6 +310,15 @@ export interface CruiseLink {
   updated_at: string;
 }
 
+export interface CruiseNavImage {
+  id: string;
+  venue_id: string;
+  nav_key: string;
+  image_url: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CruiseDailyWelcome {
   id: string;
   venue_id: string;
