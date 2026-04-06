@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FloatingBackButton } from "@/components/guest/sticky-header";
+import { FloatingBackButton } from "@/components/guest/primitives/sticky-header";
 import type { Venue } from "@/types";
 import type { CrewMember } from "@/lib/cruise-crew-data";
-import { VenueFooter } from "@/components/guest/venue-footer";
-import { CornerBracketCard } from "@/components/guest/corner-bracket-card";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
 
 interface CruiseCrewListingProps {
   venue: Venue;

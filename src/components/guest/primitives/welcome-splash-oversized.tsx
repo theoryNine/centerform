@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
-import { CornerBracketCard } from "@/components/guest/corner-bracket-card";
+import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
 import { usePressScale } from "@/hooks/use-press-scale";
 
 interface WelcomeSplashOversizedProps {

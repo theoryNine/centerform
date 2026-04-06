@@ -4,10 +4,10 @@ import {
   useWindowScroll,
   ScrollRevealStickyHeader,
   FloatingBackButton,
-} from "@/components/guest/sticky-header";
+} from "@/components/guest/primitives/sticky-header";
 import { useRouter } from "next/navigation";
 import type { CruiseRestaurant, Venue } from "@/types";
-import { VenueFooter } from "@/components/guest/venue-footer";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { formatPrice } from "@/lib/utils";
 
 interface CruiseRestaurantListingProps {

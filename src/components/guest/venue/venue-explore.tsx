@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
-import { VenueFooter } from "@/components/guest/venue-footer";
-import { ConciergePrompt } from "@/components/guest/concierge-prompt";
-import { PageHero } from "@/components/guest/page-hero";
+import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
+import { PageHero } from "@/components/guest/primitives/page-hero";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 interface AreaSection {

@@ -3,14 +3,14 @@
 import { useState, useEffect, useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
-import { WelcomeSplash } from "@/components/guest/welcome-splash";
+import { WelcomeSplash } from "@/components/guest/primitives/welcome-splash";
 import { createClient } from "@/lib/supabase/client";
 import type { VenueEvent } from "@/types";
 import { Phone } from "lucide-react";
-import { VenueFooter } from "@/components/guest/venue-footer";
-import { ConciergePrompt } from "@/components/guest/concierge-prompt";
-import { PageHero } from "@/components/guest/page-hero";
-import { NavCard, SectionDivider } from "@/components/guest/nav-card";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
+import { PageHero } from "@/components/guest/primitives/page-hero";
+import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card";
 
 function formatVenueName(slug: string) {
   return slug

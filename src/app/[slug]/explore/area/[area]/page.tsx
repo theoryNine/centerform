@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getNearbyPlacesByArea } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { AreaListingPage } from "@/components/guest/area-listing";
+import { AreaListingPage } from "@/components/guest/explore/area-listing";
 
 export default async function AreaPage({
   params,

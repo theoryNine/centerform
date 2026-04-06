@@ -3,12 +3,12 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { User } from "lucide-react";
-import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
+import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
 import type { Venue } from "@/types";
-import { VenueFooter } from "@/components/guest/venue-footer";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { CREW } from "@/lib/cruise-crew-data";
-import { PageHero } from "@/components/guest/page-hero";
-import { LoadingSpinner } from "@/components/guest/loading-spinner";
+import { PageHero } from "@/components/guest/primitives/page-hero";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 
 function CrewTile({
   name,

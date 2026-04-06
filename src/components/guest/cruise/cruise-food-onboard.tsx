@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
-import { NavCard } from "@/components/guest/nav-card";
+import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { NavCard } from "@/components/guest/primitives/nav-card";
 import type { CruiseRestaurant, Venue } from "@/types";
-import { VenueFooter } from "@/components/guest/venue-footer";
-import { PageHero } from "@/components/guest/page-hero";
-import { LoadingSpinner } from "@/components/guest/loading-spinner";
-import { SectionHeader } from "@/components/guest/section-header";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { PageHero } from "@/components/guest/primitives/page-hero";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { formatPrice } from "@/lib/utils";
 
 function restaurantSubLabel(r: CruiseRestaurant): string {

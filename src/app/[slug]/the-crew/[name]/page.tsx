@@ -1,6 +1,6 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { notFound } from "next/navigation";
-import { CruiseCrewListing } from "@/components/guest/cruise-crew-listing";
+import { CruiseCrewListing } from "@/components/guest/cruise/cruise-crew-listing";
 import { CREW } from "@/lib/cruise-crew-data";
 
 export default async function CrewMemberPage({

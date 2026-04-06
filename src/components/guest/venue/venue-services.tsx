@@ -4,11 +4,11 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Copy, Check } from "lucide-react";
 import type { Service, Venue } from "@/types";
-import { VenueFooter } from "@/components/guest/venue-footer";
-import { PageHero } from "@/components/guest/page-hero";
-import { CopyButton } from "@/components/guest/copy-button";
-import { AccordionItem } from "@/components/guest/accordion-item";
-import { SectionHeader } from "@/components/guest/section-header";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { PageHero } from "@/components/guest/primitives/page-hero";
+import { CopyButton } from "@/components/guest/primitives/copy-button";
+import { AccordionItem } from "@/components/guest/primitives/accordion-item";
+import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
 
 // Section definitions — maps service categories to display sections

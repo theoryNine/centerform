@@ -4,13 +4,13 @@ import { useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { Phone, ArrowRight, Anchor } from "lucide-react";
-import { VenueFooter } from "@/components/guest/venue-footer";
-import { WelcomeSplash } from "@/components/guest/welcome-splash";
-import { PageHero } from "@/components/guest/page-hero";
-import { NavCard, SectionDivider } from "@/components/guest/nav-card";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { WelcomeSplash } from "@/components/guest/primitives/welcome-splash";
+import { PageHero } from "@/components/guest/primitives/page-hero";
+import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card";
 import { createClient } from "@/lib/supabase/client";
 import type { CruiseDailyWelcome, CruiseLink, CruiseNavImage } from "@/types";
-import { LoadingSpinner } from "@/components/guest/loading-spinner";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 
 function formatVenueName(slug: string) {
   return slug

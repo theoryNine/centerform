@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getCruiseRestaurantById } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { CruiseRestaurantListing } from "@/components/guest/cruise-restaurant-listing";
+import { CruiseRestaurantListing } from "@/components/guest/cruise/cruise-restaurant-listing";
 
 export default async function RestaurantListingPage({
   params,

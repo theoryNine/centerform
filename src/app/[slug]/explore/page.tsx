@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getNearbyPlaces, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { VenueExplorePage } from "@/components/guest/venue-explore";
+import { VenueExplorePage } from "@/components/guest/venue/venue-explore";
 
 export default async function ExplorePage({
   params,

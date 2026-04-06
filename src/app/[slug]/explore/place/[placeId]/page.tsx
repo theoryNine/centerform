@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getNearbyPlaceById } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { PlaceListing } from "@/components/guest/place-listing";
+import { PlaceListing } from "@/components/guest/explore/place-listing";
 
 export default async function PlacePage({
   params,

@@ -4,8 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { CruiseItineraryItem, Venue } from "@/types";
-import { VenueFooter } from "@/components/guest/venue-footer";
-import { PageHero } from "@/components/guest/page-hero";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { PageHero } from "@/components/guest/primitives/page-hero";
 
 // ─── Day grouping ────────────────────────────────────────────────────────────
 

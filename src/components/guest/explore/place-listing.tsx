@@ -1,7 +1,7 @@
 "use client";
 
-import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
-import { VenueFooter } from "@/components/guest/venue-footer";
+import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 function getCTALabel(category: NearbyPlace["category"]): string {
