@@ -9,7 +9,7 @@ import { WelcomeSplash } from "@/components/guest/welcome-splash";
 import { PageHero } from "@/components/guest/page-hero";
 import { NavCard, SectionDivider } from "@/components/guest/nav-card";
 import { createClient } from "@/lib/supabase/client";
-import type { CruiseDailyWelcome, CruiseLink } from "@/types";
+import type { CruiseDailyWelcome, CruiseLink, CruiseNavImage } from "@/types";
 
 function formatVenueName(slug: string) {
   return slug
@@ -45,6 +45,7 @@ export function CruiseHomePage() {
 
   const [dailyWelcome, setDailyWelcome] = useState<CruiseDailyWelcome | null>(null);
   const [links, setLinks] = useState<CruiseLink[]>([]);
+  const [navImages, setNavImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!venue?.id) return;
@@ -71,6 +72,19 @@ export function CruiseHomePage() {
       .then(({ data }) => {
         if (data) setLinks(data as CruiseLink[]);
       });
+    supabase
+      .from("cruise_nav_images")
+      .select("*")
+      .eq("venue_id", venue.id)
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, string> = {};
+          (data as CruiseNavImage[]).forEach((row) => {
+            map[row.nav_key] = row.image_url;
+          });
+          setNavImages(map);
+        }
+      });
   }, [venue?.id]);
 
   const navItems = [
@@ -78,21 +92,25 @@ export function CruiseHomePage() {
       label: "Ship Info",
       sublabel: "Your cabin, services & boarding",
       href: `/${slug}/ship-info`,
+      imageUrl: navImages["ship-info"],
     },
     {
       label: "Food Onboard",
       sublabel: "Restaurants and dining venues",
       href: `/${slug}/food-onboard`,
+      imageUrl: navImages["food-onboard"],
     },
     {
       label: "Group Plan",
       sublabel: "Itinerary and schedule",
       href: `/${slug}/group-plan`,
+      imageUrl: navImages["group-plan"],
     },
     {
       label: "The Crew",
       sublabel: "Meet your group",
       href: `/${slug}/the-crew`,
+      imageUrl: navImages["the-crew"],
     },
   ];
 
