@@ -9,7 +9,7 @@ export const CREW: CrewMember[] = [
     name: "Adam",
     slug: "adam",
     photos: [
-      "/crew/adam.png",
+      "/crew/adam.jpg",
       "/crew/adam/1.jpg",
       "/crew/adam/2.JPG",
       "/crew/adam/3.jpg",
@@ -22,7 +22,7 @@ export const CREW: CrewMember[] = [
     name: "Alex",
     slug: "alex",
     photos: [
-      "/crew/alex.png",
+      "/crew/alex.jpg",
       "/crew/alex/1.JPG",
       "/crew/alex/2.JPG",
       "/crew/alex/3.JPG",
@@ -34,7 +34,7 @@ export const CREW: CrewMember[] = [
     name: "Ansel",
     slug: "ansel",
     photos: [
-      "/crew/ansel.png",
+      "/crew/ansel.jpg",
       "/crew/ansel/1.jpg",
       "/crew/ansel/2.jpg",
       "/crew/ansel/3.JPG",
@@ -47,7 +47,7 @@ export const CREW: CrewMember[] = [
     name: "Ben",
     slug: "ben",
     photos: [
-      "/crew/ben.png",
+      "/crew/ben.jpg",
       "/crew/ben/1.jpg",
       "/crew/ben/2.jpg",
       "/crew/ben/3.jpg",
@@ -59,7 +59,7 @@ export const CREW: CrewMember[] = [
     name: "Clinton",
     slug: "clinton",
     photos: [
-      "/crew/clinton.png",
+      "/crew/clinton.jpg",
       "/crew/clinton/1.JPG",
       "/crew/clinton/2.JPG",
       "/crew/clinton/3.jpg",
@@ -71,7 +71,7 @@ export const CREW: CrewMember[] = [
     name: "Elliot",
     slug: "elliot",
     photos: [
-      "/crew/elliot.png",
+      "/crew/elliot.jpg",
       "/crew/elliot/1.jpg",
       "/crew/elliot/2.jpg",
       "/crew/elliot/3.jpg",
@@ -83,7 +83,7 @@ export const CREW: CrewMember[] = [
     name: "Eric",
     slug: "eric",
     photos: [
-      "/crew/eric.png",
+      "/crew/eric.jpg",
       "/crew/eric/1.JPG",
       "/crew/eric/2.jpg",
       "/crew/eric/3.jpg",
@@ -95,7 +95,7 @@ export const CREW: CrewMember[] = [
     name: "Jeff",
     slug: "jeff",
     photos: [
-      "/crew/jeff.png",
+      "/crew/jeff.jpg",
       "/crew/jeff/1.jpg",
       "/crew/jeff/2.jpg",
       "/crew/jeff/3.jpg",
@@ -107,7 +107,7 @@ export const CREW: CrewMember[] = [
     name: "Sam",
     slug: "sam",
     photos: [
-      "/crew/sam.png",
+      "/crew/sam.jpg",
       "/crew/sam/1.JPG",
       "/crew/sam/2.jpg",
       "/crew/sam/3.JPG",
@@ -119,7 +119,7 @@ export const CREW: CrewMember[] = [
     name: "Will",
     slug: "will",
     photos: [
-      "/crew/will.png",
+      "/crew/will.jpg",
       "/crew/will/1.JPG",
       "/crew/will/2.JPG",
       "/crew/will/3.JPG",

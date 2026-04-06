@@ -59,7 +59,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
 
       {/* Mini-hero */}
       <PageHero
-        imageUrl={heroImageUrl ?? "/crew/hero.png"}
+        imageUrl={heroImageUrl ?? "/crew/hero.jpg"}
         imageAlt="The Crew"
         fallbackNode={
           <div
