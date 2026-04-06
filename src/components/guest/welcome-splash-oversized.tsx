@@ -25,10 +25,10 @@ export function WelcomeSplashOversized({
       {/* Image — absolutely positioned, bleeds off top and bottom edges */}
       <div
         className="absolute overflow-hidden rounded-r-[50%]"
-        style={{ top: "-290px", height: "115%", width: "95%", left: "-40px" }}
+        style={{ top: "-50px", height: "115%", width: "95%", left: "-40px" }}
       >
         {coverImageUrl ? (
-          <img src={coverImageUrl} alt={name} className="size-full object-cover" />
+          <img src={coverImageUrl} alt={name} className="size-full object-cover object-top" />
         ) : (
           fallbackContent
         )}
