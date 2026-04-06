@@ -28,8 +28,15 @@ const SECTION_CONFIG = [
     categories: ["ship_amenities"] as string[],
   },
   {
-    id: "entertainment",
+    id: "bars",
     number: "03",
+    title: "Bars & Lounges",
+    label: "Bars",
+    categories: ["ship_bars"] as string[],
+  },
+  {
+    id: "entertainment",
+    number: "04",
     title: "Entertainment",
     label: "Entertainment",
     categories: ["ship_entertainment"] as string[],
