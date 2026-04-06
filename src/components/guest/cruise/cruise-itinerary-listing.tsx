@@ -4,11 +4,11 @@ import {
   useWindowScroll,
   ScrollRevealStickyHeader,
   FloatingBackButton,
-} from "@/components/guest/sticky-header";
+} from "@/components/guest/primitives/sticky-header";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { CruiseItineraryItem, Venue } from "@/types";
-import { VenueFooter } from "@/components/guest/venue-footer";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 
 interface CruiseItineraryListingProps {
   venue: Venue;

@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getCruiseItineraryItems, getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { CruiseGroupPlanPage } from "@/components/guest/cruise-group-plan";
+import { CruiseGroupPlanPage } from "@/components/guest/cruise/cruise-group-plan";
 
 export default async function GroupPlanPage({
   params,

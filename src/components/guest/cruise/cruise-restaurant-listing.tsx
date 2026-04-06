@@ -4,16 +4,11 @@ import {
   useWindowScroll,
   ScrollRevealStickyHeader,
   FloatingBackButton,
-} from "@/components/guest/sticky-header";
+} from "@/components/guest/primitives/sticky-header";
 import { useRouter } from "next/navigation";
 import type { CruiseRestaurant, Venue } from "@/types";
-import { VenueFooter } from "@/components/guest/venue-footer";
-
-function formatPrice(priceLevel: number | null): string | null {
-  if (priceLevel === 0) return "FREE";
-  if (!priceLevel) return null;
-  return "$".repeat(priceLevel);
-}
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { formatPrice } from "@/lib/utils";
 
 interface CruiseRestaurantListingProps {
   venue: Venue;

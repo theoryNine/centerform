@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getExploreCollectionWithItems, getExploreCollections } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { ExploreCollectionPage } from "@/components/guest/explore-collection";
+import { ExploreCollectionPage } from "@/components/guest/explore/explore-collection";
 
 export default async function CollectionPage({
   params,

@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getVenueServices, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { VenueServicesPage } from "@/components/guest/venue-services";
+import { VenueServicesPage } from "@/components/guest/venue/venue-services";
 
 export default async function ServicesPage({
   params,

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useStickyScroll, StickyHeader } from "@/components/guest/sticky-header";
-import { VenueFooter } from "@/components/guest/venue-footer";
+import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 function placeHref(slug: string, place: NearbyPlace): string {

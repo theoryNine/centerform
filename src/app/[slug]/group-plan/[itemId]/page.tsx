@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getCruiseItineraryItemById, getCruiseRestaurantById } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { CruiseItineraryListing } from "@/components/guest/cruise-itinerary-listing";
+import { CruiseItineraryListing } from "@/components/guest/cruise/cruise-itinerary-listing";
 
 export default async function ItineraryItemPage({
   params,

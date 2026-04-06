@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getVenueServices, getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { CruiseShipInfoPage } from "@/components/guest/cruise-ship-info";
+import { CruiseShipInfoPage } from "@/components/guest/cruise/cruise-ship-info";
 
 export default async function ShipInfoPage({
   params,

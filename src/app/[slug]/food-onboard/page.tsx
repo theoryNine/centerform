@@ -1,7 +1,7 @@
 import { resolveSlug } from "@/lib/slug-resolver";
 import { getCruiseRestaurants, getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
-import { CruiseFoodOnboardPage } from "@/components/guest/cruise-food-onboard";
+import { CruiseFoodOnboardPage } from "@/components/guest/cruise/cruise-food-onboard";
 
 export default async function FoodOnboardPage({
   params,

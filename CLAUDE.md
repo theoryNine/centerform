@@ -41,24 +41,52 @@ src/
 │       └── the-crew/       # Cruise: crew/group member listing
 ├── components/
 │   ├── ui/                 # shadcn/ui components
-│   └── guest/              # Page-specific components
-│       ├── venue-home.tsx          # Hotel homepage
-│       ├── venue-services.tsx      # Hotel services accordion
-│       ├── cruise-home.tsx         # Cruise homepage
-│       ├── cruise-ship-info.tsx    # Cruise ship info accordion
-│       ├── cruise-food-onboard.tsx # Cruise restaurant list
-│       ├── cruise-restaurant-listing.tsx  # Cruise restaurant detail
-│       ├── cruise-group-plan.tsx   # Cruise itinerary timeline with day pills
-│       ├── cruise-itinerary-listing.tsx   # Cruise itinerary item detail page
-│       └── cruise-crew.tsx         # Cruise crew listing
+│   └── guest/              # Guest-facing components
+│       ├── primitives/     # Shared building blocks
+│       │   ├── accordion-item.tsx      # Animated expand/collapse row
+│       │   ├── concierge-prompt.tsx    # Concierge chat prompt card
+│       │   ├── copy-button.tsx         # Inline copy-to-clipboard with check feedback
+│       │   ├── corner-bracket-card.tsx # Card with decorative corner bracket spans
+│       │   ├── loading-spinner.tsx     # Fixed full-screen loading overlay
+│       │   ├── nav-card.tsx            # Navigation tile card
+│       │   ├── page-hero.tsx           # Full-bleed hero image with gradient
+│       │   ├── section-header.tsx      # Numbered section header (e.g. "01 · Title")
+│       │   ├── sticky-header.tsx       # Sticky nav header + floating back button
+│       │   ├── venue-footer.tsx        # Venue branding footer
+│       │   ├── welcome-envelope.tsx    # Animated envelope reveal
+│       │   ├── welcome-splash.tsx      # Welcome card (delegates to oversized/text variants)
+│       │   ├── welcome-splash-oversized.tsx
+│       │   └── welcome-splash-text.tsx
+│       ├── cruise/         # Cruise venue pages
+│       │   ├── cruise-home.tsx
+│       │   ├── cruise-ship-info.tsx
+│       │   ├── cruise-food-onboard.tsx
+│       │   ├── cruise-restaurant-listing.tsx
+│       │   ├── cruise-group-plan.tsx
+│       │   ├── cruise-itinerary-listing.tsx
+│       │   ├── cruise-crew.tsx
+│       │   └── cruise-crew-listing.tsx
+│       ├── venue/          # Hotel/resort venue pages
+│       │   ├── venue-home.tsx
+│       │   ├── venue-services.tsx
+│       │   └── venue-explore.tsx
+│       ├── explore/        # Explore hub pages
+│       │   ├── area-listing.tsx
+│       │   ├── explore-collection.tsx
+│       │   └── place-listing.tsx
+│       └── event/          # Standalone event pages
+│           └── event-home.tsx
 ├── lib/
 │   ├── auth.ts             # NextAuth config
 │   ├── queries.ts          # Supabase query functions
-│   ├── utils.ts            # cn() utility
+│   ├── utils.ts            # cn() utility + formatPrice()
 │   ├── slug-resolver.ts    # Route resolution (venue vs event)
 │   └── supabase/           # Supabase clients (server.ts, client.ts, middleware.ts)
 ├── types/index.ts          # All TypeScript interfaces
-└── hooks/                  # React hooks
+└── hooks/
+    ├── use-debounce.ts
+    ├── use-press-scale.ts  # Returns press event handlers (scale animation, no re-render)
+    └── use-sticky-nav.ts   # Returns { showStickyNav, headerRef } scroll-past-header state
 ```
 
 ## Database Schema
@@ -161,7 +189,22 @@ For tokens not suited to Tailwind utilities (line-height, letter-spacing, intera
 - `tracking-[var(--cf-text-label-spacing)]`
 - `style={{ transitionDuration: "var(--cf-press-duration)" }}`
 
-`cruise-home.tsx` is the reference implementation. Apply the same token utilities when working on other guest components.
+`guest/cruise/cruise-home.tsx` is the reference implementation. Apply the same token utilities when working on other guest components.
+
+## Shared Guest Primitives
+
+Before adding inline UI patterns to a guest component, check if a shared primitive already exists:
+
+| Need | Use |
+|---|---|
+| Price display (`FREE` / `$$$`) | `formatPrice(priceLevel)` from `@/lib/utils` |
+| Full-screen loading overlay | `<LoadingSpinner />` from `@/components/guest/primitives/loading-spinner` |
+| Inline clipboard copy button | `<CopyButton text={...} label={...} />` from `@/components/guest/primitives/copy-button` |
+| Animated accordion row | `<AccordionItem title isOpen onToggle>` from `@/components/guest/primitives/accordion-item` |
+| Card with decorative corner brackets | `<CornerBracketCard className?>` from `@/components/guest/primitives/corner-bracket-card` |
+| Numbered section header + underline | `<SectionHeader number="01" title="..." />` from `@/components/guest/primitives/section-header` |
+| Button press scale animation | `const p = usePressScale(); <button {...p}>` from `@/hooks/use-press-scale` |
+| Sticky nav visibility on scroll | `const { showStickyNav, headerRef } = useStickyNav()` from `@/hooks/use-sticky-nav` |
 
 ## Conventions
 
