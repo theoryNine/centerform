@@ -310,6 +310,16 @@ export interface CruiseLink {
   updated_at: string;
 }
 
+export interface CruiseDailyWelcome {
+  id: string;
+  venue_id: string;
+  effective_at: string;
+  heading: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CruiseCrewMember {
   id: string;
   venue_id: string;

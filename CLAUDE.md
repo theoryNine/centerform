@@ -79,6 +79,7 @@ Core tables (migrations in `supabase/migrations/`):
 - **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry — it renders as a regular tappable card like all other items. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item to a restaurant detail page.
 - **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
+- **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, and `body`. The query fetches the most recent row where `effective_at <= NOW()`, so multiple entries per day are supported (e.g. a morning and an evening message). Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_anniversary_cruise.sql`.
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
 - **standalone_event_themes** — theming for standalone events
 - **standalone_event_members** — user roles for standalone events
@@ -113,9 +114,9 @@ The Crew          /:slug/the-crew                 (cruise-crew.tsx)
 
 **Group Plan** renders a day-by-day timeline. `is_start=true` items are parsed as day headers and drive horizontal scrolling pill navigation at the top. Selecting a pill filters the timeline to show only that day's items. Every regular timeline card (non-`is_start`, non-`is_end`) links to its own detail page at `/:slug/group-plan/[itemId]`, which uses the same hero + floating name card design as the restaurant listing. If the item has a `restaurant_id`, the detail page also shows a "View Restaurant →" button linking to `/:slug/food-onboard/[restaurantId]`.
 
-**Cruise home** fetches `cruise_links` client-side (same pattern as venue-home fetching today's events) and renders them as a Links section.
+**Cruise home** fetches `cruise_daily_welcome` and `cruise_links` client-side on mount. The welcome card displays the most recent `cruise_daily_welcome` entry where `effective_at <= NOW()`, falling back to `venue.welcome_heading/body` then hardcoded defaults. Multiple entries per day are supported for time-of-day updates (e.g. a morning message and a Scarlet Night evening message). All timestamps are stored in UTC.
 
-**Sample cruise**: "Ansel & Adam's Anniversary" at slug `ansel-adam` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migration `012_sample_anniversary_cruise.sql`.
+**Sample cruise**: "Ansel & Adam's Anniversary" at slug `ansel-adam` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migrations `012_sample_anniversary_cruise.sql` and `019_sample_cruise_daily_welcome.sql`.
 
 ## Explore Page Architecture
 

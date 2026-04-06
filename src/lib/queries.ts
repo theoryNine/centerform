@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseCrewMember, CruiseLink } from "@/types";
+import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseCrewMember, CruiseDailyWelcome, CruiseLink } from "@/types";
 
 export async function getVenueBySlug(slug: string) {
   const supabase = await createClient();
@@ -290,6 +290,21 @@ export async function getVenuePageDescription(
     .eq("page_slug", pageSlug)
     .single();
   return data?.body ?? null;
+}
+
+export async function getCruiseDailyWelcome(
+  venueId: string,
+): Promise<CruiseDailyWelcome | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("cruise_daily_welcome")
+    .select("*")
+    .eq("venue_id", venueId)
+    .lte("effective_at", new Date().toISOString())
+    .order("effective_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data as CruiseDailyWelcome | null;
 }
 
 export async function getCruiseLinks(venueId: string): Promise<CruiseLink[]> {

@@ -9,7 +9,7 @@ import { WelcomeSplash } from "@/components/guest/welcome-splash";
 import { PageHero } from "@/components/guest/page-hero";
 import { NavCard, SectionDivider } from "@/components/guest/nav-card";
 import { createClient } from "@/lib/supabase/client";
-import type { CruiseLink } from "@/types";
+import type { CruiseDailyWelcome, CruiseLink } from "@/types";
 
 function formatVenueName(slug: string) {
   return slug
@@ -43,11 +43,23 @@ export function CruiseHomePage() {
     setTimeout(() => setSplashVisible(false), 500);
   }
 
+  const [dailyWelcome, setDailyWelcome] = useState<CruiseDailyWelcome | null>(null);
   const [links, setLinks] = useState<CruiseLink[]>([]);
 
   useEffect(() => {
     if (!venue?.id) return;
     const supabase = createClient();
+    supabase
+      .from("cruise_daily_welcome")
+      .select("*")
+      .eq("venue_id", venue.id)
+      .lte("effective_at", new Date().toISOString())
+      .order("effective_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setDailyWelcome(data as CruiseDailyWelcome);
+      });
     supabase
       .from("cruise_links")
       .select("*")
@@ -151,12 +163,13 @@ export function CruiseHomePage() {
         {/* Welcome card */}
         <div className="card-shadow mb-section rounded-default bg-card p-card">
           <h2 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">
-            {venue?.welcome_heading ?? "Welcome aboard."}
+            {dailyWelcome?.heading ?? venue?.welcome_heading ?? "Welcome aboard."}
           </h2>
           <p
             className={`text-body leading-[var(--cf-body-line-height)] text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
           >
-            {venue?.welcome_body ??
+            {dailyWelcome?.body ??
+              venue?.welcome_body ??
               "We\u2019re glad you\u2019re here. Everything you need for your voyage is right below."}
           </p>
           {venue?.phone && (
