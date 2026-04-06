@@ -8,9 +8,10 @@ interface NavCardProps {
   sublabel: string;
   href: string;
   imageUrl?: string;
+  onSettle?: () => void;
 }
 
-export function NavCard({ label, sublabel, href, imageUrl }: NavCardProps) {
+export function NavCard({ label, sublabel, href, imageUrl, onSettle }: NavCardProps) {
   const router = useRouter();
 
   return (
@@ -29,7 +30,13 @@ export function NavCard({ label, sublabel, href, imageUrl }: NavCardProps) {
         style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)" }}
       >
         {imageUrl && (
-          <img src={imageUrl} alt="" className="absolute inset-0 size-full object-cover" />
+          <img
+            src={imageUrl}
+            alt=""
+            onLoad={onSettle}
+            onError={onSettle}
+            className="absolute inset-0 size-full object-cover"
+          />
         )}
       </div>
       <div className="min-w-0 flex-1 py-4">

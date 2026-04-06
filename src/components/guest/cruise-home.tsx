@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { Phone, ArrowRight, Anchor } from "lucide-react";
@@ -47,6 +47,15 @@ export function CruiseHomePage() {
   const [dailyWelcome, setDailyWelcome] = useState<CruiseDailyWelcome | null>(null);
   const [links, setLinks] = useState<CruiseLink[]>([]);
   const [navImages, setNavImages] = useState<Record<string, string>>({});
+  const [navImagesReady, setNavImagesReady] = useState(false);
+  const [loadedCount, setLoadedCount] = useState(0);
+
+  const handleImageSettle = useCallback(() => {
+    setLoadedCount((n) => n + 1);
+  }, []);
+
+  const totalWithImages = Object.values(navImages).filter(Boolean).length;
+  const allLoaded = navImagesReady && loadedCount >= totalWithImages;
 
   useEffect(() => {
     if (!venue?.id) return;
@@ -85,6 +94,7 @@ export function CruiseHomePage() {
           });
           setNavImages(map);
         }
+        setNavImagesReady(true);
       });
   }, [venue?.id]);
 
@@ -212,7 +222,11 @@ export function CruiseHomePage() {
 
           <div className="flex flex-col gap-card-gap">
             {navItems.map((item) => (
-              <NavCard key={item.label} {...item} />
+              <NavCard
+                key={item.label}
+                {...item}
+                onSettle={item.imageUrl ? handleImageSettle : undefined}
+              />
             ))}
           </div>
         </div>
@@ -251,6 +265,24 @@ export function CruiseHomePage() {
         <div className="h-safe-bottom" />
       </div>
     </div>
+
+      {/* Loading overlay — visible until nav images have fetched and loaded */}
+      {!allLoaded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+          <svg
+            className="animate-spin"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(45,42,38,0.25)"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          </svg>
+        </div>
+      )}
     </>
   );
 }
