@@ -13,12 +13,12 @@ function CrewTile({
   name,
   photo,
   href,
-  onLoad,
+  onSettle,
 }: {
   name: string;
   photo?: string;
   href: string;
-  onLoad?: () => void;
+  onSettle?: () => void;
 }) {
   return (
     <Link href={href} className="card-shadow overflow-hidden rounded-default bg-card no-underline">
@@ -33,7 +33,8 @@ function CrewTile({
           <img
             src={photo}
             alt={name}
-            onLoad={onLoad}
+            onLoad={onSettle}
+            onError={onSettle}
             className="absolute inset-0 size-full object-cover object-top"
           />
         )}
@@ -107,7 +108,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
               name={member.name}
               photo={member.photos[0]}
               href={`/${slug}/the-crew/${member.slug}`}
-              onLoad={handleImageLoad}
+              onSettle={handleImageLoad}
             />
           ))}
         </div>
@@ -121,7 +122,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
               name={member.name}
               photo={member.photos[0]}
               href={`/${slug}/the-crew/${member.slug}`}
-              onLoad={handleImageLoad}
+              onSettle={handleImageLoad}
             />
           ))}
         </div>
