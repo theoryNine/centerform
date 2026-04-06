@@ -93,7 +93,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                   href={restaurant.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center rounded-default border border-primary px-4 py-3 text-body-sm font-semibold text-primary no-underline"
+                  className="flex min-h-[44px] items-center justify-center rounded-default border border-primary px-4 text-body-sm font-semibold text-primary no-underline"
                 >
                   Reserve a Table →
                 </a>
@@ -104,7 +104,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-right text-body-sm text-primary no-underline"
+                  className="flex min-h-[44px] items-center justify-end text-body-sm text-primary no-underline"
                 >
                   {link.label} →
                 </a>
@@ -141,7 +141,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                     </p>
                     <a
                       href={`tel:${restaurant.phone.replace(/\D/g, "")}`}
-                      className="text-body-sm text-primary no-underline"
+                      className="flex min-h-[44px] items-center text-body-sm text-primary no-underline"
                     >
                       {restaurant.phone}
                     </a>
