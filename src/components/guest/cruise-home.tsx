@@ -28,12 +28,13 @@ export function CruiseHomePage() {
   // Welcome splash state — show only once per cruise venue
   const splashKey = `splash-dismissed:${slug}`;
   const [splashDismissed, setSplashDismissed] = useState(false);
-  const [splashVisible, setSplashVisible] = useState(true);
+  const [splashVisible, setSplashVisible] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem(splashKey)) {
       setSplashDismissed(true);
-      setSplashVisible(false);
+    } else {
+      setSplashVisible(true);
     }
   }, [splashKey]);
 
