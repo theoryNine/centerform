@@ -82,26 +82,6 @@ function DayHeader({ group }: { group: DayGroup }) {
 // ─── Timeline items ──────────────────────────────────────────────────────────
 
 function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string }) {
-  // END marker (is_start items are handled as day headers, not rendered here)
-  if (item.is_end) {
-    return (
-      <div className="pb-4">
-        {item.time_label && (
-          <p className="m-0 mb-1.5 relative z-10 bg-background text-body-sm font-semibold text-foreground">
-            {item.time_label}
-          </p>
-        )}
-        <div className="relative pl-[60px] flex items-center">
-          <div className="absolute left-[24px] z-10 h-3 w-3 rounded-full bg-primary" />
-          <div className="absolute left-[36px] top-1/2 h-px w-[24px] -translate-y-1/2 bg-primary/30" />
-          <p className="m-0 text-label font-semibold tracking-widest text-primary">
-            END · {item.title.toUpperCase()}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   const cardContent = (
     <>
       {item.image_url && (
@@ -109,7 +89,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           <img src={item.image_url} alt={item.title} className="size-full object-cover" />
         </div>
       )}
-      <div className={`min-w-0 flex-1 py-3 pl-3 ${item.restaurant_id ? "pr-2" : "pr-3"}`}>
+      <div className="min-w-0 flex-1 py-3 pl-3 pr-2">
         <p className="m-0 font-serif text-card-title-lg font-bold text-foreground">
           {item.title}
         </p>
@@ -124,7 +104,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           </p>
         )}
       </div>
-      {item.restaurant_id && <ArrowRight size={15} className="mr-3 shrink-0 text-primary" />}
+      <ArrowRight size={15} className="mr-3 shrink-0 text-primary" />
     </>
   );
 
@@ -138,18 +118,12 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
       <div className="relative pl-[60px]">
         <div className="absolute left-[26px] top-[10px] z-10 h-2 w-2 rounded-full bg-muted-foreground/60" />
         <div className="absolute left-[34px] top-[13px] h-px w-[26px] bg-muted-foreground/25" />
-        {item.restaurant_id ? (
-          <Link
-            href={`/${slug}/food-onboard/${item.restaurant_id}`}
-            className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
-          >
-            {cardContent}
-          </Link>
-        ) : (
-          <div className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card">
-            {cardContent}
-          </div>
-        )}
+        <Link
+          href={`/${slug}/group-plan/${item.id}`}
+          className="card-shadow flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
+        >
+          {cardContent}
+        </Link>
       </div>
     </div>
   );

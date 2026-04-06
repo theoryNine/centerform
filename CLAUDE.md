@@ -37,6 +37,7 @@ src/
 │       ├── food-onboard/   # Cruise: restaurant list grouped by sit_down vs walk_up
 │       │   └── [restaurantId]/  # Cruise: individual restaurant detail page
 │       ├── group-plan/     # Cruise: day-by-day timeline with scrolling pill selector
+│       │   └── [itemId]/   # Cruise: individual itinerary item detail page
 │       └── the-crew/       # Cruise: crew/group member listing
 ├── components/
 │   ├── ui/                 # shadcn/ui components
@@ -48,6 +49,7 @@ src/
 │       ├── cruise-food-onboard.tsx # Cruise restaurant list
 │       ├── cruise-restaurant-listing.tsx  # Cruise restaurant detail
 │       ├── cruise-group-plan.tsx   # Cruise itinerary timeline with day pills
+│       ├── cruise-itinerary-listing.tsx   # Cruise itinerary item detail page
 │       └── cruise-crew.tsx         # Cruise crew listing
 ├── lib/
 │   ├── auth.ts             # NextAuth config
@@ -74,7 +76,7 @@ Core tables (migrations in `supabase/migrations/`):
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
 - **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.)
 - **cruise_restaurants** — dining venues on a cruise ship. `restaurant_type`: `sit_down` | `walk_up`. Linked from `cruise_itinerary_items` via optional `restaurant_id` FK.
-- **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item to a restaurant detail page.
+- **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry — it renders as a regular tappable card like all other items. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item to a restaurant detail page.
 - **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
@@ -98,6 +100,7 @@ Ship Info         /:slug/ship-info                (cruise-ship-info.tsx)
 Food Onboard      /:slug/food-onboard             (cruise-food-onboard.tsx)
   └── Detail      /:slug/food-onboard/[id]        (cruise-restaurant-listing.tsx)
 Group Plan        /:slug/group-plan               (cruise-group-plan.tsx)
+  └── Detail      /:slug/group-plan/[itemId]      (cruise-itinerary-listing.tsx)
 The Crew          /:slug/the-crew                 (cruise-crew.tsx)
 ```
 
@@ -108,7 +111,7 @@ The Crew          /:slug/the-crew                 (cruise-crew.tsx)
 
 **Food Onboard** groups `cruise_restaurants` into Sit Down Restaurants (`restaurant_type = "sit_down"`) and Walk Up Eateries (`restaurant_type = "walk_up"`). Each row links to an individual detail page.
 
-**Group Plan** renders a day-by-day timeline. `is_start=true` items are parsed as day headers and drive horizontal scrolling pill navigation at the top. Selecting a pill filters the timeline to show only that day's items. Items with `restaurant_id` set render as tappable cards linking to the restaurant detail page.
+**Group Plan** renders a day-by-day timeline. `is_start=true` items are parsed as day headers and drive horizontal scrolling pill navigation at the top. Selecting a pill filters the timeline to show only that day's items. Every regular timeline card (non-`is_start`, non-`is_end`) links to its own detail page at `/:slug/group-plan/[itemId]`, which uses the same hero + floating name card design as the restaurant listing. If the item has a `restaurant_id`, the detail page also shows a "View Restaurant →" button linking to `/:slug/food-onboard/[restaurantId]`.
 
 **Cruise home** fetches `cruise_links` client-side (same pattern as venue-home fetching today's events) and renders them as a Links section.
 
