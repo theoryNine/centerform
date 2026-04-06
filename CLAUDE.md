@@ -171,6 +171,39 @@ For tokens not suited to Tailwind utilities (line-height, letter-spacing, intera
 - **Path alias**: `@/*` maps to `src/*`
 - **Branches**: `develop` for active work, `main` for production
 
+## Supabase Storage
+
+Two public buckets. Folders use the venue/event slug as the top-level key (slugs are globally unique); sub-entity folders use UUIDs (stable even if display names change).
+
+**`venue-assets`** — all venue and cruise image assets
+
+```
+venue-assets/
+└── {venue-slug}/
+    ├── hero                        # venue cover/hero image (single file, overwrite on update)
+    ├── gallery/                    # additional venue photos
+    ├── places/
+    │   └── {place-id}/             # nearby_places images
+    ├── collections/
+    │   └── {collection-id}/        # explore_collections cover images
+    ├── restaurants/
+    │   └── {restaurant-id}/        # cruise_restaurants images
+    ├── itinerary/
+    │   └── {item-id}/              # cruise_itinerary_items images
+    └── crew/
+        └── {crew-id}/              # cruise_crew member photos
+```
+
+**`event-assets`** — standalone event image assets
+
+```
+event-assets/
+└── {event-slug}/
+    ├── hero
+    └── schedule/
+        └── {item-id}/              # event_schedule_items images
+```
+
 ## Environment Variables
 
 Required in `.env.local` (see `.env.local.example`):
