@@ -303,7 +303,7 @@ export function CruiseShipInfoPage({
               </span>
             </div>
           }
-          title="Ship Info"
+          title={venue.ship_name ?? "Ship Info"}
           className="pt-8"
         />
       </div>

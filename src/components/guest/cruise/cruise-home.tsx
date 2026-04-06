@@ -101,7 +101,7 @@ export function CruiseHomePage() {
 
   const navItems = [
     {
-      label: "Ship Info",
+      label: venue?.ship_name ?? "Ship Info",
       sublabel: "Your cabin, services & boarding",
       href: `/${slug}/ship-info`,
       imageUrl: navImages["ship-info"],
