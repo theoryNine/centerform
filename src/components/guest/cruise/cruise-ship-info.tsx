@@ -28,8 +28,15 @@ const SECTION_CONFIG = [
     categories: ["ship_amenities"] as string[],
   },
   {
-    id: "entertainment",
+    id: "bars",
     number: "03",
+    title: "Bars & Lounges",
+    label: "Bars",
+    categories: ["ship_bars"] as string[],
+  },
+  {
+    id: "entertainment",
+    number: "04",
     title: "Entertainment",
     label: "Entertainment",
     categories: ["ship_entertainment"] as string[],
@@ -76,7 +83,7 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
             key={i}
             className="flex items-start gap-2 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground"
           >
-            <span className="mt-[5px] h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
+            <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
             <InlineBold text={item} />
           </li>
         ))}

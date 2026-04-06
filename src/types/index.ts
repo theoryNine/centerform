@@ -1,7 +1,7 @@
 export type VenueType = "hotel" | "resort" | "museum" | "event_space" | "cruise" | "other";
 export type SplashVariant = "oversized" | "text";
 export type MemberRole = "owner" | "admin" | "staff";
-export type ServiceCategory = "room_service" | "spa" | "concierge" | "dining" | "transportation" | "activities" | "other" | "welcome_aboard" | "ship_amenities" | "ship_entertainment";
+export type ServiceCategory = "room_service" | "spa" | "concierge" | "dining" | "transportation" | "activities" | "other" | "welcome_aboard" | "ship_amenities" | "ship_bars" | "ship_entertainment";
 export type PlaceCategory = "restaurant" | "bar" | "cafe" | "attraction" | "shopping" | "entertainment" | "outdoors" | "other";
 export type AmenityCategory = "general" | "room" | "bathroom" | "kitchen" | "dining" | "recreation" | "business" | "wellness" | "parking" | "accessibility" | "family" | "safety" | "outdoor";
 export type InfoCategory = "general" | "policies" | "hours" | "payments";
