@@ -2,11 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  useWindowScroll,
-  ScrollRevealStickyHeader,
-  FloatingBackButton,
-} from "@/components/guest/sticky-header";
+import { FloatingBackButton } from "@/components/guest/sticky-header";
 import type { Venue } from "@/types";
 import type { CrewMember } from "@/lib/cruise-crew-data";
 import { VenueFooter } from "@/components/guest/venue-footer";
@@ -14,7 +10,6 @@ import { VenueFooter } from "@/components/guest/venue-footer";
 interface CruiseCrewListingProps {
   venue: Venue;
   member: CrewMember;
-  slug: string;
 }
 
 function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
@@ -72,9 +67,8 @@ function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
   );
 }
 
-export function CruiseCrewListing({ venue, member, slug }: CruiseCrewListingProps) {
+export function CruiseCrewListing({ venue, member }: CruiseCrewListingProps) {
   const router = useRouter();
-  const scrolled = useWindowScroll();
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -85,13 +79,7 @@ export function CruiseCrewListing({ venue, member, slug }: CruiseCrewListingProp
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      <ScrollRevealStickyHeader
-        venueName={venue.name}
-        scrolled={scrolled}
-        onBack={() => router.back()}
-        nameHref={`/${slug}`}
-      />
-      <FloatingBackButton scrolled={scrolled} onBack={() => router.back()} />
+      <FloatingBackButton scrolled={false} onBack={() => router.back()} />
 
       {/* Photo carousel */}
       <PhotoCarousel photos={member.photos} name={member.name} />
