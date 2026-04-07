@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import type { ThemeColors } from "@/types";
+
+// useLayoutEffect fires synchronously before browser paint (client only).
+// Falls back to useEffect on the server to avoid SSR warnings.
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function hexToOklch(hex: string): string {
   // For now, pass through the hex value directly as CSS color
@@ -19,7 +23,7 @@ interface ThemeProviderProps {
 export function VenueThemeProvider({ theme, darkMode, children }: ThemeProviderProps) {
   const [isDark, setIsDark] = useState(false);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!darkMode) return;
     const darkBg = (darkMode as Record<string, string>)["--background"] ?? "";
 
