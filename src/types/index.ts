@@ -315,6 +315,16 @@ export interface CruiseNavImage {
   venue_id: string;
   nav_key: string;
   image_url: string;
+  sublabel: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VenueNavTile {
+  id: string;
+  venue_id: string;
+  nav_key: string;
+  sublabel: string | null;
   created_at: string;
   updated_at: string;
 }

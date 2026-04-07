@@ -61,6 +61,7 @@ export function VenueHomePage() {
 
   // Today's events
   const [todayEvents, setTodayEvents] = useState<VenueEvent[]>([]);
+  const [navSublabels, setNavSublabels] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!venue?.id) return;
@@ -80,6 +81,20 @@ export function VenueHomePage() {
       .then(({ data }) => {
         if (data) setTodayEvents(data);
       });
+
+    supabase
+      .from("venue_nav_tiles")
+      .select("nav_key, sublabel")
+      .eq("venue_id", venue.id)
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, string> = {};
+          data.forEach((row) => {
+            if (row.sublabel) map[row.nav_key] = row.sublabel;
+          });
+          setNavSublabels(map);
+        }
+      });
   }, [venue?.id]);
 
   function handleSplashEnter() {
@@ -92,17 +107,17 @@ export function VenueHomePage() {
   const navItems = [
     {
       label: "Your Room & Stay",
-      sublabel: "Amenities, services, and requests",
+      sublabel: navSublabels["services"] ?? "Amenities, services, and requests",
       href: `/${slug}/services`,
     },
     {
       label: "Dining",
-      sublabel: venue?.name ? `At ${venue.name}` : "Restaurants and cafes",
+      sublabel: navSublabels["dining"] ?? (venue?.name ? `At ${venue.name}` : "Restaurants and cafes"),
       href: `/${slug}/dining`,
     },
     {
       label: `Explore ${cityName}`,
-      sublabel: "Let us show you around town",
+      sublabel: navSublabels["explore"] ?? "Let us show you around town",
       href: `/${slug}/explore`,
     },
   ];

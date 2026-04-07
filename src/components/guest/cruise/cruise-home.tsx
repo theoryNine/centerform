@@ -47,7 +47,7 @@ export function CruiseHomePage() {
 
   const [dailyWelcome, setDailyWelcome] = useState<CruiseDailyWelcome | null>(null);
   const [links, setLinks] = useState<CruiseLink[]>([]);
-  const [navImages, setNavImages] = useState<Record<string, string>>({});
+  const [navTiles, setNavTiles] = useState<Record<string, { imageUrl?: string; sublabel?: string }>>({});
   const [navImagesReady, setNavImagesReady] = useState(false);
   const [loadedCount, setLoadedCount] = useState(0);
 
@@ -55,7 +55,7 @@ export function CruiseHomePage() {
     setLoadedCount((n) => n + 1);
   }, []);
 
-  const totalWithImages = Object.values(navImages).filter(Boolean).length;
+  const totalWithImages = Object.values(navTiles).filter((t) => t.imageUrl).length;
   const allLoaded = navImagesReady && loadedCount >= totalWithImages;
 
   useEffect(() => {
@@ -89,11 +89,14 @@ export function CruiseHomePage() {
       .eq("venue_id", venue.id)
       .then(({ data }) => {
         if (data) {
-          const map: Record<string, string> = {};
+          const map: Record<string, { imageUrl?: string; sublabel?: string }> = {};
           (data as CruiseNavImage[]).forEach((row) => {
-            map[row.nav_key] = row.image_url;
+            map[row.nav_key] = {
+              imageUrl: row.image_url || undefined,
+              sublabel: row.sublabel ?? undefined,
+            };
           });
-          setNavImages(map);
+          setNavTiles(map);
         }
         setNavImagesReady(true);
       });
@@ -102,27 +105,27 @@ export function CruiseHomePage() {
   const navItems = [
     {
       label: venue?.ship_name ?? "Ship Info",
-      sublabel: "Your cabin, services & boarding",
+      sublabel: navTiles["ship-info"]?.sublabel ?? "Your cabin, services & boarding",
       href: `/${slug}/ship-info`,
-      imageUrl: navImages["ship-info"],
+      imageUrl: navTiles["ship-info"]?.imageUrl,
     },
     {
       label: "Food Onboard",
-      sublabel: "Restaurants and dining venues",
+      sublabel: navTiles["food-onboard"]?.sublabel ?? "Restaurants and dining venues",
       href: `/${slug}/food-onboard`,
-      imageUrl: navImages["food-onboard"],
+      imageUrl: navTiles["food-onboard"]?.imageUrl,
     },
     {
       label: "Group Plan",
-      sublabel: "Itinerary and schedule",
+      sublabel: navTiles["group-plan"]?.sublabel ?? "Itinerary and schedule",
       href: `/${slug}/group-plan`,
-      imageUrl: navImages["group-plan"],
+      imageUrl: navTiles["group-plan"]?.imageUrl,
     },
     {
       label: "Crew Manifest",
-      sublabel: "Meet your group",
+      sublabel: navTiles["the-crew"]?.sublabel ?? "Meet your group",
       href: `/${slug}/the-crew`,
-      imageUrl: navImages["the-crew"],
+      imageUrl: navTiles["the-crew"]?.imageUrl,
     },
   ];
 
