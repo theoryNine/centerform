@@ -139,7 +139,7 @@ export function CruiseHomePage() {
         >
           <WelcomeSplash
             name={shipName}
-            tagline="Welcome aboard. We're glad you're here."
+            tagline={<>Welcome aboard!<br />We&rsquo;re glad you&rsquo;re here.</>}
             coverImageUrl={venue?.cover_image_url ?? undefined}
             fallbackContent={
               <div
@@ -198,7 +198,7 @@ export function CruiseHomePage() {
         {/* Welcome card */}
         <div className="card-shadow mb-section rounded-default bg-card p-card">
           <h2 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">
-            {dailyWelcome?.heading ?? venue?.welcome_heading ?? "Welcome aboard."}
+            {dailyWelcome?.heading ?? venue?.welcome_heading ?? "Welcome aboard!"}
           </h2>
           <p
             className={`text-body leading-[var(--cf-body-line-height)] text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
