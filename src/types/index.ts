@@ -1,4 +1,5 @@
 export type VenueType = "hotel" | "resort" | "museum" | "event_space" | "cruise" | "other";
+export type ColorScheme = "system" | "light" | "dark";
 export type SplashVariant = "oversized" | "text";
 export type MemberRole = "owner" | "admin" | "staff";
 export type ServiceCategory = "room_service" | "spa" | "concierge" | "dining" | "transportation" | "activities" | "other" | "welcome_aboard" | "ship_amenities" | "ship_bars" | "ship_entertainment";
@@ -42,6 +43,7 @@ export interface VenueTheme {
   font_family: string | null;
   border_radius: string | null;
   custom_css: string | null;
+  color_scheme: ColorScheme;
   created_at: string;
   updated_at: string;
 }
@@ -183,6 +185,7 @@ export interface StandaloneEventTheme {
   font_family: string | null;
   border_radius: string | null;
   custom_css: string | null;
+  color_scheme: ColorScheme;
   created_at: string;
   updated_at: string;
 }
@@ -375,6 +378,7 @@ export interface ThemeColors {
   font_family: string | null;
   border_radius: string | null;
   custom_css: string | null;
+  color_scheme: ColorScheme;
 }
 
 export type SlugResolution =
