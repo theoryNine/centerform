@@ -119,7 +119,7 @@ export function CruiseHomePage() {
       imageUrl: navImages["group-plan"],
     },
     {
-      label: "The Crew",
+      label: "Crew Manifest",
       sublabel: "Meet your group",
       href: `/${slug}/the-crew`,
       imageUrl: navImages["the-crew"],

@@ -84,14 +84,14 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
 
       <PageHero
         imageUrl={heroImageUrl ?? "/crew/hero.jpg"}
-        imageAlt="The Crew"
+        imageAlt="Crew Manifest"
         fallbackNode={
           <div
             className="size-full"
             style={{ background: "linear-gradient(135deg, #0E3A5C 0%, #2980B9 100%)" }}
           />
         }
-        title="The Crew"
+        title="Crew Manifest"
         className="pt-8"
       />
 
