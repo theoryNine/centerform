@@ -312,7 +312,12 @@ export function CruiseShipInfoPage({
       <div className="px-page pb-10">
         {pageDescription && (
           <p className="mb-6 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription}
+            {pageDescription.split("\n").map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {line}
+              </span>
+            ))}
           </p>
         )}
         {sectionServices.map((section) => (

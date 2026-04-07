@@ -284,7 +284,12 @@ export function VenueExplorePage({ slug, venue, places, pageDescription }: Venue
         {pageDescription && (
           <div className="card-shadow mb-section rounded-default bg-card px-card py-5">
             <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
-              {pageDescription}
+              {pageDescription.split("\n").map((line, i) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))}
             </p>
           </div>
         )}
