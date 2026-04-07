@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { ThemeColors } from "@/types";
 
 function hexToOklch(hex: string): string {
@@ -10,11 +11,24 @@ function hexToOklch(hex: string): string {
 
 interface ThemeProviderProps {
   theme: ThemeColors;
+  /** CSS var overrides applied when the OS prefers dark color scheme. */
+  darkMode?: React.CSSProperties;
   children: React.ReactNode;
 }
 
-export function VenueThemeProvider({ theme, children }: ThemeProviderProps) {
-  const style = {
+export function VenueThemeProvider({ theme, darkMode, children }: ThemeProviderProps) {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (!darkMode) return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDark(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [darkMode]);
+
+  const lightStyle = {
     "--primary": hexToOklch(theme.primary_color),
     "--secondary": hexToOklch(theme.secondary_color),
     "--accent": hexToOklch(theme.accent_color),
@@ -23,6 +37,8 @@ export function VenueThemeProvider({ theme, children }: ThemeProviderProps) {
     "--radius": theme.border_radius ?? "0.625rem",
     "--font-sans": theme.font_family ?? "DM Sans",
   } as React.CSSProperties;
+
+  const style = isDark && darkMode ? { ...lightStyle, ...darkMode } : lightStyle;
 
   return (
     <div style={style} className="min-h-screen bg-background text-foreground">

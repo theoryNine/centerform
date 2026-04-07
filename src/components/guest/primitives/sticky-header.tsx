@@ -111,7 +111,7 @@ export function FloatingBackButton({ scrolled, backHref, onBack }: FloatingBackB
       style={{
         width: 44,
         height: 36,
-        backgroundColor: "rgba(250,247,242,0.9)",
+        backgroundColor: "var(--cf-glass-bg)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
       }}
