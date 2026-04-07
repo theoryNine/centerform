@@ -181,6 +181,39 @@ Explore index         /:slug/explore
 - **Place listing** shows full detail for an individual `nearby_place` — hero image, metadata sections (address, hours, price, phone), tips bullets, and venue footer. Back button uses `history.back()` to return to whichever page linked here.
 - **`nearby_places.collection_id`** is the key field that makes an explore card a gateway to a collection rather than an individual place listing.
 
+## Dark Mode
+
+All guest-facing venue and event pages (`[slug]/` routes) support system dark mode via `prefers-color-scheme`. The dashboard does not currently implement dark mode.
+
+### Architecture
+
+Dark mode is **CSS-first**: `globals.css` has a `@media (prefers-color-scheme: dark)` block that overrides `:root` token values before any JavaScript runs. This is critical — JS-only approaches (e.g. `useEffect` or `useLayoutEffect`) cause race conditions with component lifecycle that produce inconsistent results, especially on the welcome splash screen.
+
+```css
+/* globals.css */
+@media (prefers-color-scheme: dark) {
+  :root { --background: #1C1A17; --foreground: #EDE8DE; ... }
+  body { background-color: #1C1A17; }  /* for iOS status bar */
+}
+```
+
+`VenueThemeProvider` (`src/components/theme-provider.tsx`) also applies dark overrides as inline CSS vars after mount via `useEffect` for tokens not handled by the CSS cascade (e.g. `--cf-card-shadow`, `--cf-glass-bg`). It also sets `document.body.style.backgroundColor` to ensure the iOS Safari status bar matches the page background.
+
+### Dark palette tokens
+
+The `DARK_MODE` constant in `[slug]/layout.tsx` defines the structural neutral tokens applied to all venue/event pages. **Venue brand colors (`--primary`, `--accent`) are intentionally excluded** — they stay the same in both modes as configured in `venue_themes`.
+
+Key dark values: background `#1C1A17`, card `#252220`, foreground `#EDE8DE`, muted `#2E2B27`, border `#3A3632`.
+
+### Critical constraints
+
+- **Do not add `--background` or `--foreground` to `VenueThemeProvider`'s `lightStyle`**. These must come from the CSS cascade (`:root` in `globals.css`) so the dark media query can take effect on first render before JS fires. Adding them as inline styles would override the CSS and break dark mode on first paint.
+- **Do not put `bg-background` on `VenueThemeProvider`'s wrapper div**. The body provides the page background; the wrapper is intentionally transparent so the body color is visible in the iOS status bar area.
+- **Splash components (`welcome-splash-oversized.tsx`, `welcome-splash-text.tsx`) use `bg-background`** on their root div — this is correct and intentional. It gives the splash an opaque background that blocks underlying content, and it resolves correctly from the CSS dark media query (not from inline styles).
+- **`FloatingBackButton`** uses `var(--cf-glass-bg)` for its background (not a hardcoded color), so it adapts to dark mode.
+- **`card-shadow` utility** uses `var(--cf-card-shadow)` which is overridden in dark mode.
+- **`theme-color` meta tag** in `src/app/layout.tsx` uses a media-conditional array so Safari's browser chrome matches the dark background.
+
 ## Design Token System
 
 All design tokens live in `src/app/globals.css` as `--cf-*` CSS custom properties on `:root`. They are the single source of truth — change a value there and it propagates everywhere. Tokens cover typography, spacing, radius, and interactive states.

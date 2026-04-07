@@ -2,12 +2,12 @@ export function LoadingSpinner() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
       <svg
-        className="animate-spin"
+        className="animate-spin text-foreground opacity-25"
         width="24"
         height="24"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="rgba(45,42,38,0.25)"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       >

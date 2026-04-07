@@ -4,6 +4,25 @@ import { SlugProvider } from "@/components/slug-context";
 import { resolveSlug } from "@/lib/slug-resolver";
 import type { ThemeColors } from "@/types";
 
+// Only structural/neutral tokens — venue brand colors (primary, accent) are intentionally
+// excluded so they remain exactly as configured in venue_themes.
+const DARK_MODE: React.CSSProperties = {
+  "--background": "#1C1A17",
+  "--foreground": "#EDE8DE",
+  "--card": "#252220",
+  "--card-foreground": "#EDE8DE",
+  "--popover": "#252220",
+  "--popover-foreground": "#EDE8DE",
+  "--secondary": "#2E2B27",
+  "--secondary-foreground": "#EDE8DE",
+  "--muted": "#2E2B27",
+  "--muted-foreground": "#8B8680",
+  "--border": "#3A3632",
+  "--input": "#3A3632",
+  "--cf-card-shadow": "0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.4)",
+  "--cf-glass-bg": "rgba(28, 26, 23, 0.9)",
+} as React.CSSProperties;
+
 const defaultTheme: ThemeColors = {
   primary_color: "#1A7A6D",
   secondary_color: "#EDE8DE",
@@ -42,9 +61,18 @@ export default async function SlugLayout({
     }
   }
 
+  const darkBg = (DARK_MODE as Record<string, string>)["--background"];
+
   return (
     <SlugProvider value={resolved}>
-      <VenueThemeProvider theme={theme}>
+      {/* Runs synchronously during HTML parsing — sets body background before first paint
+          so the status bar and browser chrome match the dark background immediately. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function(){try{if(window.matchMedia('(prefers-color-scheme:dark)').matches){document.body.style.backgroundColor='${darkBg}';}}catch(e){}})();`,
+        }}
+      />
+      <VenueThemeProvider theme={theme} darkMode={DARK_MODE}>
         {children}
       </VenueThemeProvider>
     </SlugProvider>
