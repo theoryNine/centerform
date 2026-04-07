@@ -84,11 +84,6 @@ function DayHeader({ group }: { group: DayGroup }) {
 function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string }) {
   const cardContent = (
     <>
-      {item.image_url && (
-        <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
-          <img src={item.image_url} alt={item.title} className="size-full object-cover" />
-        </div>
-      )}
       <div className="min-w-0 flex-1 py-3 pl-3 pr-2">
         <p className="m-0 font-serif text-card-title-lg font-bold text-foreground">
           {item.title}
