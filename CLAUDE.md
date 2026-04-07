@@ -29,16 +29,23 @@ src/
 │   ├── dashboard/          # Protected admin routes (venue, events)
 │   └── [slug]/             # Public venue/event pages
 │       ├── page.tsx        # Routes to VenueHomePage, CruiseHomePage, or EventHomePage by type
-│       ├── services/       # Hotel "Your Room & Stay" (accordion)
-│       ├── dining/         # Hotel dining
+│       ├── services/       # Venue: "Your Room & Stay" accordion
+│       ├── dining/         # Venue: nearby dining/drinks list
+│       ├── events/         # Venue: venue-hosted events list
 │       ├── explore/        # Explore hub + collections + place listings
+│       │   ├── [collectionId]/  # Collection page (cards or timeline layout)
+│       │   ├── place/[placeId]/ # Individual place detail
+│       │   └── area/[area]/     # Area-filtered explore view
 │       ├── concierge/      # Concierge chat
-│       ├── ship-info/      # Cruise: accordion info (Welcome Aboard / Amenities / Entertainment)
+│       ├── info/           # Event-only: event details (date, location, contact)
+│       ├── schedule/       # Event-only: grouped schedule items
+│       ├── ship-info/      # Cruise: accordion info (Welcome Aboard / Amenities / Bars / Entertainment)
 │       ├── food-onboard/   # Cruise: restaurant list grouped by sit_down vs walk_up
 │       │   └── [restaurantId]/  # Cruise: individual restaurant detail page
 │       ├── group-plan/     # Cruise: day-by-day timeline with scrolling pill selector
 │       │   └── [itemId]/   # Cruise: individual itinerary item detail page
 │       └── the-crew/       # Cruise: crew/group member listing
+│           └── [name]/     # Cruise: individual crew member photo gallery
 ├── components/
 │   ├── ui/                 # shadcn/ui components
 │   └── guest/              # Guest-facing components
@@ -83,6 +90,7 @@ src/
 │   ├── storage.ts          # uploadVenueAsset / uploadEventAsset / deleteVenueAsset
 │   ├── utils.ts            # cn() utility + formatPrice()
 │   ├── slug-resolver.ts    # Route resolution (venue vs event)
+│   ├── cruise-crew-data.ts # Hardcoded CREW array (name, slug, photos[]) for anniversary cruise photo galleries
 │   └── supabase/           # Supabase clients
 │       ├── server.ts       # Anon key client for Server Components (respects RLS)
 │       ├── client.ts       # Anon key client for Client Components
@@ -109,12 +117,14 @@ Core tables (migrations in `supabase/migrations/`):
 - **explore_collection_items** — ordered join table linking a collection to its `nearby_places`. Supports `time_label`, `is_start`, and `is_end` for the timeline variant
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
 - **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.)
-- **cruise_restaurants** — dining venues on a cruise ship. `restaurant_type`: `sit_down` | `walk_up`. Linked from `cruise_itinerary_items` via optional `restaurant_id` FK.
+- **cruise_restaurants** — dining venues on a cruise ship. `restaurant_type`: `sit_down` | `walk_up`. Extra fields: `hours` (text, newline-separated), `menu_links` (JSONB `{label, url}[]`). Linked from `cruise_itinerary_items` via optional `restaurant_id` FK.
 - **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry — it renders as a regular tappable card like all other items. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item to a restaurant detail page.
 - **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
-- **cruise_nav_images** — optional hero images for the four nav tiles on the cruise homepage. One row per tile per venue: `nav_key` is one of `"ship-info"` | `"food-onboard"` | `"group-plan"` | `"the-crew"` (matching the route segment). Unique constraint on `(venue_id, nav_key)`. Fetched client-side on mount alongside `cruise_links`; passed as `imageUrl` to `NavCard`.
-- **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, and `body`. The query fetches the most recent row where `effective_at <= NOW()`, so multiple entries per day are supported (e.g. a morning and an evening message). Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_anniversary_cruise.sql`.
+- **cruise_nav_images** — optional hero images for the four nav tiles on the cruise homepage. One row per tile per venue: `nav_key` is one of `"ship-info"` | `"food-onboard"` | `"group-plan"` | `"the-crew"` (matching the route segment). Also has `sublabel` (text, optional) for secondary label text on the tile. Unique constraint on `(venue_id, nav_key)`. Fetched client-side on mount alongside `cruise_links`; passed as `imageUrl` to `NavCard`.
+- **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, `body`, and `expires_at` (timestamptz, nullable). The query fetches the most recent row where `effective_at <= NOW() AND (expires_at IS NULL OR expires_at > NOW())`. Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_cruise_daily_welcome.sql`.
+- **venue_page_descriptions** — optional flavor text shown at the top of L1 venue/cruise pages. Keyed by `(venue_id, page_slug)` where `page_slug` matches the route segment (e.g. `"food-onboard"`, `"ship-info"`, `"group-plan"`, `"the-crew"`). See migration `016_venue_page_descriptions.sql`.
+- **venue_nav_tiles** — sublabel text for nav tiles on standard venue homepages (hotel/resort/etc.). `nav_key` is one of `"services"` | `"dining"` | `"explore"`. Analogous to `cruise_nav_images` but for non-cruise venues. See migration `022_cruise_nav_sublabel.sql`.
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
 - **standalone_event_themes** — theming for standalone events
 - **standalone_event_members** — user roles for standalone events
@@ -138,20 +148,22 @@ Food Onboard      /:slug/food-onboard             (cruise-food-onboard.tsx)
 Group Plan        /:slug/group-plan               (cruise-group-plan.tsx)
   └── Detail      /:slug/group-plan/[itemId]      (cruise-itinerary-listing.tsx)
 The Crew          /:slug/the-crew                 (cruise-crew.tsx)
+  └── Detail      /:slug/the-crew/[name]          (cruise-crew-listing.tsx — photo gallery, uses cruise-crew-data.ts)
 ```
 
-**Ship Info** uses the existing `services` table with three cruise-specific categories:
+**Ship Info** uses the existing `services` table with four cruise-specific categories:
 - `welcome_aboard` → section 01 Welcome Aboard
 - `ship_amenities` → section 02 Amenities
-- `ship_entertainment` → section 03 Entertainment
+- `ship_bars` → section 03 Bars
+- `ship_entertainment` → section 04 Entertainment
 
 **Food Onboard** groups `cruise_restaurants` into Sit Down Restaurants (`restaurant_type = "sit_down"`) and Walk Up Eateries (`restaurant_type = "walk_up"`). Each row links to an individual detail page.
 
 **Group Plan** renders a day-by-day timeline. `is_start=true` items are parsed as day headers and drive horizontal scrolling pill navigation at the top. Selecting a pill filters the timeline to show only that day's items. Every regular timeline card (non-`is_start`, non-`is_end`) links to its own detail page at `/:slug/group-plan/[itemId]`, which uses the same hero + floating name card design as the restaurant listing. If the item has a `restaurant_id`, the detail page also shows a "View Restaurant →" button linking to `/:slug/food-onboard/[restaurantId]`.
 
-**Cruise home** fetches `cruise_daily_welcome` and `cruise_links` client-side on mount. The welcome card displays the most recent `cruise_daily_welcome` entry where `effective_at <= NOW()`, falling back to `venue.welcome_heading/body` then hardcoded defaults. Multiple entries per day are supported for time-of-day updates (e.g. a morning message and a Scarlet Night evening message). All timestamps are stored in UTC.
+**Cruise home** fetches `cruise_daily_welcome` and `cruise_links` client-side on mount. The welcome card displays the most recent `cruise_daily_welcome` entry where `effective_at <= NOW() AND (expires_at IS NULL OR expires_at > NOW())`, falling back to `venue.welcome_heading/body` then hardcoded defaults. Multiple entries per day are supported for time-of-day updates (e.g. a morning message and a Scarlet Night evening message). All timestamps are stored in UTC.
 
-**Sample cruise**: "Adam & Ansel's Anniversary" at slug `adam-ansel` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migrations `012_sample_anniversary_cruise.sql` and `019_sample_cruise_daily_welcome.sql`.
+**Sample cruise**: "Adam & Ansel's Anniversary" at slug `adam-ansel` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migrations `012_sample_anniversary_cruise.sql` and `019_sample_cruise_daily_welcome.sql`. Crew photo galleries for this cruise use `cruise-crew-data.ts` (hardcoded, not the `cruise_crew` DB table).
 
 ## Explore Page Architecture
 
@@ -159,8 +171,9 @@ Three-tier navigation under `/:slug/explore/`:
 
 ```
 Explore index         /:slug/explore
-  └── Collection      /:slug/explore/[collectionId]      (explore-collection.tsx)
-        └── Place     /:slug/explore/place/[placeId]     (place-listing.tsx)
+  ├── Collection      /:slug/explore/[collectionId]      (explore-collection.tsx)
+  │     └── Place     /:slug/explore/place/[placeId]     (place-listing.tsx)
+  └── Area            /:slug/explore/area/[area]         (area-filtered explore view)
 ```
 
 - **Explore index** groups `nearby_places` by `area`. Cards with `collection_id` set link to the collection; cards without link to the place listing.
