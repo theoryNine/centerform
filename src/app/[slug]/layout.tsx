@@ -1,8 +1,36 @@
 import { notFound } from "next/navigation";
+import type { Viewport } from "next";
 import { VenueThemeProvider } from "@/components/theme-provider";
 import { SlugProvider } from "@/components/slug-context";
 import { resolveSlug } from "@/lib/slug-resolver";
 import type { ThemeColors } from "@/types";
+
+export async function generateViewport({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Viewport> {
+  const { slug } = await params;
+  const resolved = await resolveSlug(slug);
+
+  const bgColor =
+    resolved?.type === "venue"
+      ? (resolved.data.venue_themes?.background_color ?? "#F5F0E8")
+      : resolved?.type === "event"
+        ? (resolved.data.standalone_event_themes?.background_color ?? "#F5F0E8")
+        : "#F5F0E8";
+
+  const isCruise = resolved?.type === "venue" && resolved.data.venue_type === "cruise";
+
+  return {
+    themeColor: isCruise
+      ? [
+          { media: "(prefers-color-scheme: light)", color: bgColor },
+          { media: "(prefers-color-scheme: dark)", color: "#1C1A17" },
+        ]
+      : bgColor,
+  };
+}
 
 // Only structural/neutral tokens — venue brand colors (primary, accent) are intentionally
 // excluded so they remain exactly as configured in venue_themes.
