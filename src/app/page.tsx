@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -148,25 +149,13 @@ export default function RootPage() {
         }}
       />
 
-      {/* Wax seal as logo */}
-      <div
-        className="relative z-[1] flex size-16 items-center justify-center rounded-full"
-        style={{
-          background: "linear-gradient(135deg, #8B2635 0%, #6B1D29 50%, #4A1520 100%)",
-          boxShadow: `
-            0 4px 16px rgba(139,38,53,0.5),
-            0 0 ${20 + breathe * 15}px rgba(139,38,53,${0.3 * breathe}),
-            inset 0 2px 4px rgba(255,255,255,0.2)
-          `,
-        }}
-      >
-        <span className="font-serif text-[22px] font-semibold text-white/90">
-          C
-        </span>
+      {/* Logo */}
+      <div className="relative z-[1]">
+        <Image src="/icons/logo.png" alt="Centerform" width={100} height={100} priority />
       </div>
 
       {/* Title */}
-      <div className="relative z-[1] mt-6 text-[11px] font-semibold uppercase tracking-[3px] text-[#8B7355]">
+      <div className="relative z-[1] mt-2 text-[11px] font-semibold uppercase tracking-[3px] text-[#8B7355]">
         Centerform
       </div>
 
