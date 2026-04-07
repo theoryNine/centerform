@@ -21,11 +21,21 @@ export function VenueThemeProvider({ theme, darkMode, children }: ThemeProviderP
 
   useEffect(() => {
     if (!darkMode) return;
+    const darkBg = (darkMode as Record<string, string>)["--background"] ?? "";
+
+    const apply = (dark: boolean) => {
+      setIsDark(dark);
+      document.body.style.backgroundColor = dark ? darkBg : "";
+    };
+
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    setIsDark(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
     mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    return () => {
+      mq.removeEventListener("change", handler);
+      document.body.style.backgroundColor = "";
+    };
   }, [darkMode]);
 
   const lightStyle = {
