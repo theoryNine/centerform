@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import type { ThemeColors } from "@/types";
 
 function hexToOklch(hex: string): string {
@@ -17,20 +17,26 @@ interface ThemeProviderProps {
 }
 
 export function VenueThemeProvider({ theme, darkMode, children }: ThemeProviderProps) {
-  const [isDark, setIsDark] = useState(false);
+  const darkBg = darkMode ? (darkMode as Record<string, string>)["--background"] ?? "" : "";
 
+  // Initialize synchronously from matchMedia so the first client render is already correct,
+  // avoiding a light→dark flash before useEffect would fire.
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window === "undefined" || !darkMode) return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  // Set body background before paint so the status bar area matches the page.
+  useLayoutEffect(() => {
+    if (!darkMode) return;
+    document.body.style.backgroundColor = isDark ? darkBg : "";
+  }, [isDark, darkMode, darkBg]);
+
+  // Keep in sync with system preference changes.
   useEffect(() => {
     if (!darkMode) return;
-    const darkBg = (darkMode as Record<string, string>)["--background"] ?? "";
-
-    const apply = (dark: boolean) => {
-      setIsDark(dark);
-      document.body.style.backgroundColor = dark ? darkBg : "";
-    };
-
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    apply(mq.matches);
-    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
     mq.addEventListener("change", handler);
     return () => {
       mq.removeEventListener("change", handler);

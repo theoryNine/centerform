@@ -6,7 +6,7 @@ import type { ThemeColors } from "@/types";
 
 // Only structural/neutral tokens — venue brand colors (primary, accent) are intentionally
 // excluded so they remain exactly as configured in venue_themes.
-const CRUISE_DARK: React.CSSProperties = {
+const DARK_MODE: React.CSSProperties = {
   "--background": "#1C1A17",
   "--foreground": "#EDE8DE",
   "--card": "#252220",
@@ -61,11 +61,9 @@ export default async function SlugLayout({
     }
   }
 
-  const isCruise = resolved.type === "venue" && resolved.data.venue_type === "cruise";
-
   return (
     <SlugProvider value={resolved}>
-      <VenueThemeProvider theme={theme} darkMode={isCruise ? CRUISE_DARK : undefined}>
+      <VenueThemeProvider theme={theme} darkMode={DARK_MODE}>
         {children}
       </VenueThemeProvider>
     </SlugProvider>
