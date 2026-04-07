@@ -61,8 +61,17 @@ export default async function SlugLayout({
     }
   }
 
+  const darkBg = (DARK_MODE as Record<string, string>)["--background"];
+
   return (
     <SlugProvider value={resolved}>
+      {/* Runs synchronously during HTML parsing — sets body background before first paint
+          so the status bar and browser chrome match the dark background immediately. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function(){try{if(window.matchMedia('(prefers-color-scheme:dark)').matches){document.body.style.backgroundColor='${darkBg}';}}catch(e){}})();`,
+        }}
+      />
       <VenueThemeProvider theme={theme} darkMode={DARK_MODE}>
         {children}
       </VenueThemeProvider>
