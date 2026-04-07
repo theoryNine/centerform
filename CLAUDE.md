@@ -78,10 +78,16 @@ src/
 │           └── event-home.tsx
 ├── lib/
 │   ├── auth.ts             # NextAuth config
-│   ├── queries.ts          # Supabase query functions
+│   ├── queries.ts          # Supabase query functions (public + admin variants)
+│   ├── permissions.ts      # Dashboard auth: getVenueRole, requireVenueRole, getVenuesForUser
+│   ├── storage.ts          # uploadVenueAsset / uploadEventAsset / deleteVenueAsset
 │   ├── utils.ts            # cn() utility + formatPrice()
 │   ├── slug-resolver.ts    # Route resolution (venue vs event)
-│   └── supabase/           # Supabase clients (server.ts, client.ts, middleware.ts)
+│   └── supabase/           # Supabase clients
+│       ├── server.ts       # Anon key client for Server Components (respects RLS)
+│       ├── client.ts       # Anon key client for Client Components
+│       ├── middleware.ts   # Session refresh middleware
+│       └── admin.ts        # Service role client — server-only, bypasses RLS
 ├── types/index.ts          # All TypeScript interfaces
 └── hooks/
     ├── use-debounce.ts
@@ -206,12 +212,42 @@ Before adding inline UI patterns to a guest component, check if a shared primiti
 | Button press scale animation | `const p = usePressScale(); <button {...p}>` from `@/hooks/use-press-scale` |
 | Sticky nav visibility on scroll | `const { showStickyNav, headerRef } = useStickyNav()` from `@/hooks/use-sticky-nav` |
 
+## Dashboard Architecture
+
+**Auth identity gap:** NextAuth and Supabase are separate auth systems. Supabase RLS relies on `auth.uid()` from a Supabase JWT, but the app uses NextAuth sessions — so `auth.uid()` is always NULL in dashboard requests, causing all write RLS policies to silently block.
+
+**Solution:** Dashboard Server Actions and Server Components use `createAdminClient()` (service role key, bypasses RLS) and manually enforce permissions via `src/lib/permissions.ts`.
+
+Pattern for a protected dashboard page:
+```ts
+import { auth } from "@/lib/auth";
+import { requireVenueRole } from "@/lib/permissions";
+
+// In a Server Component or Server Action:
+const session = await auth();
+const role = await requireVenueRole(session.user.id, venueId, "staff");
+// role is now "owner" | "admin" | "staff" — use it to conditionally show owner-only UI
+```
+
+Pattern for a Server Action that writes to Supabase:
+```ts
+import { createAdminClient } from "@/lib/supabase/admin";
+
+const supabase = createAdminClient();
+await supabase.from("services").insert({ venue_id, ... });
+```
+
+**Never** import `createAdminClient` in client components or `"use client"` files — the service role key must stay server-side only.
+
+Server Actions go in colocated `actions.ts` files, e.g. `src/app/dashboard/venue/services/actions.ts`.
+
 ## Conventions
 
 - **Formatting**: Double quotes, semicolons, 2-space indent, trailing commas, 100 char width
 - **Styling**: Tailwind classes for layout; CSS variables for dynamic theming per venue/event; `--cf-*` design tokens for all typography, spacing, radius, and interactive values (see Design Token System above)
 - **Components**: Follow shadcn/ui patterns with `data-slot` attributes and CVA variants
-- **Database queries**: Add to `src/lib/queries.ts` using the Supabase client pattern
+- **Database queries**: Public/guest queries go in `src/lib/queries.ts` using `createClient()` (anon key). Dashboard admin queries that need to bypass RLS use `createAdminClient()` directly in the Server Action or Server Component — or use the `getAll*` / `getVenuesForUser` / `getVenueMemberRole` variants already in `queries.ts`.
+- **Image uploads**: Use `uploadVenueAsset(slug, path, file)` from `src/lib/storage.ts`. The `path` arg is relative within the slug folder, e.g. `"places/{place-id}/photo.jpg"`. See the Supabase Storage section for the full bucket layout.
 - **Path alias**: `@/*` maps to `src/*`
 - **Branches**: `develop` for active work, `main` for production
 
@@ -254,5 +290,6 @@ event-assets/
 
 Required in `.env.local` (see `.env.local.example`):
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` — server-only, never prefix with `NEXT_PUBLIC_`. Find in Supabase → Settings → API.
 - `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (optional)
