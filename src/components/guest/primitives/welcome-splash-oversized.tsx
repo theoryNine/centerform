@@ -7,7 +7,7 @@ import { usePressScale } from "@/hooks/use-press-scale";
 
 interface WelcomeSplashOversizedProps {
   name: string;
-  tagline?: string;
+  tagline?: ReactNode;
   coverImageUrl?: string;
   fallbackContent?: ReactNode;
   onEnter: () => void;
@@ -47,7 +47,7 @@ export function WelcomeSplashOversized({
               {name}
             </h1>
             {tagline && (
-              <p className="m-0 text-body leading-[var(--cf-body-line-height)] text-muted-foreground">
+              <p className="m-0 mt-2 text-body leading-[var(--cf-body-line-height)] text-muted-foreground">
                 {tagline}
               </p>
             )}

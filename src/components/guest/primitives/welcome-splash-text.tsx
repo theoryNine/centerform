@@ -7,7 +7,7 @@ import { usePressScale } from "@/hooks/use-press-scale";
 
 interface WelcomeSplashTextProps {
   name: string;
-  tagline?: string;
+  tagline?: ReactNode;
   coverImageUrl?: string;
   fallbackContent?: ReactNode;
   onEnter: () => void;
