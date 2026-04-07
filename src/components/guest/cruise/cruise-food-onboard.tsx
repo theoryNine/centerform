@@ -70,7 +70,12 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
       <div className="px-page pb-10 pt-2">
         {pageDescription && (
           <p className="mb-6 mt-2 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription}
+            {pageDescription.split("\n").map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {line}
+              </span>
+            ))}
           </p>
         )}
         {restaurants.length === 0 ? (

@@ -321,7 +321,12 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
 
         {pageDescription && (
           <p className="mb-0 px-page pt-5 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription}
+            {pageDescription.split("\n").map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {line}
+              </span>
+            ))}
           </p>
         )}
 
