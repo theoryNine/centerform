@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseDailyWelcome, CruiseLink } from "@/types";
+import { createAdminClient } from "@/lib/supabase/admin";
+import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseDailyWelcome, CruiseLink, MemberRole, Venue } from "@/types";
 
 export async function getVenueBySlug(slug: string) {
   const supabase = await createClient();
@@ -329,4 +330,63 @@ export async function getCruiseNavImage(venueId: string, navKey: string): Promis
     .eq("nav_key", navKey)
     .maybeSingle();
   return data?.image_url ?? null;
+}
+
+// ─── Dashboard / admin queries ─────────────────────────────────────────────────
+
+// Returns all venues the given user is a member of, ordered by when they joined.
+// Uses the admin client so it works regardless of whether Supabase Auth is active.
+export async function getVenuesForUser(
+  userId: string,
+): Promise<Array<{ role: MemberRole; venue: Venue }>> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("venue_members")
+    .select("role, venues(*)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true });
+
+  if (!data) return [];
+
+  return data.map((row) => ({
+    role: row.role as MemberRole,
+    venue: row.venues as unknown as Venue,
+  }));
+}
+
+// Returns the user's role for a specific venue, or null if they have no membership.
+export async function getVenueMemberRole(
+  userId: string,
+  venueId: string,
+): Promise<MemberRole | null> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("venue_members")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("venue_id", venueId)
+    .maybeSingle();
+  return (data?.role as MemberRole) ?? null;
+}
+
+// Returns all explore collections for a venue regardless of is_active (for dashboard listing).
+export async function getAllExploreCollections(venueId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("explore_collections")
+    .select("*")
+    .eq("venue_id", venueId)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
+// Returns all nearby places for a venue regardless of is_active (for dashboard listing).
+export async function getAllNearbyPlaces(venueId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("nearby_places")
+    .select("*")
+    .eq("venue_id", venueId)
+    .order("display_order", { ascending: true });
+  return data ?? [];
 }
