@@ -1,11 +1,7 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ThemeColors } from "@/types";
-
-// useLayoutEffect fires synchronously before browser paint (client only).
-// Falls back to useEffect on the server to avoid SSR warnings.
-const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function hexToOklch(hex: string): string {
   // For now, pass through the hex value directly as CSS color
@@ -23,7 +19,7 @@ interface ThemeProviderProps {
 export function VenueThemeProvider({ theme, darkMode, children }: ThemeProviderProps) {
   const [isDark, setIsDark] = useState(false);
 
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
     if (!darkMode) return;
     const darkBg = (darkMode as Record<string, string>)["--background"] ?? "";
 
@@ -42,12 +38,13 @@ export function VenueThemeProvider({ theme, darkMode, children }: ThemeProviderP
     };
   }, [darkMode]);
 
+  // --background and --foreground are intentionally omitted from lightStyle.
+  // They are handled by the CSS @media (prefers-color-scheme: dark) rule in globals.css,
+  // which applies before any JS fires. This prevents the dark-mode flash on first render.
   const lightStyle = {
     "--primary": hexToOklch(theme.primary_color),
     "--secondary": hexToOklch(theme.secondary_color),
     "--accent": hexToOklch(theme.accent_color),
-    "--background": hexToOklch(theme.background_color),
-    "--foreground": hexToOklch(theme.foreground_color),
     "--radius": theme.border_radius ?? "0.625rem",
     "--font-sans": theme.font_family ?? "DM Sans",
   } as React.CSSProperties;
@@ -55,7 +52,7 @@ export function VenueThemeProvider({ theme, darkMode, children }: ThemeProviderP
   const style = isDark && darkMode ? { ...lightStyle, ...darkMode } : lightStyle;
 
   return (
-    <div style={style} className="min-h-screen bg-background text-foreground">
+    <div style={style} className="min-h-screen">
       {children}
     </div>
   );
