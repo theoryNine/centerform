@@ -23,7 +23,7 @@ export function WelcomeSplashText({
   const pressHandlers = usePressScale();
 
   return (
-    <div className="flex size-full flex-col overflow-hidden font-sans">
+    <div className="flex size-full flex-col overflow-hidden bg-background font-sans">
       {/* Image — in-flow, bleeds off top edge, rounded right */}
       <div
         className="relative shrink-0 overflow-hidden rounded-r-[50%]"

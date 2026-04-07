@@ -23,7 +23,7 @@ export function WelcomeSplashOversized({
   const pressHandlers = usePressScale();
 
   return (
-    <div className="relative size-full overflow-hidden font-sans">
+    <div className="relative size-full overflow-hidden bg-background font-sans">
       {/* Image — absolutely positioned, bleeds off top and bottom edges */}
       <div
         className="absolute overflow-hidden rounded-r-[50%]"
