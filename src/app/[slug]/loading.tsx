@@ -1,16 +1,13 @@
 export default function SlugLoading() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ background: "#F5F0E8" }}
-    >
+    <div className="flex min-h-screen items-center justify-center bg-background">
       <svg
-        className="animate-spin"
+        className="animate-spin text-foreground opacity-25"
         width="24"
         height="24"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="rgba(45,42,38,0.25)"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       >
