@@ -76,7 +76,12 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
           {/* Description */}
           {restaurant.description && (
             <p className="mt-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
-              {restaurant.description}
+              {restaurant.description.split("\n").map((line, i) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))}
             </p>
           )}
 
