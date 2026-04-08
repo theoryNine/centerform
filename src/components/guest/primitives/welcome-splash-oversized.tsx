@@ -4,6 +4,8 @@ import { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
 import { usePressScale } from "@/hooks/use-press-scale";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { useImageLoaded } from "@/hooks/use-image-loaded";
 
 interface WelcomeSplashOversizedProps {
   name: string;
@@ -21,16 +23,25 @@ export function WelcomeSplashOversized({
   onEnter,
 }: WelcomeSplashOversizedProps) {
   const pressHandlers = usePressScale();
+  const { loaded, imgRef, settle } = useImageLoaded(coverImageUrl);
 
   return (
     <div className="relative size-full overflow-hidden bg-background font-sans">
+      {!loaded && <LoadingSpinner />}
       {/* Image — absolutely positioned, bleeds off top and bottom edges */}
       <div
         className="absolute overflow-hidden rounded-r-[50%]"
         style={{ top: "-50px", height: "115%", width: "95%", left: "-40px" }}
       >
         {coverImageUrl ? (
-          <img src={coverImageUrl} alt={name} className="size-full object-cover object-top" />
+          <img
+            ref={imgRef}
+            src={coverImageUrl}
+            alt={name}
+            className="size-full object-cover object-top"
+            onLoad={settle}
+            onError={settle}
+          />
         ) : (
           fallbackContent
         )}

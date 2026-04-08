@@ -4,6 +4,8 @@ import { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
 import { usePressScale } from "@/hooks/use-press-scale";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { useImageLoaded } from "@/hooks/use-image-loaded";
 
 interface WelcomeSplashTextProps {
   name: string;
@@ -21,16 +23,25 @@ export function WelcomeSplashText({
   onEnter,
 }: WelcomeSplashTextProps) {
   const pressHandlers = usePressScale();
+  const { loaded, imgRef, settle } = useImageLoaded(coverImageUrl);
 
   return (
     <div className="flex size-full flex-col overflow-hidden bg-background font-sans">
+      {!loaded && <LoadingSpinner />}
       {/* Image — in-flow, bleeds off top edge, rounded right */}
       <div
         className="relative shrink-0 overflow-hidden rounded-r-[50%]"
         style={{ height: "calc(57vh + 40px)", width: "85%", marginTop: "-40px" }}
       >
         {coverImageUrl ? (
-          <img src={coverImageUrl} alt={name} className="size-full object-cover" />
+          <img
+            ref={imgRef}
+            src={coverImageUrl}
+            alt={name}
+            className="size-full object-cover"
+            onLoad={settle}
+            onError={settle}
+          />
         ) : (
           fallbackContent
         )}

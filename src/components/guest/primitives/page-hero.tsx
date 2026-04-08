@@ -1,5 +1,9 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { useImageLoaded } from "@/hooks/use-image-loaded";
 
 interface PageHeroProps {
   /** Cover image URL. If falsy, renders fallbackNode instead. */
@@ -36,8 +40,11 @@ export function PageHero({
   textAlign = "center",
 }: PageHeroProps) {
   const isHome = size === "home";
+  const { loaded, imgRef, settle } = useImageLoaded(imageUrl);
 
   return (
+    <>
+    {!loaded && <LoadingSpinner />}
     <div
       className={cn("flex items-center", isHome ? "min-h-[280px] pt-8" : "min-h-[180px]", className)}
     >
@@ -52,7 +59,14 @@ export function PageHero({
         )}
       >
         {imageUrl ? (
-          <img src={imageUrl} alt={imageAlt} className="size-full object-cover" />
+          <img
+            ref={imgRef}
+            src={imageUrl}
+            alt={imageAlt}
+            className="size-full object-cover"
+            onLoad={settle}
+            onError={settle}
+          />
         ) : (
           fallbackNode
         )}
@@ -86,5 +100,6 @@ export function PageHero({
         )}
       </div>
     </div>
+    </>
   );
 }
