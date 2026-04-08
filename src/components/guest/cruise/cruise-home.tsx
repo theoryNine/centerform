@@ -139,7 +139,7 @@ export function CruiseHomePage() {
         >
           <WelcomeSplash
             name={shipName}
-            tagline={<>Welcome aboard!<br />We&rsquo;re glad you&rsquo;re here.</>}
+            tagline={<>Welcome aboard!</>}
             coverImageUrl={venue?.cover_image_url ?? undefined}
             fallbackContent={
               <div
@@ -205,7 +205,7 @@ export function CruiseHomePage() {
           >
             {dailyWelcome?.body ??
               venue?.welcome_body ??
-              "We\u2019re glad you\u2019re here. Everything you need for your voyage is right below."}
+              "We\u2019re so happy you\u2019re here. Twenty years led us here, and there are no refunds."}
           </p>
           {venue?.phone && (
             <div className="flex justify-end">
