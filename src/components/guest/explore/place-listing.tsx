@@ -2,6 +2,8 @@
 
 import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { useImageLoaded } from "@/hooks/use-image-loaded";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 function getCTALabel(category: NearbyPlace["category"]): string {
@@ -37,6 +39,7 @@ interface PlaceListingProps {
 
 export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
+  const { loaded, imgRef, settle } = useImageLoaded(place.image_url);
 
   const priceLabel = place.price_level ? "$".repeat(place.price_level) : null;
   const ctaLabel = place.cta_label ?? getCTALabel(place.category);
@@ -47,6 +50,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
 
   return (
     <div className="min-h-screen bg-background font-sans">
+      {!loaded && <LoadingSpinner />}
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
@@ -59,9 +63,12 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
       {place.image_url ? (
         <div className="aspect-[4/3] w-full overflow-hidden">
           <img
+            ref={imgRef}
             src={place.image_url}
             alt={place.name}
             className="size-full object-cover"
+            onLoad={settle}
+            onError={settle}
           />
         </div>
       ) : (

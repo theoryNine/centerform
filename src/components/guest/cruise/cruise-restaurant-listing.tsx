@@ -7,6 +7,8 @@ import {
 } from "@/components/guest/primitives/sticky-header";
 import { useRouter } from "next/navigation";
 import type { CruiseRestaurant, Venue } from "@/types";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { useImageLoaded } from "@/hooks/use-image-loaded";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { formatPrice } from "@/lib/utils";
 
@@ -19,6 +21,7 @@ interface CruiseRestaurantListingProps {
 export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseRestaurantListingProps) {
   const router = useRouter();
   const scrolled = useWindowScroll();
+  const { loaded, imgRef, settle } = useImageLoaded(restaurant.image_url);
 
   const metaParts = [
     restaurant.cuisine_type ?? null,
@@ -28,6 +31,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
 
   return (
     <div className="min-h-screen bg-background font-sans">
+      {!loaded && <LoadingSpinner />}
       <ScrollRevealStickyHeader
         venueName={venue.name}
         scrolled={scrolled}
@@ -41,9 +45,12 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
         {restaurant.image_url ? (
           <div className="aspect-[4/3] w-full overflow-hidden">
             <img
+              ref={imgRef}
               src={restaurant.image_url}
               alt={restaurant.name}
               className="size-full object-cover"
+              onLoad={settle}
+              onError={settle}
             />
           </div>
         ) : (

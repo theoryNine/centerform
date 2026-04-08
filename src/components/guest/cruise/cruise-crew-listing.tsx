@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FloatingBackButton } from "@/components/guest/primitives/sticky-header";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { useImageLoaded } from "@/hooks/use-image-loaded";
 import type { Venue } from "@/types";
 import type { CrewMember } from "@/lib/cruise-crew-data";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
@@ -16,6 +18,7 @@ interface CruiseCrewListingProps {
 function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
   const [index, setIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  const { loaded, imgRef, settle } = useImageLoaded(photos[0]);
 
   const prev = () => setIndex((i) => (i - 1 + photos.length) % photos.length);
   const next = () => setIndex((i) => (i + 1) % photos.length);
@@ -32,39 +35,49 @@ function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
   };
 
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    >
+    <>
+      {!loaded && <LoadingSpinner />}
       <div
-        className="flex transition-transform duration-300 ease-out"
-        style={{ transform: `translateX(-${index * 100}%)` }}
+        className="relative w-full overflow-hidden"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
-        {photos.map((src, i) => (
-          <div key={i} className="aspect-[3/4] w-full shrink-0">
-            <img src={src} alt={`${name} ${i + 1}`} className="size-full object-cover object-top" />
-          </div>
-        ))}
-      </div>
-
-      {/* Dots — sit above the floating name card */}
-      {photos.length > 1 && (
-        <div className="absolute bottom-16 inset-x-0 flex justify-center gap-1.5">
-          {photos.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i)}
-              className="h-1.5 cursor-pointer rounded-full border-none p-0 transition-all duration-200"
-              style={{
-                width: i === index ? 20 : 6,
-                backgroundColor: i === index ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.45)",
-              }}
-            />
+        <div
+          className="flex transition-transform duration-300 ease-out"
+          style={{ transform: `translateX(-${index * 100}%)` }}
+        >
+          {photos.map((src, i) => (
+            <div key={i} className="aspect-[3/4] w-full shrink-0">
+              <img
+                ref={i === 0 ? imgRef : undefined}
+                src={src}
+                alt={`${name} ${i + 1}`}
+                className="size-full object-cover object-top"
+                onLoad={i === 0 ? settle : undefined}
+                onError={i === 0 ? settle : undefined}
+              />
+            </div>
           ))}
         </div>
-      )}
-    </div>
+
+        {/* Dots — sit above the floating name card */}
+        {photos.length > 1 && (
+          <div className="absolute bottom-16 inset-x-0 flex justify-center gap-1.5">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                className="h-1.5 cursor-pointer rounded-full border-none p-0 transition-all duration-200"
+                style={{
+                  width: i === index ? 20 : 6,
+                  backgroundColor: i === index ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.45)",
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
