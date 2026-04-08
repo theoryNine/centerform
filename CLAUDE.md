@@ -99,6 +99,7 @@ src/
 ├── types/index.ts          # All TypeScript interfaces
 └── hooks/
     ├── use-debounce.ts
+    ├── use-image-loaded.ts # Returns { loaded, imgRef, settle } — spinner until image loads or errors
     ├── use-press-scale.ts  # Returns press event handlers (scale animation, no re-render)
     └── use-sticky-nav.ts   # Returns { showStickyNav, headerRef } scroll-past-header state
 ```
@@ -251,6 +252,7 @@ Before adding inline UI patterns to a guest component, check if a shared primiti
 |---|---|
 | Price display (`FREE` / `$$$`) | `formatPrice(priceLevel)` from `@/lib/utils` |
 | Full-screen loading overlay | `<LoadingSpinner />` from `@/components/guest/primitives/loading-spinner` |
+| Wait for image before showing page | `const { loaded, imgRef, settle } = useImageLoaded(url)` from `@/hooks/use-image-loaded` — then `{!loaded && <LoadingSpinner />}` and `<img ref={imgRef} onLoad={settle} onError={settle} />` |
 | Inline clipboard copy button | `<CopyButton text={...} label={...} />` from `@/components/guest/primitives/copy-button` |
 | Animated accordion row | `<AccordionItem title isOpen onToggle>` from `@/components/guest/primitives/accordion-item` |
 | Card with decorative corner brackets | `<CornerBracketCard className?>` from `@/components/guest/primitives/corner-bracket-card` |
