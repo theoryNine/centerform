@@ -7,8 +7,10 @@ import {
 } from "@/components/guest/primitives/sticky-header";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { CruiseItineraryItem, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 
 interface CruiseItineraryListingProps {
   venue: Venue;
@@ -25,9 +27,11 @@ export function CruiseItineraryListing({
 }: CruiseItineraryListingProps) {
   const router = useRouter();
   const scrolled = useWindowScroll();
+  const [imageLoaded, setImageLoaded] = useState(!item.image_url);
 
   return (
     <div className="min-h-screen bg-background font-sans">
+      {!imageLoaded && <LoadingSpinner />}
       <ScrollRevealStickyHeader
         venueName={venue.name}
         scrolled={scrolled}
@@ -40,7 +44,12 @@ export function CruiseItineraryListing({
       <div className="relative">
         {item.image_url ? (
           <div className="aspect-[4/3] w-full overflow-hidden">
-            <img src={item.image_url} alt={item.title} className="size-full object-cover" />
+            <img
+              src={item.image_url}
+              alt={item.title}
+              className="size-full object-cover"
+              onLoad={() => setImageLoaded(true)}
+            />
           </div>
         ) : (
           <div
