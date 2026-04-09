@@ -93,9 +93,9 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
             {item.location}
           </p>
         )}
-        {item.description && (
+        {item.card_description && (
           <p className="m-0 mt-1 text-body-sm leading-snug text-muted-foreground line-clamp-2">
-            {item.description}
+            {item.card_description}
           </p>
         )}
       </div>

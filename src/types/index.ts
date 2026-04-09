@@ -289,6 +289,7 @@ export interface CruiseItineraryItem {
   id: string;
   venue_id: string;
   title: string;
+  card_description: string | null;
   description: string | null;
   location: string | null;
   time_label: string | null;
