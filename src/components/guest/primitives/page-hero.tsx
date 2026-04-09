@@ -82,7 +82,7 @@ export function PageHero({
       >
         <h1
           className={cn(
-            "m-0 font-serif font-normal leading-tight text-foreground",
+            "m-0 font-serif font-semibold leading-tight text-foreground",
             isHome ? "text-hotel-name" : "text-page-title",
           )}
         >

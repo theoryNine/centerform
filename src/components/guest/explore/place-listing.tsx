@@ -84,7 +84,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
       >
         <div className="px-page pb-10 pt-6">
           {/* Name + tagline */}
-          <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-hotel-name font-semibold leading-tight text-foreground">
             {place.name}
           </h1>
           {place.tagline && (
@@ -166,7 +166,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
           {/* What to know */}
           {place.tips && place.tips.length > 0 && (
             <div className="mt-6">
-              <h2 className="m-0 mb-3 font-serif text-card-title-md font-normal text-foreground">
+              <h2 className="m-0 mb-3 font-serif text-card-title-md font-medium text-foreground">
                 What to know
               </h2>
               <ul className="m-0 list-none p-0">

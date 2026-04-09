@@ -50,7 +50,7 @@ export function WelcomeSplashText({
       {/* Card + button — below image, pushed right */}
       <div className="flex flex-1 flex-col justify-center pl-[22%] pr-6">
         <CornerBracketCard>
-          <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-hotel-name font-semibold leading-tight text-foreground">
             {name}
           </h1>
           <div className="mx-auto my-3 h-px w-10 bg-foreground/20" />

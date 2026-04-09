@@ -74,7 +74,7 @@ export function VenueThemeProvider({ theme, darkMode, lightMode, children }: The
     "--secondary": hexToOklch(theme.secondary_color),
     "--accent": hexToOklch(theme.accent_color),
     "--radius": theme.border_radius ?? "0.625rem",
-    "--font-sans": theme.font_family ?? "DM Sans",
+    "--font-sans": theme.font_family ?? "Source Sans 3",
   } as React.CSSProperties;
 
   let style: React.CSSProperties;

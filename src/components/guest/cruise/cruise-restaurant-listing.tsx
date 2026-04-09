@@ -65,7 +65,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
         {/* Name card — 50% overlaps the bottom of the hero */}
         <div className="absolute bottom-0 left-0 right-0 z-10 translate-y-1/2 px-page">
           <div className="rounded-default bg-card px-card py-5 text-center shadow-md">
-            <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
+            <h1 className="m-0 font-serif text-hotel-name font-semibold leading-tight text-foreground">
               {restaurant.name}
             </h1>
             {metaParts.length > 0 && (

@@ -101,7 +101,7 @@ export function CruiseCrewListing({ venue, member }: CruiseCrewListingProps) {
       {/* Name card — half over the image, half below */}
       <div className="-mt-12 relative z-10 px-page pb-10">
         <CornerBracketCard className="mb-10">
-          <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
+          <h1 className="m-0 font-serif text-page-title font-semibold leading-tight text-foreground">
             {member.name}
           </h1>
           <div className="mx-auto my-3 h-px w-10 bg-foreground/20" />

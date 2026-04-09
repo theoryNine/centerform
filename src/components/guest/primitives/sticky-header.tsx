@@ -83,14 +83,14 @@ function NameContent({
     return (
       <Link
         href={nameHref}
-        className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
+        className="pointer-events-auto font-serif text-[20px] font-medium text-foreground no-underline"
       >
         {venueName}
       </Link>
     );
   }
   return (
-    <span className="font-serif text-[20px] font-normal text-foreground">{venueName}</span>
+    <span className="font-serif text-[20px] font-medium text-foreground">{venueName}</span>
   );
 }
 

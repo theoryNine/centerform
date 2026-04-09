@@ -197,7 +197,7 @@ export function CruiseHomePage() {
       <div className="px-page pb-10 pt-6">
         {/* Welcome card */}
         <div className="card-shadow mb-section rounded-default bg-card p-card">
-          <h2 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">
+          <h2 className="mb-2 font-serif text-card-title-lg font-medium text-foreground">
             {dailyWelcome?.heading ?? venue?.welcome_heading ?? "Welcome aboard!"}
           </h2>
           <p

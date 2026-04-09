@@ -159,7 +159,7 @@ function AreaSectionView({
             {sectionNumber}
           </span>
           <span className="text-[8px] text-primary">·</span>
-          <h2 className="m-0 mb-2 font-serif text-card-title-md font-normal text-foreground">
+          <h2 className="m-0 mb-2 font-serif text-card-title-md font-medium text-foreground">
             {section.name.toLowerCase().startsWith("beyond") ? section.name : `In ${section.name}`}
           </h2>
         </div>
@@ -307,7 +307,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription }: Venue
 
         {/* "Or just ask" section */}
         <div className="mb-8 mt-4">
-          <h2 className="mb-4 font-serif text-card-title-md font-normal text-foreground">
+          <h2 className="mb-4 font-serif text-card-title-md font-medium text-foreground">
             Or just ask.
           </h2>
 
