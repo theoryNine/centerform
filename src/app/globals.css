@@ -98,7 +98,7 @@
   --cf-text-chip: 14px;              /* suggestion chips */
   --cf-text-cta-button: 16px;        /* outline button text */
   --cf-text-cta-link: 15px;          /* 13–14px  text link CTAs */
-  --cf-text-section-number: 13px;    /* "01" prefix in section headings */
+  --cf-text-section-number: 15px;    /* "01" prefix in section headings */
 
   /* Typography — other */
   --cf-text-label-spacing: 1.5px;      /* 0.5–1px  letter-spacing on uppercase labels */
