@@ -92,17 +92,17 @@
   --cf-text-header-nav: 20px;        /* sticky header venue name */
 
   /* Typography — font sizes (body / Source Sans 3) */
-  --cf-text-body: 15px;              /* concierge notes, body text */
-  --cf-text-body-sm: 14px;           /* practical details, secondary text, card subtitles */
-  --cf-text-label: 11px;             /* 11–12px  uppercase info labels */
+  --cf-text-body: 16px;              /* concierge notes, body text */
+  --cf-text-body-sm: 15px;           /* practical details, secondary text, card subtitles */
+  --cf-text-label: 12px;             /* 11–12px  uppercase info labels */
   --cf-text-chip: 14px;              /* suggestion chips */
-  --cf-text-cta-button: 15px;        /* outline button text */
-  --cf-text-cta-link: 14px;          /* 13–14px  text link CTAs */
+  --cf-text-cta-button: 16px;        /* outline button text */
+  --cf-text-cta-link: 15px;          /* 13–14px  text link CTAs */
   --cf-text-section-number: 13px;    /* "01" prefix in section headings */
 
   /* Typography — other */
-  --cf-text-label-spacing: 1px;      /* 0.5–1px  letter-spacing on uppercase labels */
-  --cf-body-line-height: 1.65;       /* 1.6–1.7  body line height */
+  --cf-text-label-spacing: 1.5px;      /* 0.5–1px  letter-spacing on uppercase labels */
+  --cf-body-line-height: 1.5;       /* 1.6–1.7  body line height */
 
   /* Spacing */
   --cf-page-padding: 20px;           /* side padding on all pages */
