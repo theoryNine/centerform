@@ -95,7 +95,7 @@
   --cf-text-body: 16px;              /* concierge notes, body text */
   --cf-text-body-sm: 15px;           /* practical details, secondary text, card subtitles */
   --cf-text-label: 12px;             /* 11–12px  uppercase info labels */
-  --cf-text-chip: 14px;              /* suggestion chips */
+  --cf-text-chip: 15px;              /* suggestion chips */
   --cf-text-cta-button: 16px;        /* outline button text */
   --cf-text-cta-link: 15px;          /* 13–14px  text link CTAs */
   --cf-text-section-number: 15px;    /* "01" prefix in section headings */
