@@ -81,11 +81,15 @@ export function CruiseItineraryListing({
       <div className="bg-background">
         <div className="px-page pb-10 pt-20">
           {/* Description */}
-          {item.description && (
-            <p className="mt-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
-              {item.description}
-            </p>
-          )}
+          {item.description &&
+            item.description.split("\n\n").map((para, i) => (
+              <p
+                key={i}
+                className="mt-0 text-body leading-[var(--cf-body-line-height)] text-foreground [&+p]:mt-4"
+              >
+                {para}
+              </p>
+            ))}
 
           {/* Link to associated restaurant */}
           {item.restaurant_id && (
