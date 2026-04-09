@@ -69,7 +69,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
               {restaurant.name}
             </h1>
             {metaParts.length > 0 && (
-              <p className="m-0 mt-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="m-0 mt-1.5 text-label font-semibold uppercase tracking-widest text-muted-foreground">
                 {metaParts.join(" · ")}
               </p>
             )}
