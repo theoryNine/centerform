@@ -37,7 +37,7 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
       <div className="px-page pb-10 pt-6">
         {/* Section heading */}
         <div className="mb-6">
-          <h1 className="m-0 font-serif text-page-title font-normal text-foreground">{heading}</h1>
+          <h1 className="m-0 font-serif text-page-title font-semibold text-foreground">{heading}</h1>
           <div className="-ml-page mt-2 h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
         </div>
 

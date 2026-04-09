@@ -1,15 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Cormorant_Garamond } from "next/font/google";
+import { Nunito_Sans, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const sourceSans = Source_Sans_3({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-const cormorant = Cormorant_Garamond({
+const nunitoSans = Nunito_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-serif",
 });
 
@@ -50,7 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${cormorant.variable} antialiased`} suppressHydrationWarning>
+      <body className={`${sourceSans.variable} ${nunitoSans.variable} antialiased`} suppressHydrationWarning>
         {children}
       </body>
     </html>

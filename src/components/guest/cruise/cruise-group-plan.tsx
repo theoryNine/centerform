@@ -68,7 +68,7 @@ function DayHeader({ group }: { group: DayGroup }) {
           {group.header.location}
         </p>
       )}
-      <h2 className="m-0 mt-0.5 font-serif text-card-title-lg font-normal text-foreground">
+      <h2 className="m-0 mt-0.5 font-serif text-card-title-lg font-medium text-foreground">
         {group.header.title
           .split(/\s+/)
           .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
@@ -85,7 +85,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
   const cardContent = (
     <>
       <div className="min-w-0 flex-1 py-3 pl-3 pr-2">
-        <p className="m-0 font-serif text-card-title-lg font-bold text-foreground">
+        <p className="m-0 font-serif text-card-title-lg font-medium text-foreground">
           {item.title}
         </p>
         {item.location && (
@@ -261,7 +261,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
               <ArrowLeft size={20} />
             </Link>
             <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-              <span className="font-serif text-[20px] font-normal text-foreground">{venue.name}</span>
+              <span className="font-serif text-[20px] font-medium text-foreground">{venue.name}</span>
             </div>
             <div className="w-5 shrink-0" />
           </div>
@@ -285,7 +285,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
           <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
             <Link
               href={`/${slug}`}
-              className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
+              className="pointer-events-auto font-serif text-[20px] font-medium text-foreground no-underline"
             >
               {venue.name}
             </Link>

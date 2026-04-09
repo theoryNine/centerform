@@ -219,16 +219,22 @@ Key dark values: background `#1C1A17`, card `#252220`, foreground `#EDE8DE`, mut
 
 All design tokens live in `src/app/globals.css` as `--cf-*` CSS custom properties on `:root`. They are the single source of truth — change a value there and it propagates everywhere. Tokens cover typography, spacing, radius, and interactive states.
 
+**Font families:** `--cf-font-display: "Nunito Sans"` (display/headings, loaded via `--font-serif` CSS variable) and `--cf-font-body: "Source Sans 3"` (body, loaded via `--font-sans`). Use `font-serif` Tailwind class for display text, `font-sans` for body.
+
+**Font weight conventions for display (`font-serif`) text:**
+- Hero h1 (`text-hotel-name`, `text-page-title`): `font-semibold` (600)
+- Section headings, sticky header venue name, card titles: `font-medium` (500)
+- Nav card labels, timeline card titles, decorative/secondary display text: `font-normal` (400)
+
 Tokens are registered in the `@theme inline {}` block so Tailwind generates real utility classes from them:
 
 | Token group | CSS var example | Tailwind utility |
 |---|---|---|
 | Font size | `--cf-text-hotel-name: 30px` | `text-hotel-name` |
 | Font size | `--cf-text-body: 15px` | `text-body` |
-| Font size | `--cf-text-description: 13px` | `text-description` |
 | Font size | `--cf-text-label: 11px` | `text-label` |
 | Font size | `--cf-text-cta-button: 15px` | `text-cta-button` |
-| Font size | `--cf-text-card-title-lg: 22px` | `text-card-title-lg` |
+| Font size | `--cf-text-card-title-lg: 20px` | `text-card-title-lg` |
 | Spacing | `--cf-page-padding: 20px` | `px-page`, `-ml-page` |
 | Spacing | `--cf-section-gap: 40px` | `mb-section` |
 | Spacing | `--cf-card-padding: 20px` | `p-card` |

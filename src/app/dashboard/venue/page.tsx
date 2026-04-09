@@ -108,7 +108,7 @@ export default async function VenueSettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="font">Font Family</Label>
-              <Input id="font" defaultValue={theme?.font_family ?? "DM Sans"} />
+              <Input id="font" defaultValue={theme?.font_family ?? "Source Sans 3"} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="radius">Border Radius</Label>

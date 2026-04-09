@@ -37,7 +37,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-serif: "Nunito Sans", sans-serif;
 
   /* ── Design token → Tailwind mappings ─────────────────────── */
 
@@ -78,20 +78,20 @@
   /* ── Design tokens (source of truth) ──────────────────────── */
 
   /* Typography — font families */
-  --cf-font-display: "Cormorant Garamond", serif;
-  --cf-font-body: "DM Sans", sans-serif;
+  --cf-font-display: "Nunito Sans", sans-serif;
+  --cf-font-body: "Source Sans 3", sans-serif;
 
-  /* Typography — font sizes (display / Cormorant Garamond) */
+  /* Typography — font sizes (display / Nunito Sans) */
   --cf-text-hotel-name: 30px;        /* 28–32px  homepage hero name */
   --cf-text-page-title: 26px;        /* mini-hero page titles */
   --cf-text-section-heading: 24px;   /* numbered section headings */
-  --cf-text-card-title-lg: 22px;     /* 22–24px  venue names, card titles */
+  --cf-text-card-title-lg: 20px;     /* 22–24px  venue names, card titles */
   --cf-text-card-title-md: 19px;     /* 18–20px  card titles in lists, timeline stops */
   --cf-text-card-title-sm: 16px;     /* 16–17px  compact cards, photo-on-left titles */
   --cf-text-concierge-heading: 22px; /* "Or just ask.", "Something else?" */
   --cf-text-header-nav: 20px;        /* sticky header venue name */
 
-  /* Typography — font sizes (body / DM Sans) */
+  /* Typography — font sizes (body / Source Sans 3) */
   --cf-text-body: 15px;              /* concierge notes, body text */
   --cf-text-body-sm: 14px;           /* practical details, secondary text, card subtitles */
   --cf-text-label: 11px;             /* 11–12px  uppercase info labels */
@@ -232,7 +232,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans, "DM Sans", sans-serif);
+    font-family: var(--font-sans, "Source Sans 3", sans-serif);
   }
 }
 

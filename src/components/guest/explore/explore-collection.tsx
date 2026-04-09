@@ -68,7 +68,7 @@ function CollectionHeader({
 }) {
   return (
     <CornerBracketCard className="mb-5">
-      <h1 className="m-0 font-serif text-page-title font-normal leading-tight text-foreground">
+      <h1 className="m-0 font-serif text-page-title font-semibold leading-tight text-foreground">
         {title}
       </h1>
       {subtitle && (
@@ -182,7 +182,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
       {/* Content */}
       <div className="px-4 pb-4 pt-3">
         <Link href={`/${slug}/explore/place/${place.id}`} className="no-underline">
-          <h2 className="m-0 font-serif text-card-title-md font-normal leading-tight text-foreground">
+          <h2 className="m-0 font-serif text-card-title-md font-medium leading-tight text-foreground">
             {place.name}
           </h2>
         </Link>
@@ -255,7 +255,7 @@ function SomethingElse({
 }) {
   return (
     <div className="mt-10">
-      <h2 className="m-0 mb-1 text-center font-serif text-card-title-lg font-normal text-foreground">
+      <h2 className="m-0 mb-1 text-center font-serif text-card-title-lg font-medium text-foreground">
         Something else?
       </h2>
       <p className="m-0 mb-4 text-center text-body-sm text-muted-foreground">

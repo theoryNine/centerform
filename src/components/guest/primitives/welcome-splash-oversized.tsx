@@ -54,7 +54,7 @@ export function WelcomeSplashOversized({
       >
         <div className="flex flex-1 flex-col justify-center gap-5">
           <CornerBracketCard>
-            <h1 className="m-0 font-serif text-hotel-name font-normal leading-tight text-foreground">
+            <h1 className="m-0 font-serif text-hotel-name font-semibold leading-tight text-foreground">
               {name}
             </h1>
             {tagline && (

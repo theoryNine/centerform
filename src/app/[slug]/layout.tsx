@@ -48,7 +48,7 @@ const defaultTheme: ThemeColors = {
   accent_color: "#D4B483",
   background_color: "#F5F0E8",
   foreground_color: "#2D2A26",
-  font_family: "DM Sans",
+  font_family: "Source Sans 3",
   border_radius: "0.625rem",
   custom_css: null,
   color_scheme: "system",
