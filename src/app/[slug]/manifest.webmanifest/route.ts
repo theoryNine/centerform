@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
+import { resolveSlug } from "@/lib/slug-resolver";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+  const resolved = await resolveSlug(slug);
+  const name = resolved?.data.name ?? "Centerform";
 
   return NextResponse.json(
     {
-      name: "Centerform",
-      short_name: "Centerform",
+      name,
+      short_name: name,
       description: "Your digital concierge",
       start_url: `/${slug}`,
       scope: "/",
@@ -18,20 +21,14 @@ export async function GET(
       orientation: "portrait",
       icons: [
         {
-          src: "/icons/android-chrome-192x192.png",
-          sizes: "192x192",
+          src: "/icons/logo.png",
+          sizes: "1024x1024",
           type: "image/png",
           purpose: "any",
         },
         {
-          src: "/icons/android-chrome-512x512.png",
-          sizes: "512x512",
-          type: "image/png",
-          purpose: "any",
-        },
-        {
-          src: "/icons/android-chrome-512x512.png",
-          sizes: "512x512",
+          src: "/icons/logo.png",
+          sizes: "1024x1024",
           type: "image/png",
           purpose: "maskable",
         },
