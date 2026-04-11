@@ -52,6 +52,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${sourceSans.variable} ${nunitoSans.variable} antialiased`} suppressHydrationWarning>
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");`,
+          }}
+        />
       </body>
     </html>
   );

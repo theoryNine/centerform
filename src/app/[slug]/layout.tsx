@@ -1,8 +1,18 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { VenueThemeProvider } from "@/components/theme-provider";
 import { SlugProvider } from "@/components/slug-context";
 import { resolveSlug } from "@/lib/slug-resolver";
 import type { ColorScheme, ThemeColors } from "@/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return { manifest: `/${slug}/manifest.webmanifest` };
+}
 
 // Only structural/neutral tokens — venue brand colors (primary, accent) are intentionally
 // excluded so they remain exactly as configured in venue_themes.
