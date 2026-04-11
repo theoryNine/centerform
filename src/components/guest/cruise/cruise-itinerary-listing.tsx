@@ -69,7 +69,7 @@ export function CruiseItineraryListing({
               {item.title}
             </h1>
             {(item.time_label || item.location) && (
-              <p className="m-0 mt-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="m-0 mt-1.5 text-label font-semibold uppercase tracking-widest text-muted-foreground">
                 {[item.time_label, item.location].filter(Boolean).join(" · ")}
               </p>
             )}
