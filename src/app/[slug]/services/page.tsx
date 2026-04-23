@@ -1,5 +1,5 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getVenueServices, getVenuePageDescription } from "@/lib/queries";
+import { getVenueServices, getVenuePageDescription, getVenueInfoValues } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { VenueServicesPage } from "@/components/guest/venue/venue-services";
 
@@ -15,9 +15,10 @@ export default async function ServicesPage({
     notFound();
   }
 
-  const [services, pageDescription] = await Promise.all([
+  const [services, pageDescription, infoValues] = await Promise.all([
     getVenueServices(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "services"),
+    getVenueInfoValues(resolved.data.id, ["check_out_time", "front_desk_hours"]),
   ]);
 
   return (
@@ -26,6 +27,8 @@ export default async function ServicesPage({
       services={services}
       slug={slug}
       pageDescription={pageDescription}
+      checkoutTime={infoValues["check_out_time"] ?? null}
+      frontDeskHours={infoValues["front_desk_hours"] ?? null}
     />
   );
 }
