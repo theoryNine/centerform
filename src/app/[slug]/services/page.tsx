@@ -18,7 +18,7 @@ export default async function ServicesPage({
   const [services, pageDescription, infoValues] = await Promise.all([
     getVenueServices(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "services"),
-    getVenueInfoValues(resolved.data.id, ["checkout_time", "front_desk_hours"]),
+    getVenueInfoValues(resolved.data.id, ["check_out_time", "front_desk_hours"]),
   ]);
 
   return (
@@ -27,7 +27,7 @@ export default async function ServicesPage({
       services={services}
       slug={slug}
       pageDescription={pageDescription}
-      checkoutTime={infoValues["checkout_time"] ?? null}
+      checkoutTime={infoValues["check_out_time"] ?? null}
       frontDeskHours={infoValues["front_desk_hours"] ?? null}
     />
   );
