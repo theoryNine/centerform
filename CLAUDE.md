@@ -76,6 +76,8 @@ src/
 │       ├── venue/          # Hotel/resort venue pages
 │       │   ├── venue-home.tsx
 │       │   ├── venue-services.tsx
+│       │   ├── venue-dining.tsx
+│       │   ├── venue-events.tsx
 │       │   └── venue-explore.tsx
 │       ├── explore/        # Explore hub pages
 │       │   ├── area-listing.tsx
@@ -117,14 +119,14 @@ Core tables (migrations in `supabase/migrations/`):
 - **explore_collections** — curated editorial lists (e.g. "Date Night", "A Walk Through Ballard"). Two layout variants: `cards` (stacked image cards with CTA) and `timeline` (vertical dot-and-line itinerary). Each collection belongs to a venue and optionally maps to an `area`
 - **explore_collection_items** — ordered join table linking a collection to its `nearby_places`. Supports `time_label`, `is_start`, and `is_end` for the timeline variant
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
-- **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.)
+- **venue_info** — key-value hotel metadata (check-in time, cancellation policy, star rating, etc.). Two keys drive the services page header display: `check_out_time` (e.g. "11:00 AM") and `front_desk_hours` (e.g. "24 hours") — fetched via `getVenueInfoValues()` with hardcoded fallbacks if absent.
 - **cruise_restaurants** — dining venues on a cruise ship. `restaurant_type`: `sit_down` | `walk_up`. Extra fields: `hours` (text, newline-separated), `menu_links` (JSONB `{label, url}[]`). Linked from `cruise_itinerary_items` via optional `restaurant_id` FK.
 - **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry — it renders as a regular tappable card like all other items. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item directly to a restaurant detail page (bypasses the itinerary detail page entirely). Two text fields intentionally carry different content: `card_description` is the short subheader shown on the timeline card (line-clamped to 2 lines); `description` is the body text rendered on the individual item detail page (split on `\n\n` into paragraphs). Items with `restaurant_id` set only need `card_description` — their detail page is the restaurant page. See migration `027_itinerary_card_description.sql`.
 - **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
 - **cruise_nav_images** — optional hero images for the four nav tiles on the cruise homepage. One row per tile per venue: `nav_key` is one of `"ship-info"` | `"food-onboard"` | `"group-plan"` | `"the-crew"` (matching the route segment). Also has `sublabel` (text, optional) for secondary label text on the tile. Unique constraint on `(venue_id, nav_key)`. Fetched client-side on mount alongside `cruise_links`; passed as `imageUrl` to `NavCard`.
 - **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, `body`, and `expires_at` (timestamptz, nullable). The query fetches the most recent row where `effective_at <= NOW() AND (expires_at IS NULL OR expires_at > NOW())`. Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_cruise_daily_welcome.sql`.
-- **venue_page_descriptions** — optional flavor text shown at the top of L1 venue/cruise pages. Keyed by `(venue_id, page_slug)` where `page_slug` matches the route segment (e.g. `"food-onboard"`, `"ship-info"`, `"group-plan"`, `"the-crew"`). See migration `016_venue_page_descriptions.sql`.
+- **venue_page_descriptions** — optional flavor text shown at the top of L1 venue/cruise pages. Keyed by `(venue_id, page_slug)` where `page_slug` matches the route segment (e.g. `"services"`, `"dining"`, `"events"`, `"explore"`, `"food-onboard"`, `"ship-info"`, `"group-plan"`, `"the-crew"`). See migration `016_venue_page_descriptions.sql`.
 - **venue_nav_tiles** — sublabel text for nav tiles on standard venue homepages (hotel/resort/etc.). `nav_key` is one of `"services"` | `"dining"` | `"explore"`. Analogous to `cruise_nav_images` but for non-cruise venues. See migration `022_cruise_nav_sublabel.sql`.
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
 - **standalone_event_themes** — theming for standalone events
