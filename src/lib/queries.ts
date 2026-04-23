@@ -109,6 +109,23 @@ export async function getVenueInfoByCategory(venueId: string, category: string) 
   return data ?? [];
 }
 
+export async function getVenueInfoValues(
+  venueId: string,
+  keys: string[],
+): Promise<Record<string, string>> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("venue_info")
+    .select("key, value")
+    .eq("venue_id", venueId)
+    .in("key", keys);
+  const result: Record<string, string> = {};
+  data?.forEach((row) => {
+    if (row.key && row.value) result[row.key] = row.value;
+  });
+  return result;
+}
+
 export async function getAllVenueAmenities(venueId: string) {
   const supabase = await createClient();
   const { data } = await supabase

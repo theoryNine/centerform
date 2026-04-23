@@ -134,9 +134,18 @@ interface VenueServicesPageProps {
   services: Service[];
   slug: string;
   pageDescription?: string | null;
+  checkoutTime?: string | null;
+  frontDeskHours?: string | null;
 }
 
-export function VenueServicesPage({ venue, services, slug, pageDescription }: VenueServicesPageProps) {
+export function VenueServicesPage({
+  venue,
+  services,
+  slug,
+  pageDescription,
+  checkoutTime,
+  frontDeskHours,
+}: VenueServicesPageProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [activeSection, setActiveSection] = useState("room");
   const { showStickyNav, headerRef } = useStickyNav();
@@ -287,8 +296,8 @@ export function VenueServicesPage({ venue, services, slug, pageDescription }: Ve
             )}
           </div>
           <div className="text-right leading-relaxed">
-            <div>Front Desk: 7am–10pm</div>
-            <div className="font-semibold text-foreground">Check out by 11:00 AM</div>
+            <div>Front Desk: {frontDeskHours ?? "7am–10pm"}</div>
+            <div className="font-semibold text-foreground">Check out by {checkoutTime ?? "11:00 AM"}</div>
           </div>
         </div>
       </div>
