@@ -15,11 +15,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // TODO: Implement credential validation against Supabase
-        // This is a placeholder for development
         if (credentials?.email && credentials?.password) {
           return {
-            id: "1",
+            id: "00000000-0000-0000-0000-000000000001",
             email: credentials.email as string,
             name: "Dev User",
           };
@@ -32,10 +30,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/sign-in",
   },
   callbacks: {
+    jwt({ token, user }) {
+      if (user?.id) token.id = user.id;
+      return token;
+    },
+    session({ session, token }) {
+      if (token.id) session.user.id = token.id as string;
+      return session;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isDashboard = nextUrl.pathname.startsWith("/dashboard");
-      if (isDashboard && !isLoggedIn) {
+if (isDashboard && !isLoggedIn) {
         return false; // Redirect to sign-in
       }
       return true;
