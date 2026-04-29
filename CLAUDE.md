@@ -6,7 +6,7 @@ Digital concierge platform (PWA) for venues, standalone events, and cruise ships
 
 - **Framework**: Next.js 16 (App Router, React 19, TypeScript strict mode)
 - **Database**: Supabase (PostgreSQL, remote instance — no local Supabase)
-- **Auth**: NextAuth.js 5 beta (Google OAuth + Supabase)
+- **Auth**: NextAuth.js 5 beta (magic link via Resend + SupabaseAdapter)
 - **UI**: shadcn/ui (New York style) + Radix UI + Tailwind CSS 4
 - **Mobile**: Capacitor (iOS/Android)
 - **Package Manager**: pnpm
@@ -26,6 +26,12 @@ src/
 ├── app/                    # Next.js App Router pages
 │   ├── (auth)/             # Sign-in/sign-up routes
 │   ├── api/auth/           # NextAuth API handler
+│   ├── api/admin/invites/  # Internal POST endpoint: generate venue invite tokens (ADMIN_API_KEY gated)
+│   ├── invite/             # Invite-based onboarding flow
+│   │   ├── [token]/        # Landing page + email form (Server Component + Client form)
+│   │   ├── check-email/    # "Check your inbox" screen (pages.verifyRequest destination)
+│   │   ├── claim/          # Post-auth claim handler → inserts venue_members → /dashboard
+│   │   └── error/          # NextAuth error page (expired magic link, config errors)
 │   ├── dashboard/          # Protected admin routes — see Dashboard Architecture below
 │   │   ├── layout.tsx      # Auth guard, venue switcher, sidebar nav
 │   │   ├── page.tsx        # Overview: real counts (events, services, places, collections)
@@ -108,7 +114,8 @@ src/
 │       └── event/          # Standalone event pages
 │           └── event-home.tsx
 ├── lib/
-│   ├── auth.ts             # NextAuth config
+│   ├── auth.ts             # NextAuth config (Resend magic link + SupabaseAdapter + JWT strategy)
+│   ├── invites.ts          # getInviteByToken(), claimInvite() — all invite DB logic
 │   ├── dashboard.ts        # getActiveDashboardVenue(userId) — resolves active venue from cookie
 │   ├── queries.ts          # Supabase query functions (public + admin variants)
 │   ├── permissions.ts      # Dashboard auth: getVenueRole, requireVenueRole, getVenuesForUser
@@ -155,6 +162,8 @@ Core tables (migrations in `supabase/migrations/`):
 - **standalone_event_themes** — theming for standalone events
 - **standalone_event_members** — user roles for standalone events
 - **event_schedule_items** — schedule/agenda for standalone events
+- **venue_invites** — invite tokens for owner onboarding. Fields: `token` (unique random string), `venue_id`, `role` (default `owner`), `email_hint` (display only — not enforced), `claimed_by`/`claimed_at` (set on claim), `expires_at`. No RLS permissive policies — only accessible via service role. See migration `029_venue_invites.sql`.
+- **users / accounts / verification_tokens** — NextAuth adapter tables managed by `@auth/supabase-adapter`. Required for magic link verification token persistence. No app code reads these directly. See migration `028_nextauth_adapter_schema.sql`.
 
 Key patterns:
 - All tables use UUID primary keys and `updated_at` triggers
@@ -293,9 +302,31 @@ Before adding inline UI patterns to a guest component, check if a shared primiti
 
 ## Auth Configuration
 
-NextAuth 5 (beta.30) is configured in `src/lib/auth.ts`. A few non-obvious constraints:
+NextAuth 5 (beta.30) is configured in `src/lib/auth.ts`. Auth uses **email magic link via Resend** — no passwords, works with any email provider (Gmail, Outlook, work domains, etc.).
 
-**`session.user.id` requires explicit callbacks.** NextAuth 5 does NOT automatically copy `user.id` from the credentials `authorize` return value into `session.user.id`. Without the `jwt` + `session` callbacks below, `session.user.id` is always `undefined` — every dashboard page will redirect to sign-in even after a successful login.
+### Providers
+
+- **Resend** — production magic link provider. Sends a sign-in email via Resend's API. Configured with `RESEND_API_KEY` and `RESEND_FROM_EMAIL`.
+- **Credentials** — dev-only stub (guarded by `NODE_ENV === "development"`). Returns a hardcoded user for any email/password. Allows local development without a real email. **Never present in production.**
+
+### SupabaseAdapter
+
+`@auth/supabase-adapter` is wired into the NextAuth config. It uses the service role key to persist `verification_tokens` (required for magic link round-trips) and `users` to the Supabase DB. Combined with `strategy: "jwt"` so sessions stay client-side — no `sessions` table needed.
+
+### Invite flow
+
+New venue owners arrive via `/invite/[token]`. The flow:
+1. Customer enters email on the invite landing page
+2. Server Action calls `signIn("resend", { email, redirectTo: "/invite/claim?token=<token>" })`
+3. NextAuth signs the `redirectTo` URL into the verification token — the invite token travels in the URL through the email round-trip, no cookie needed, works cross-device
+4. Customer clicks magic link → NextAuth validates → redirects to `/invite/claim?token=<token>`
+5. `/invite/claim` calls `claimInvite(userId, token)` from `src/lib/invites.ts` → upserts `venue_members` → redirects to `/dashboard`
+
+Invite tokens are generated via `POST /api/admin/invites` (gated by `ADMIN_API_KEY`). See `src/lib/invites.ts` for `getInviteByToken` and `claimInvite`.
+
+### `session.user.id` requires explicit callbacks
+
+NextAuth 5 does NOT automatically copy `user.id` into `session.user.id`. Without the `jwt` + `session` callbacks, `session.user.id` is always `undefined`:
 
 ```ts
 callbacks: {
@@ -307,27 +338,24 @@ callbacks: {
     if (token.id) session.user.id = token.id as string;
     return session;
   },
-  authorized({ auth, request: { nextUrl } }) { /* middleware guard */ }
 }
 ```
 
-**`SessionProvider` is required in the root layout** for any `next-auth/react` client imports (e.g. `signIn` for Google OAuth). It lives in `src/components/session-provider.tsx` (a thin `"use client"` wrapper) and is added to `src/app/layout.tsx`.
+### Magic link / Server Action pattern
 
-**Sign-in form pattern.** The credentials sign-in uses `useActionState` (React 19) with `<form action={formAction}>` — not `onSubmit` + `startTransition`. This ensures Next.js properly handles the `NEXT_REDIRECT` thrown by `signIn` on success. The server action in `src/app/(auth)/sign-in/actions.ts` must re-throw all non-`AuthError` errors so the redirect propagates:
+Magic link sign-in uses `useActionState` (React 19) with `<form action={formAction}>`. The server action must re-throw non-`AuthError` errors so the `NEXT_REDIRECT` thrown by `signIn` propagates:
 
 ```ts
-export async function signInWithCredentials(_prev, formData): Promise<{ error: string } | null> {
+export async function signInWithMagicLink(_prev, formData): Promise<{ error: string } | null> {
   try {
-    await signIn("credentials", { email, password, redirectTo: "/dashboard" });
+    await signIn("resend", { email, redirectTo: "/dashboard" });
     return null;
   } catch (error) {
-    if (error instanceof AuthError) return { error: "Invalid credentials." };
+    if (error instanceof AuthError) return { error: "Failed to send magic link." };
     throw error; // Re-throw NEXT_REDIRECT — swallowing it breaks navigation
   }
 }
 ```
-
-**Credentials provider is a dev stub.** `authorize` in `auth.ts` returns a hardcoded user (`id: "00000000-0000-0000-0000-000000000001"`) for any email/password. Replace with real Supabase validation before production.
 
 ---
 
@@ -470,5 +498,8 @@ event-assets/
 Required in `.env.local` (see `.env.local.example`):
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` — server-only, never prefix with `NEXT_PUBLIC_`. Find in Supabase → Settings → API.
-- `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (optional)
+- `AUTH_SECRET` — NextAuth 5 uses `AUTH_SECRET` (not `NEXTAUTH_SECRET`). Generate: `openssl rand -base64 32`.
+- `AUTH_URL` — NextAuth 5 uses `AUTH_URL` (not `NEXTAUTH_URL`). Base URL of the app (`http://localhost:3000` in dev).
+- `RESEND_API_KEY` — from Resend dashboard → API Keys. Required for magic link emails.
+- `RESEND_FROM_EMAIL` — must be on a verified Resend domain, e.g. `noreply@centerform.co`.
+- `ADMIN_API_KEY` — guards `POST /api/admin/invites`. Generate: `openssl rand -base64 32`.
