@@ -20,10 +20,16 @@ export default async function DiningPage({
     getVenuePageDescription(resolved.data.id, "dining"),
   ]);
 
+  const diningPlaces = places.filter(
+    (p) =>
+      !p.collection_id &&
+      (p.category === "restaurant" || p.category === "bar" || p.category === "cafe"),
+  );
+
   return (
     <VenueDiningPage
       venue={resolved.data}
-      places={places}
+      places={diningPlaces}
       slug={slug}
       pageDescription={pageDescription}
     />
