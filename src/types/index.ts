@@ -385,3 +385,18 @@ export interface ThemeColors {
 export type SlugResolution =
   | { type: "venue"; data: VenueWithTheme }
   | { type: "event"; data: StandaloneEventWithTheme };
+
+// --- Venue Invites ---
+
+export interface VenueInvite {
+  id: string;
+  venue_id: string;
+  token: string;
+  role: MemberRole;
+  invited_by: string | null;
+  email_hint: string | null;
+  claimed_by: string | null;
+  claimed_at: string | null;
+  expires_at: string;
+  created_at: string;
+}

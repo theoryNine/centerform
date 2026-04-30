@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito_Sans, Source_Sans_3 } from "next/font/google";
+import { AuthSessionProvider } from "@/components/session-provider";
 import "./globals.css";
 
 const sourceSans = Source_Sans_3({
@@ -51,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${sourceSans.variable} ${nunitoSans.variable} antialiased`} suppressHydrationWarning>
-        {children}
+        <AuthSessionProvider>{children}</AuthSessionProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");`,

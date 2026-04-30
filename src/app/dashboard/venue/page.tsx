@@ -1,29 +1,36 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { getActiveDashboardVenue } from "@/lib/dashboard";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/server";
+import { updateVenueAction, updateVenueThemeAction } from "./actions";
 
 export default async function VenueSettingsPage() {
-  const supabase = await createClient();
+  const session = await auth();
+  if (!session?.user?.id) redirect("/sign-in");
 
-  // TODO: scope to the authenticated user's venue
-  const { data: venue } = await supabase
-    .from("venues")
-    .select("*, venue_themes(*)")
-    .limit(1)
-    .single();
+  const active = await getActiveDashboardVenue(session.user.id);
+  if (!active) redirect("/sign-in");
 
-  const theme = venue?.venue_themes;
+  const supabase = createAdminClient();
+  const { data: theme } = await supabase
+    .from("venue_themes")
+    .select("*")
+    .eq("venue_id", active.venue.id)
+    .maybeSingle();
+
+  const v = active.venue;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Venue Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your venue details and branding.
-        </p>
+        <p className="text-muted-foreground">Manage your venue details and branding.</p>
       </div>
 
       {/* General info */}
@@ -33,34 +40,72 @@ export default async function VenueSettingsPage() {
           <CardDescription>Basic details about your venue.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4 md:grid-cols-2">
+          <form action={updateVenueAction} className="grid gap-4 md:grid-cols-2">
+            <input type="hidden" name="venueId" value={v.id} />
             <div className="space-y-2">
               <Label htmlFor="name">Venue Name</Label>
-              <Input id="name" defaultValue={venue?.name ?? ""} />
+              <Input id="name" name="name" defaultValue={v.name} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="slug">URL Slug</Label>
-              <Input id="slug" defaultValue={venue?.slug ?? ""} />
+              <Label htmlFor="website">Website</Label>
+              <Input id="website" name="website" defaultValue={v.website ?? ""} placeholder="https://..." />
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="description">Description</Label>
-              <Input id="description" defaultValue={venue?.description ?? ""} />
+              <Textarea id="description" name="description" defaultValue={v.description ?? ""} rows={3} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Input id="address" defaultValue={venue?.address ?? ""} />
+              <Input id="address" name="address" defaultValue={v.address ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="city">City</Label>
-              <Input id="city" defaultValue={venue?.city ?? ""} />
+              <Input id="city" name="city" defaultValue={v.city ?? ""} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="state">State</Label>
+              <Input id="state" name="state" defaultValue={v.state ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" defaultValue={venue?.phone ?? ""} />
+              <Input id="phone" name="phone" defaultValue={v.phone ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" defaultValue={venue?.email ?? ""} />
+              <Input id="email" name="email" type="email" defaultValue={v.email ?? ""} />
+            </div>
+            <div className="md:col-span-2">
+              <Separator className="mb-4" />
+              <p className="mb-3 text-sm font-medium">Welcome Card</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="welcome_heading">Heading</Label>
+                  <Input
+                    id="welcome_heading"
+                    name="welcome_heading"
+                    defaultValue={v.welcome_heading ?? ""}
+                    placeholder="Welcome."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone_label">Phone Label</Label>
+                  <Input
+                    id="phone_label"
+                    name="phone_label"
+                    defaultValue={v.phone_label ?? ""}
+                    placeholder="Call the Front Desk"
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="welcome_body">Body Text</Label>
+                  <Textarea
+                    id="welcome_body"
+                    name="welcome_body"
+                    defaultValue={v.welcome_body ?? ""}
+                    rows={3}
+                  />
+                </div>
+              </div>
             </div>
             <div className="md:col-span-2">
               <Button type="submit">Save Changes</Button>
@@ -74,45 +119,67 @@ export default async function VenueSettingsPage() {
       {/* Branding / Theme */}
       <Card>
         <CardHeader>
-          <CardTitle>Branding & Theme</CardTitle>
-          <CardDescription>
-            Customize how your concierge looks for guests.
-          </CardDescription>
+          <CardTitle>Branding &amp; Theme</CardTitle>
+          <CardDescription>Customize how your concierge looks for guests.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4 md:grid-cols-3">
+          <form action={updateVenueThemeAction} className="grid gap-4 md:grid-cols-3">
+            <input type="hidden" name="venueId" value={v.id} />
             <div className="space-y-2">
-              <Label htmlFor="primary">Primary Color</Label>
+              <Label htmlFor="primary_color">Primary Color</Label>
               <div className="flex gap-2">
-                <Input id="primary" type="color" defaultValue={theme?.primary_color ?? "#1a1a2e"} className="h-10 w-14 p-1" />
-                <Input defaultValue={theme?.primary_color ?? "#1a1a2e"} className="flex-1" />
+                <Input
+                  id="primary_color"
+                  name="primary_color"
+                  type="color"
+                  defaultValue={theme?.primary_color ?? "#1a1a2e"}
+                  className="h-10 w-14 p-1"
+                />
+                <Input defaultValue={theme?.primary_color ?? "#1a1a2e"} readOnly className="flex-1 font-mono text-sm" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="secondary">Secondary Color</Label>
+              <Label htmlFor="secondary_color">Secondary Color</Label>
               <div className="flex gap-2">
-                <Input id="secondary" type="color" defaultValue={theme?.secondary_color ?? "#16213e"} className="h-10 w-14 p-1" />
-                <Input defaultValue={theme?.secondary_color ?? "#16213e"} className="flex-1" />
+                <Input
+                  id="secondary_color"
+                  name="secondary_color"
+                  type="color"
+                  defaultValue={theme?.secondary_color ?? "#16213e"}
+                  className="h-10 w-14 p-1"
+                />
+                <Input defaultValue={theme?.secondary_color ?? "#16213e"} readOnly className="flex-1 font-mono text-sm" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="accent">Accent Color</Label>
+              <Label htmlFor="accent_color">Accent Color</Label>
               <div className="flex gap-2">
-                <Input id="accent" type="color" defaultValue={theme?.accent_color ?? "#e94560"} className="h-10 w-14 p-1" />
-                <Input defaultValue={theme?.accent_color ?? "#e94560"} className="flex-1" />
+                <Input
+                  id="accent_color"
+                  name="accent_color"
+                  type="color"
+                  defaultValue={theme?.accent_color ?? "#e94560"}
+                  className="h-10 w-14 p-1"
+                />
+                <Input defaultValue={theme?.accent_color ?? "#e94560"} readOnly className="flex-1 font-mono text-sm" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="logo">Logo URL</Label>
-              <Input id="logo" defaultValue={venue?.logo_url ?? ""} placeholder="https://..." />
+              <Label htmlFor="font_family">Font Family</Label>
+              <Input
+                id="font_family"
+                name="font_family"
+                defaultValue={theme?.font_family ?? "Source Sans 3"}
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="font">Font Family</Label>
-              <Input id="font" defaultValue={theme?.font_family ?? "Source Sans 3"} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="radius">Border Radius</Label>
-              <Input id="radius" defaultValue={theme?.border_radius ?? "0.625rem"} />
+              <Label htmlFor="border_radius">Border Radius</Label>
+              <Input
+                id="border_radius"
+                name="border_radius"
+                defaultValue={theme?.border_radius ?? "0.625rem"}
+                placeholder="0.625rem"
+              />
             </div>
             <div className="md:col-span-3">
               <Button type="submit">Update Theme</Button>

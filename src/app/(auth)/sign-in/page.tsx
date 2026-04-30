@@ -1,48 +1,57 @@
+"use client";
+
+import { useActionState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { signInWithMagicLink, signInWithCredentials } from "./actions";
 
 export default function SignInPage() {
+  const [state, formAction, isPending] = useActionState(signInWithMagicLink, null);
+
+  // Dev-only credentials form — hidden in production via env check on the server.
+  const isDev = process.env.NODE_ENV === "development";
+  const [devState, devFormAction, isDevPending] = useActionState(signInWithCredentials, null);
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your Centerform account</CardDescription>
+          <CardDescription>
+            Enter your email and we&apos;ll send you a magic link to sign in.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form className="space-y-4">
+        <CardContent className="space-y-6">
+          <form action={formAction} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="you@example.com" />
+              <Input id="email" name="email" type="email" placeholder="you@example.com" required />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" />
-            </div>
-            <Button className="w-full" type="submit">
-              Sign In
+            {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
+            <Button className="w-full" type="submit" disabled={isPending}>
+              {isPending ? "Sending…" : "Send magic link"}
             </Button>
           </form>
 
-          <div className="my-6 flex items-center gap-4">
-            <Separator className="flex-1" />
-            <span className="text-xs text-muted-foreground">OR</span>
-            <Separator className="flex-1" />
-          </div>
-
-          <Button variant="outline" className="w-full">
-            Continue with Google
-          </Button>
-
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <a href="/sign-up" className="text-primary underline">
-              Sign up
-            </a>
-          </p>
+          {isDev && (
+            <details className="rounded border p-3 text-sm text-muted-foreground">
+              <summary className="cursor-pointer select-none font-medium">
+                Dev credentials (local only)
+              </summary>
+              <form action={devFormAction} className="mt-3 space-y-3">
+                <Input name="email" type="email" placeholder="any@email.com" required />
+                <Input name="password" type="password" placeholder="any password" required />
+                {devState?.error && (
+                  <p className="text-sm text-destructive">{devState.error}</p>
+                )}
+                <Button variant="outline" size="sm" type="submit" disabled={isDevPending}>
+                  {isDevPending ? "Signing in…" : "Sign in (dev)"}
+                </Button>
+              </form>
+            </details>
+          )}
         </CardContent>
       </Card>
     </div>

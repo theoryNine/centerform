@@ -2,10 +2,10 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getActiveDashboardVenue } from "@/lib/dashboard";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { EventsClient } from "./events-client";
-import type { VenueEvent } from "@/types";
+import { HotelInfoClient } from "./hotel-info-client";
+import type { VenueInfo } from "@/types";
 
-export default async function ManageEventsPage() {
+export default async function HotelInfoPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/sign-in");
 
@@ -14,10 +14,11 @@ export default async function ManageEventsPage() {
 
   const supabase = createAdminClient();
   const { data } = await supabase
-    .from("events")
+    .from("venue_info")
     .select("*")
     .eq("venue_id", active.venue.id)
-    .order("start_time", { ascending: true });
+    .order("category", { ascending: true })
+    .order("display_order", { ascending: true });
 
-  return <EventsClient events={(data as VenueEvent[]) ?? []} venueId={active.venue.id} />;
+  return <HotelInfoClient info={(data as VenueInfo[]) ?? []} venueId={active.venue.id} />;
 }
