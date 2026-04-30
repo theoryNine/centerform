@@ -27,6 +27,7 @@ src/
 │   ├── (auth)/             # Sign-in/sign-up routes
 │   ├── api/auth/           # NextAuth API handler
 │   ├── api/admin/invites/  # Internal POST endpoint: generate venue invite tokens (ADMIN_API_KEY gated)
+│   ├── api/go/             # Affiliate link redirect + click tracking (see Affiliate Links below)
 │   ├── invite/             # Invite-based onboarding flow
 │   │   ├── [token]/        # Landing page + email form (Server Component + Client form)
 │   │   ├── check-email/    # "Check your inbox" screen (pages.verifyRequest destination)
@@ -144,8 +145,9 @@ Core tables (migrations in `supabase/migrations/`):
 - **venue_themes** — per-venue color/font theming (1:1 with venues)
 - **venue_members** — links users to venues with roles (owner/admin/staff)
 - **services** — detailed venue service descriptions (WiFi instructions, housekeeping details, etc.)
-- **events** — venue-hosted events (wine hour, live jazz, etc.)
-- **nearby_places** — recommended spots near the venue. Dual-purpose: some rows are real places (restaurants, parks, etc.) that link to individual listing pages; others are gateway cards on the Explore page that link to a collection (when `collection_id` is set). Grouped by `area` for the Explore page. Extra detail fields: `tagline`, `hours`, `tips` (text[]), `cta_label`, `price_level` (0 = FREE), `collection_id`
+- **events** — venue-hosted events (wine hour, live jazz, etc.). Optional `booking_url` field — when set, event cards show a "Book Now" button that routes through `/api/go?event=<id>` for click tracking.
+- **nearby_places** — recommended spots near the venue. Dual-purpose: some rows are real places (restaurants, parks, etc.) that link to individual listing pages; others are gateway cards on the Explore page that link to a collection (when `collection_id` is set). Grouped by `area` for the Explore page. Extra detail fields: `tagline`, `hours`, `tips` (text[]), `cta_label`, `price_level` (0 = FREE), `collection_id`, `booking_url` (optional affiliate/booking link — routes through `/api/go?place=<id>` for click tracking; when set, `website` drops to a secondary "Visit Website" button)
+- **affiliate_clicks** — click log for affiliate/booking links. Fields: `entity_type` (`'place'` | `'event'`), `entity_id` (uuid), `venue_id`, `clicked_at`. Written fire-and-forget by `/api/go` via the admin client so it never blocks the redirect. Indexed on `(entity_type, entity_id)` and `(venue_id, clicked_at DESC)`. See migration `030_affiliate_links.sql`.
 - **explore_collections** — curated editorial lists (e.g. "Date Night", "A Walk Through Ballard"). Two layout variants: `cards` (stacked image cards with CTA) and `timeline` (vertical dot-and-line itinerary). Each collection belongs to a venue and optionally maps to an `area`
 - **explore_collection_items** — ordered join table linking a collection to its `nearby_places`. Supports `time_label`, `is_start`, and `is_end` for the timeline variant
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
@@ -215,6 +217,40 @@ Explore index         /:slug/explore
 - **Collection page** renders either `cards` layout (Date Night style) or `timeline` layout (Open Wander/itinerary style) based on `explore_collections.layout`.
 - **Place listing** shows full detail for an individual `nearby_place` — hero image, metadata sections (address, hours, price, phone), tips bullets, and venue footer. Back button uses `history.back()` to return to whichever page linked here.
 - **`nearby_places.collection_id`** is the key field that makes an explore card a gateway to a collection rather than an individual place listing.
+
+## Affiliate Links
+
+Optional booking/affiliate URLs on `nearby_places` and `events`. When a `booking_url` is set, guest-facing cards route clicks through `/api/go` before redirecting, logging each click to `affiliate_clicks`.
+
+### Flow
+
+```
+Guest taps CTA → /api/go?place=<id>  (or ?event=<id>)
+                → INSERT affiliate_clicks (fire-and-forget, admin client)
+                → 302 → booking_url
+```
+
+### Guest behavior
+
+- **Place listing** (`place-listing.tsx`): when `booking_url` is set, the primary CTA button (`cta_label` or category default) routes through `/api/go?place=<id>`. The place's `website` drops to a secondary "Visit Website" outline button below it. When no `booking_url`, behavior is unchanged — CTA links directly to `website` or Google Maps.
+- **Venue events** (`venue-events.tsx`): event cards show a "Book Now →" pill button when `booking_url` is set. No button when absent.
+
+### Dashboard
+
+Both `PlaceSheet` and `EventSheet` have a "Booking URL" field. Managed via `upsertPlaceAction` / `upsertVenueEventAction` — the field is nullable and optional.
+
+### Querying clicks
+
+```sql
+-- Clicks per place for a venue (last 30 days)
+SELECT entity_id, COUNT(*) AS clicks
+FROM affiliate_clicks
+WHERE venue_id = '<venue-id>'
+  AND entity_type = 'place'
+  AND clicked_at > now() - interval '30 days'
+GROUP BY entity_id
+ORDER BY clicks DESC;
+```
 
 ## Dark Mode
 
