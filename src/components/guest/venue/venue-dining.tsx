@@ -16,12 +16,18 @@ interface VenueDiningPageProps {
   pageDescription?: string | null;
 }
 
+function placeHref(slug: string, place: NearbyPlace): string {
+  return place.collection_id
+    ? `/${slug}/explore/${place.collection_id}`
+    : `/${slug}/explore/place/${place.id}`;
+}
+
 function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
   const press = usePressScale();
 
   return (
     <Link
-      href={`/${slug}/explore/place/${place.id}`}
+      href={placeHref(slug, place)}
       className="block no-underline transition-transform duration-[var(--cf-press-duration)]"
       {...press}
     >
@@ -47,9 +53,11 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="rounded-chip bg-secondary px-2.5 py-0.5 text-label font-medium capitalize text-muted-foreground">
-            {place.category}
-          </span>
+          {!place.collection_id && (
+            <span className="rounded-chip bg-secondary px-2.5 py-0.5 text-label font-medium capitalize text-muted-foreground">
+              {place.category}
+            </span>
+          )}
           {place.distance && (
             <span className="text-label text-muted-foreground">{place.distance}</span>
           )}
