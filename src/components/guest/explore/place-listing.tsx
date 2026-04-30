@@ -43,7 +43,8 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
 
   const priceLabel = place.price_level ? "$".repeat(place.price_level) : null;
   const ctaLabel = place.cta_label ?? getCTALabel(place.category);
-  const ctaHref = getCTAHref(place);
+  const ctaHref = place.booking_url ? `/api/go?place=${place.id}` : getCTAHref(place);
+  const websiteHref = place.booking_url ? getCTAHref(place) : null;
   const mapsHref = place.address
     ? `https://maps.google.com/maps?q=${encodeURIComponent(place.address)}`
     : null;
@@ -109,6 +110,16 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
               >
                 {ctaLabel} →
               </a>
+              {websiteHref && (
+                <a
+                  href={websiteHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center rounded-default border border-border px-4 py-3 text-body-sm font-medium text-foreground no-underline"
+                >
+                  Visit Website →
+                </a>
+              )}
             </div>
           )}
 

@@ -23,6 +23,7 @@ export async function upsertVenueEventAction(formData: FormData): Promise<void> 
     start_time: formData.get("start_time") as string,
     end_time: (formData.get("end_time") as string) || null,
     image_url: (formData.get("image_url") as string) || null,
+    booking_url: (formData.get("booking_url") as string) || null,
     is_featured: formData.get("is_featured") === "true",
     is_active: formData.get("is_active") === "true",
   };

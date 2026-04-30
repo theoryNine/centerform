@@ -87,6 +87,7 @@ export interface VenueEvent {
   start_time: string;
   end_time: string | null;
   image_url: string | null;
+  booking_url: string | null;
   is_featured: boolean;
   is_active: boolean;
   created_at: string;
@@ -114,6 +115,7 @@ export interface NearbyPlace {
   hours: string | null;
   tips: string[] | null;
   cta_label: string | null;
+  booking_url: string | null;
   collection_id: string | null;
   created_at: string;
   updated_at: string;

@@ -56,6 +56,7 @@ export async function upsertPlaceAction(formData: FormData): Promise<void> {
     tagline: (formData.get("tagline") as string) || null,
     hours: (formData.get("hours") as string) || null,
     cta_label: (formData.get("cta_label") as string) || null,
+    booking_url: (formData.get("booking_url") as string) || null,
     collection_id: (formData.get("collection_id") as string) || null,
     is_featured: formData.get("is_featured") === "true",
     display_order: displayOrder,
