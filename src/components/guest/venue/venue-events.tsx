@@ -146,6 +146,17 @@ export function VenueEventsPage({ venue, events, slug, pageDescription }: VenueE
                         {event.description}
                       </p>
                     )}
+
+                    {event.booking_url && (
+                      <a
+                        href={`/api/go?event=${event.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-1 rounded-default bg-primary px-3 py-1.5 text-label font-semibold text-primary-foreground no-underline"
+                      >
+                        Book Now →
+                      </a>
+                    )}
                   </div>
 
                   {event.image_url && (

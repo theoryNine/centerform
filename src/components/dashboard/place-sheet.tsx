@@ -246,6 +246,19 @@ export function PlaceSheet({ open, onOpenChange, place, venueId, collections }: 
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="pl-booking">Booking URL</Label>
+            <Input
+              id="pl-booking"
+              name="booking_url"
+              defaultValue={place?.booking_url ?? ""}
+              placeholder="https://resy.com/..."
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Affiliate or booking link — clicks are tracked via /api/go
+            </p>
+          </div>
+
           {collections.length > 0 && (
             <div className="space-y-2">
               <Label htmlFor="pl-collection">Link to Collection</Label>

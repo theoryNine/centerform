@@ -140,6 +140,19 @@ export function EventSheet({ open, onOpenChange, event, venueId }: EventSheetPro
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="evt-booking">Booking URL</Label>
+            <Input
+              id="evt-booking"
+              name="booking_url"
+              defaultValue={event?.booking_url ?? ""}
+              placeholder="https://eventbrite.com/..."
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Affiliate or ticketing link — clicks are tracked via /api/go
+            </p>
+          </div>
+
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <select
