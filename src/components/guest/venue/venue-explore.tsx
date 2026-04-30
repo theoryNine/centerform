@@ -160,7 +160,7 @@ function AreaSectionView({
           </span>
           <span className="text-[8px] text-primary">·</span>
           <h2 className="m-0 mb-2 font-serif text-card-title-md font-medium text-foreground">
-            {section.name.toLowerCase().startsWith("beyond") ? section.name : `In ${section.name}`}
+            {section.name}
           </h2>
         </div>
         <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
@@ -228,9 +228,7 @@ function AreaSectionView({
             href={areaHref}
             className="flex items-center gap-1 text-body-sm font-medium text-primary no-underline"
           >
-            {section.name.startsWith("Beyond")
-              ? `See more ${section.name.replace("Beyond", "beyond")}`
-              : `See more in ${section.name}`}
+            {`See more in ${section.name}`}
             <ArrowRight size={14} />
           </Link>
         </div>
@@ -273,7 +271,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription }: Venue
             style={{ background: "linear-gradient(135deg, #3A5A7C 0%, #2C4A6C 40%, #1E3A5C 100%)" }}
           />
         }
-        title={<>Explore<br />{cityName} & Beyond</>}
+        title={<>Explore<br />{cityName}</>}
         animated
         textAlign="left"
         className="min-h-[200px] pt-8"
