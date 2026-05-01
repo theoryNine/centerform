@@ -41,6 +41,7 @@ export interface VenueTheme {
   background_color: string;
   foreground_color: string;
   font_family: string | null;
+  heading_font_family: string | null;
   border_radius: string | null;
   custom_css: string | null;
   color_scheme: ColorScheme;
@@ -185,6 +186,7 @@ export interface StandaloneEventTheme {
   background_color: string;
   foreground_color: string;
   font_family: string | null;
+  heading_font_family: string | null;
   border_radius: string | null;
   custom_css: string | null;
   color_scheme: ColorScheme;
@@ -379,6 +381,7 @@ export interface ThemeColors {
   background_color: string;
   foreground_color: string;
   font_family: string | null;
+  heading_font_family: string | null;
   border_radius: string | null;
   custom_css: string | null;
   color_scheme: ColorScheme;

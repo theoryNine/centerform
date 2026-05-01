@@ -16,6 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { upsertPlaceAction, deletePlaceAction } from "@/app/dashboard/venue/places/actions";
 import type { ExploreCollection, NearbyPlace, PlaceCategory } from "@/types";
 
+const DINING_CATEGORIES: PlaceCategory[] = ["restaurant", "bar", "cafe"];
+
 const PLACE_CATEGORIES: { value: PlaceCategory; label: string }[] = [
   { value: "restaurant", label: "Restaurant" },
   { value: "bar", label: "Bar" },
@@ -41,6 +43,15 @@ export function PlaceSheet({ open, onOpenChange, place, venueId, collections }: 
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const isEdit = place !== null;
+  const [category, setCategory] = useState<PlaceCategory>(place?.category ?? "restaurant");
+  const isDining = DINING_CATEGORIES.includes(category);
+
+  // Reset category when sheet opens for a different place
+  const handleOpenChange = (v: boolean) => {
+    if (v) setCategory(place?.category ?? "restaurant");
+    onOpenChange(v);
+    if (!v) setConfirmDelete(false);
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -72,7 +83,7 @@ export function PlaceSheet({ open, onOpenChange, place, venueId, collections }: 
   }
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); setConfirmDelete(false); }}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>{isEdit ? "Edit Place" : "Add Place"}</SheetTitle>
@@ -93,7 +104,8 @@ export function PlaceSheet({ open, onOpenChange, place, venueId, collections }: 
             <select
               id="pl-category"
               name="category"
-              defaultValue={place?.category ?? "restaurant"}
+              value={category}
+              onChange={(e) => setCategory(e.target.value as PlaceCategory)}
               className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
             >
               {PLACE_CATEGORIES.map((c) => (
@@ -124,26 +136,28 @@ export function PlaceSheet({ open, onOpenChange, place, venueId, collections }: 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="pl-area">Area</Label>
-              <Input
-                id="pl-area"
-                name="area"
-                defaultValue={place?.area ?? ""}
-                placeholder="Capitol Hill"
-              />
+          {!isDining && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="pl-area">Area</Label>
+                <Input
+                  id="pl-area"
+                  name="area"
+                  defaultValue={place?.area ?? ""}
+                  placeholder="Capitol Hill"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="pl-area-order">Area Order</Label>
+                <Input
+                  id="pl-area-order"
+                  name="area_display_order"
+                  type="number"
+                  defaultValue={place?.area_display_order ?? 0}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="pl-area-order">Area Order</Label>
-              <Input
-                id="pl-area-order"
-                name="area_display_order"
-                type="number"
-                defaultValue={place?.area_display_order ?? 0}
-              />
-            </div>
-          </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="pl-address">Address</Label>

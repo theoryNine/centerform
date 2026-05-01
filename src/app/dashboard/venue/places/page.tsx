@@ -5,12 +5,19 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { PlacesClient } from "./places-client";
 import type { ExploreCollection, NearbyPlace } from "@/types";
 
-export default async function NearbyPlacesPage() {
+export default async function NearbyPlacesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>;
+}) {
   const session = await auth();
   if (!session?.user?.id) redirect("/sign-in");
 
   const active = await getActiveDashboardVenue(session.user.id);
   if (!active) redirect("/sign-in");
+
+  const { type } = await searchParams;
+  const viewType = type === "places" ? "places" : "dining";
 
   const supabase = createAdminClient();
   const [placesRes, collectionsRes] = await Promise.all([
@@ -32,6 +39,7 @@ export default async function NearbyPlacesPage() {
       places={(placesRes.data as NearbyPlace[]) ?? []}
       collections={(collectionsRes.data as ExploreCollection[]) ?? []}
       venueId={active.venue.id}
+      type={viewType}
     />
   );
 }

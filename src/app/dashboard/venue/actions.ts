@@ -49,6 +49,7 @@ export async function updateVenueThemeAction(formData: FormData): Promise<void> 
       secondary_color: formData.get("secondary_color") as string,
       accent_color: formData.get("accent_color") as string,
       font_family: (formData.get("font_family") as string) || null,
+      heading_font_family: (formData.get("heading_font_family") as string) || null,
       border_radius: (formData.get("border_radius") as string) || null,
     },
     { onConflict: "venue_id" }

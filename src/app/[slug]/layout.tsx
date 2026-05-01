@@ -59,6 +59,7 @@ const defaultTheme: ThemeColors = {
   background_color: "#F5F0E8",
   foreground_color: "#2D2A26",
   font_family: "Source Sans 3",
+  heading_font_family: "Nunito Sans",
   border_radius: "0.625rem",
   custom_css: null,
   color_scheme: "system",

@@ -69,14 +69,16 @@ src/
 ├── components/
 │   ├── ui/                 # shadcn/ui components (textarea.tsx added manually)
 │   ├── dashboard/          # Dashboard-only components
-│   │   ├── nav-link.tsx        # pathname-aware Link with active state styling
+│   │   ├── nav-link.tsx        # pathname-aware Link with active state; `exact` prop for exact-match only; `activeParam={{ key, value }}` prop for query-param-aware active state (used by Dining & Drinks / Nearby Places)
 │   │   ├── venue-switcher.tsx  # Multi-venue dropdown (hidden for single-venue users)
+│   │   ├── color-picker.tsx    # Themed color picker: Radix Popover + react-colorful HexColorPicker + hex text input
+│   │   ├── font-picker.tsx     # Font selector: dropdown + live preview; loads Google Fonts on demand; exports HEADING_FONTS and BODY_FONTS lists
 │   │   ├── service-sheet.tsx   # Sheet form for Service create/edit/delete
 │   │   ├── event-sheet.tsx     # Sheet form for VenueEvent create/edit/delete
-│   │   ├── place-sheet.tsx     # Sheet form for NearbyPlace create/edit/delete
+│   │   ├── place-sheet.tsx     # Sheet form for NearbyPlace create/edit/delete; Area field hidden for dining categories (restaurant/bar/cafe)
 │   │   ├── collection-sheet.tsx # Sheet form for ExploreCollection create/edit/delete
 │   │   ├── amenity-sheet.tsx   # Sheet form for VenueAmenity create/edit/delete
-│   │   └── info-sheet.tsx      # Sheet form for VenueInfo create/edit/delete
+│   │   └── info-sheet.tsx      # Sheet form for VenueInfo create/edit/delete; "Label" field stores the key (snake_case keys like check_out_time are formatted for display via formatKey())
 │   └── guest/              # Guest-facing components
 │       ├── primitives/     # Shared building blocks
 │       │   ├── accordion-item.tsx      # Animated expand/collapse row
@@ -142,7 +144,7 @@ src/
 Core tables (migrations in `supabase/migrations/`):
 
 - **venues** — venue profiles (name, slug, address, type, etc.). Also holds editable welcome card content: `welcome_heading` (nullable, e.g. "Welcome."), `welcome_body` (nullable), `phone_label` (nullable, e.g. "Call the Front Desk"). Components fall back to hardcoded defaults when null. See migration `013_welcome_card_content.sql`.
-- **venue_themes** — per-venue color/font theming (1:1 with venues)
+- **venue_themes** — per-venue color/font theming (1:1 with venues). Configurable fields: `primary_color`, `secondary_color`, `accent_color`, `font_family` (body font → `--font-sans`), `heading_font_family` (heading font → `--font-serif`, migration `031_heading_font_family.sql`), `border_radius`, `color_scheme`. Custom fonts are loaded client-side via injected Google Fonts `<link>` tags in `VenueThemeProvider`; built-in Next.js fonts (Nunito Sans, Source Sans 3) are always available without injection.
 - **venue_members** — links users to venues with roles (owner/admin/staff)
 - **services** — detailed venue service descriptions (WiFi instructions, housekeeping details, etc.)
 - **events** — venue-hosted events (wine hour, live jazz, etc.). Optional `booking_url` field — when set, event cards show a "Book Now" button that routes through `/api/go?event=<id>` for click tracking.
@@ -289,7 +291,7 @@ Key dark values: background `#1C1A17`, card `#252220`, foreground `#EDE8DE`, mut
 
 All design tokens live in `src/app/globals.css` as `--cf-*` CSS custom properties on `:root`. They are the single source of truth — change a value there and it propagates everywhere. Tokens cover typography, spacing, radius, and interactive states.
 
-**Font families:** `--cf-font-display: "Nunito Sans"` (display/headings, loaded via `--font-serif` CSS variable) and `--cf-font-body: "Source Sans 3"` (body, loaded via `--font-sans`). Use `font-serif` Tailwind class for display text, `font-sans` for body.
+**Font families:** `--cf-font-display: "Nunito Sans"` (display/headings, loaded via `--font-serif` CSS variable) and `--cf-font-body: "Source Sans 3"` (body, loaded via `--font-sans`). Use `font-serif` Tailwind class for display text, `font-sans` for body. Both fonts are **per-venue configurable** via `venue_themes.heading_font_family` (→ `--font-serif`) and `venue_themes.font_family` (→ `--font-sans`). Custom fonts are loaded client-side via Google Fonts; Nunito Sans and Source Sans 3 are pre-loaded by Next.js and need no injection. The `FontPicker` dashboard component (`src/components/dashboard/font-picker.tsx`) handles selection and live preview.
 
 **Font weight conventions for display (`font-serif`) text:**
 - Hero h1 (`text-hotel-name`, `text-page-title`): `font-semibold` (600)
@@ -412,16 +414,19 @@ Every dashboard page calls this once at the top. The `VenueSwitcher` component i
 ### Dashboard Routes
 
 ```
-/dashboard                              Overview (real counts: events, services, places, collections)
-/dashboard/venue                        Venue settings: general info + welcome card + theme
-/dashboard/venue/services               Services CRUD
-/dashboard/venue/events                 Venue events CRUD
-/dashboard/venue/places                 Nearby places CRUD (grouped by area)
-/dashboard/venue/explore                Explore collections list
-/dashboard/venue/explore/[collectionId] Collection detail + ordered items management
-/dashboard/venue/amenities              Amenity toggles + CRUD (grouped by category)
-/dashboard/venue/info                   Hotel info key-value pairs (grouped by category)
+/dashboard                                    Overview (real counts: events, services, places, collections)
+/dashboard/venue                              Hotel Info & Branding: general info + welcome card + theme
+/dashboard/venue/info                         Hotel Details: key-value metadata (check-in, policies, etc.)
+/dashboard/venue/amenities                    Amenity toggles + CRUD (grouped by category)
+/dashboard/venue/services                     Services CRUD
+/dashboard/venue/events                       Venue events CRUD
+/dashboard/venue/places?type=dining           Dining & Drinks: places with category restaurant/bar/cafe (flat list, no area grouping)
+/dashboard/venue/places?type=places           Nearby Places: all non-dining places (grouped by area)
+/dashboard/venue/explore                      Explore Collections list
+/dashboard/venue/explore/[collectionId]       Collection detail + ordered items management
 ```
+
+The nav is organized into two sections — **Hotel** (Hotel Info & Branding, Hotel Details, Amenities, Services, Events) and **Places** (Dining & Drinks, Nearby Places, Explore Collections). `NavLink` uses `activeParam={{ key: "type", value: "..." }}` to correctly highlight the Dining vs Places links independently despite sharing the same route path.
 
 The `/dashboard/events/*` standalone event routes still exist but are not linked from the nav. Cruise content has no dashboard coverage yet.
 
@@ -483,6 +488,7 @@ All list pages use a right-side shadcn `Sheet` (`side="right"`) for create/edit.
 - On action success: close sheet + `router.refresh()`
 - Delete confirmation: inline toggle in sheet footer (no separate Dialog)
 - Delete requires `"admin"` role minimum; upsert requires `"staff"`
+- One exception: Hotel Info & Branding (`/dashboard/venue`) stays as an inline full-page form (no Sheet)
 
 ## Conventions
 

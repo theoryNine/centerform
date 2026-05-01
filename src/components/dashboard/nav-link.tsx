@@ -1,18 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface NavLinkProps {
   href: string;
   children: React.ReactNode;
   exact?: boolean;
+  activeParam?: { key: string; value: string };
 }
 
-export function NavLink({ href, children, exact = false }: NavLinkProps) {
+export function NavLink({ href, children, exact = false, activeParam }: NavLinkProps) {
   const pathname = usePathname();
-  const isActive = exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
+  const searchParams = useSearchParams();
+
+  const hrefPath = href.split("?")[0];
+  const pathnameMatch = exact ? pathname === hrefPath : pathname === hrefPath || pathname.startsWith(hrefPath + "/");
+  const isActive = activeParam
+    ? pathnameMatch && searchParams.get(activeParam.key) === activeParam.value
+    : pathnameMatch;
 
   return (
     <Link

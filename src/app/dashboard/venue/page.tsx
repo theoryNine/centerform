@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { updateVenueAction, updateVenueThemeAction } from "./actions";
+import { ColorPicker } from "@/components/dashboard/color-picker";
+import { FontPicker } from "@/components/dashboard/font-picker";
 
 export default async function VenueSettingsPage() {
   const session = await auth();
@@ -29,7 +31,7 @@ export default async function VenueSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Venue Settings</h1>
+        <h1 className="text-2xl font-bold">Hotel Info & Branding</h1>
         <p className="text-muted-foreground">Manage your venue details and branding.</p>
       </div>
 
@@ -127,49 +129,44 @@ export default async function VenueSettingsPage() {
             <input type="hidden" name="venueId" value={v.id} />
             <div className="space-y-2">
               <Label htmlFor="primary_color">Primary Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="primary_color"
-                  name="primary_color"
-                  type="color"
-                  defaultValue={theme?.primary_color ?? "#1a1a2e"}
-                  className="h-10 w-14 p-1"
-                />
-                <Input defaultValue={theme?.primary_color ?? "#1a1a2e"} readOnly className="flex-1 font-mono text-sm" />
-              </div>
+              <ColorPicker
+                id="primary_color"
+                name="primary_color"
+                defaultValue={theme?.primary_color ?? "#1a1a2e"}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="secondary_color">Secondary Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="secondary_color"
-                  name="secondary_color"
-                  type="color"
-                  defaultValue={theme?.secondary_color ?? "#16213e"}
-                  className="h-10 w-14 p-1"
-                />
-                <Input defaultValue={theme?.secondary_color ?? "#16213e"} readOnly className="flex-1 font-mono text-sm" />
-              </div>
+              <ColorPicker
+                id="secondary_color"
+                name="secondary_color"
+                defaultValue={theme?.secondary_color ?? "#16213e"}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="accent_color">Accent Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="accent_color"
-                  name="accent_color"
-                  type="color"
-                  defaultValue={theme?.accent_color ?? "#e94560"}
-                  className="h-10 w-14 p-1"
-                />
-                <Input defaultValue={theme?.accent_color ?? "#e94560"} readOnly className="flex-1 font-mono text-sm" />
-              </div>
+              <ColorPicker
+                id="accent_color"
+                name="accent_color"
+                defaultValue={theme?.accent_color ?? "#e94560"}
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="font_family">Font Family</Label>
-              <Input
+              <Label htmlFor="heading_font_family">Heading Font</Label>
+              <FontPicker
+                id="heading_font_family"
+                name="heading_font_family"
+                defaultValue={theme?.heading_font_family ?? "Nunito Sans"}
+                variant="heading"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="font_family">Body Font</Label>
+              <FontPicker
                 id="font_family"
                 name="font_family"
                 defaultValue={theme?.font_family ?? "Source Sans 3"}
+                variant="body"
               />
             </div>
             <div className="space-y-2">

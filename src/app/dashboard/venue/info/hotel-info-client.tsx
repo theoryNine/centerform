@@ -48,7 +48,7 @@ export function HotelInfoClient({ info, venueId }: HotelInfoClientProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Hotel Info</h1>
+          <h1 className="text-2xl font-bold">Hotel Details</h1>
           <p className="text-muted-foreground">Key details displayed to guests (check-in, policies, etc.).</p>
         </div>
         <Button onClick={openCreate}>Add Info</Button>

@@ -69,12 +69,29 @@ export function VenueThemeProvider({ theme, darkMode, lightMode, children }: The
   // dark @media rule fires before any JS. For forced modes they are applied via the
   // inline <script> in layout.tsx (first paint) and via the style prop below (after
   // hydration), beating the CSS cascade without causing a flash.
+  useEffect(() => {
+    const builtIn = new Set(["Nunito Sans", "Source Sans 3"]);
+    const inject = (name: string, weights: string) => {
+      if (builtIn.has(name)) return;
+      const id = `gfont-${name.replace(/\s+/g, "-").toLowerCase()}`;
+      if (document.getElementById(id)) return;
+      const link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?family=${name.replace(/\s+/g, "+")}:wght@${weights}&display=swap`;
+      document.head.appendChild(link);
+    };
+    if (theme.font_family) inject(theme.font_family, "300;400;500;600;700");
+    if (theme.heading_font_family) inject(theme.heading_font_family, "300;400;500;600;700");
+  }, [theme.font_family, theme.heading_font_family]);
+
   const brandStyle = {
     "--primary": hexToOklch(theme.primary_color),
     "--secondary": hexToOklch(theme.secondary_color),
     "--accent": hexToOklch(theme.accent_color),
     "--radius": theme.border_radius ?? "0.625rem",
     "--font-sans": theme.font_family ?? "Source Sans 3",
+    "--font-serif": theme.heading_font_family ?? "Nunito Sans",
   } as React.CSSProperties;
 
   let style: React.CSSProperties;

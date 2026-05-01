@@ -49,11 +49,11 @@ export function MobileNav({ venues, activeVenueId }: MobileNavProps) {
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Hotel
               </p>
-              <NavLink href="/dashboard/venue" exact>Settings</NavLink>
+              <NavLink href="/dashboard/venue" exact>Hotel Info</NavLink>
+              <NavLink href="/dashboard/venue/info">Hotel Details</NavLink>
               <NavLink href="/dashboard/venue/amenities">Amenities</NavLink>
               <NavLink href="/dashboard/venue/services">Services</NavLink>
               <NavLink href="/dashboard/venue/events">Events</NavLink>
-              <NavLink href="/dashboard/venue/info">Hotel Info</NavLink>
             </div>
 
             <Separator />
@@ -62,7 +62,8 @@ export function MobileNav({ venues, activeVenueId }: MobileNavProps) {
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Places
               </p>
-              <NavLink href="/dashboard/venue/places">Nearby Places</NavLink>
+              <NavLink href="/dashboard/venue/places?type=dining" activeParam={{ key: "type", value: "dining" }}>Dining & Drinks</NavLink>
+              <NavLink href="/dashboard/venue/places?type=places" activeParam={{ key: "type", value: "places" }}>Nearby Places</NavLink>
               <NavLink href="/dashboard/venue/explore">Explore Collections</NavLink>
             </div>
           </nav>
