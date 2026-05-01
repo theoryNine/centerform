@@ -94,7 +94,7 @@ export function InfoSheet({ open, onOpenChange, info, venueId }: InfoSheetProps)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="info-key">Key</Label>
+            <Label htmlFor="info-key">Label</Label>
             <Input
               id="info-key"
               name="key"

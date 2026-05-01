@@ -47,23 +47,23 @@ export function MobileNav({ venues, activeVenueId }: MobileNavProps) {
 
             <div className="py-2">
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Content
+                Hotel
               </p>
-              <NavLink href="/dashboard/venue">Venue Settings</NavLink>
+              <NavLink href="/dashboard/venue" exact>Settings</NavLink>
+              <NavLink href="/dashboard/venue/amenities">Amenities</NavLink>
               <NavLink href="/dashboard/venue/services">Services</NavLink>
               <NavLink href="/dashboard/venue/events">Events</NavLink>
-              <NavLink href="/dashboard/venue/places">Nearby Places</NavLink>
-              <NavLink href="/dashboard/venue/explore">Explore Collections</NavLink>
+              <NavLink href="/dashboard/venue/info">Hotel Info</NavLink>
             </div>
 
             <Separator />
 
             <div className="py-2">
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Settings
+                Places
               </p>
-              <NavLink href="/dashboard/venue/amenities">Amenities</NavLink>
-              <NavLink href="/dashboard/venue/info">Hotel Info</NavLink>
+              <NavLink href="/dashboard/venue/places">Nearby Places</NavLink>
+              <NavLink href="/dashboard/venue/explore">Explore Collections</NavLink>
             </div>
           </nav>
         </SheetContent>

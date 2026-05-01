@@ -123,16 +123,6 @@ export function ServiceSheet({ open, onOpenChange, service, venueId }: ServiceSh
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="svc-icon">Icon</Label>
-            <Input
-              id="svc-icon"
-              name="icon"
-              defaultValue={service?.icon ?? ""}
-              placeholder="wifi"
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="svc-details">Details (JSON)</Label>
             <Textarea
               id="svc-details"

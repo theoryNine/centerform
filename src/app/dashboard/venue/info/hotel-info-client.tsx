@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { InfoSheet } from "@/components/dashboard/info-sheet";
 import type { InfoCategory, VenueInfo } from "@/types";
 
+function formatKey(key: string): string {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 const CATEGORY_LABELS: Record<InfoCategory, string> = {
   general: "General",
   policies: "Policies",
@@ -67,7 +73,7 @@ export function HotelInfoClient({ info, venueId }: HotelInfoClientProps) {
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between px-4 py-3">
                     <div>
-                      <p className="text-sm font-medium">{item.key}</p>
+                      <p className="text-sm font-medium">{formatKey(item.key)}</p>
                       <p className="text-xs text-muted-foreground">{item.value}</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => openEdit(item)}>

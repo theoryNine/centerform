@@ -128,16 +128,6 @@ export function AmenitySheet({ open, onOpenChange, amenity, venueId }: AmenitySh
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="am-icon">Icon</Label>
-            <Input
-              id="am-icon"
-              name="icon"
-              defaultValue={amenity?.icon ?? ""}
-              placeholder="wifi"
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label>Availability</Label>
             <select
               name="is_available"
