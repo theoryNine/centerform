@@ -391,6 +391,17 @@ export type SlugResolution =
   | { type: "venue"; data: VenueWithTheme }
   | { type: "event"; data: StandaloneEventWithTheme };
 
+// --- Venue Media ---
+
+export interface VenueMedia {
+  id: string;
+  venue_id: string;
+  url: string;
+  filename: string;
+  size: number | null;
+  created_at: string;
+}
+
 // --- Venue Invites ---
 
 export interface VenueInvite {

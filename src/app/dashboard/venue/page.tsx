@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { updateVenueAction, updateVenueThemeAction } from "./actions";
+import { updateVenueAction, updateVenueThemeAction, updatePageImagesAction } from "./actions";
 import { ColorPicker } from "@/components/dashboard/color-picker";
 import { FontPicker } from "@/components/dashboard/font-picker";
+import { ImageUpload } from "@/components/dashboard/image-upload";
 
 export default async function VenueSettingsPage() {
   const session = await auth();
@@ -20,11 +21,18 @@ export default async function VenueSettingsPage() {
   if (!active) redirect("/sign-in");
 
   const supabase = createAdminClient();
-  const { data: theme } = await supabase
-    .from("venue_themes")
-    .select("*")
-    .eq("venue_id", active.venue.id)
-    .maybeSingle();
+  const [{ data: theme }, { data: pageDescRows }] = await Promise.all([
+    supabase.from("venue_themes").select("*").eq("venue_id", active.venue.id).maybeSingle(),
+    supabase
+      .from("venue_page_descriptions")
+      .select("page_slug, image_url")
+      .eq("venue_id", active.venue.id)
+      .in("page_slug", ["services", "dining", "events", "explore"]),
+  ]);
+
+  const pageImages = Object.fromEntries(
+    (pageDescRows ?? []).map((r) => [r.page_slug, (r as { image_url: string | null }).image_url ?? null]),
+  ) as Record<string, string | null>;
 
   const v = active.venue;
 
@@ -76,6 +84,13 @@ export default async function VenueSettingsPage() {
               <Label htmlFor="email">Email</Label>
               <Input id="email" name="email" type="email" defaultValue={v.email ?? ""} />
             </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Cover Image</Label>
+              <p className="text-[11px] text-muted-foreground">
+                Used as the splash screen image and page hero for guests.
+              </p>
+              <ImageUpload name="cover_image_url" defaultValue={v.cover_image_url} venueId={v.id} />
+            </div>
             <div className="md:col-span-2">
               <Separator className="mb-4" />
               <p className="mb-3 text-sm font-medium">Welcome Card</p>
@@ -111,6 +126,42 @@ export default async function VenueSettingsPage() {
             </div>
             <div className="md:col-span-2">
               <Button type="submit">Save Changes</Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      {/* Page Images */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Page Images</CardTitle>
+          <CardDescription>
+            Hero image for each section page. Falls back to the Cover Image above when not set.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={updatePageImagesAction} className="grid gap-6 md:grid-cols-2">
+            <input type="hidden" name="venueId" value={v.id} />
+            <div className="space-y-2">
+              <Label>Services</Label>
+              <ImageUpload name="services" defaultValue={pageImages["services"]} venueId={v.id} />
+            </div>
+            <div className="space-y-2">
+              <Label>Dining &amp; Drinks</Label>
+              <ImageUpload name="dining" defaultValue={pageImages["dining"]} venueId={v.id} />
+            </div>
+            <div className="space-y-2">
+              <Label>Events</Label>
+              <ImageUpload name="events" defaultValue={pageImages["events"]} venueId={v.id} />
+            </div>
+            <div className="space-y-2">
+              <Label>Explore</Label>
+              <ImageUpload name="explore" defaultValue={pageImages["explore"]} venueId={v.id} />
+            </div>
+            <div className="md:col-span-2">
+              <Button type="submit">Save Page Images</Button>
             </div>
           </form>
         </CardContent>

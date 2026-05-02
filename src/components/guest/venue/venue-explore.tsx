@@ -242,9 +242,10 @@ interface VenueExplorePageProps {
   venue: VenueWithTheme;
   places: NearbyPlace[];
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
 }
 
-export function VenueExplorePage({ slug, venue, places, pageDescription }: VenueExplorePageProps) {
+export function VenueExplorePage({ slug, venue, places, pageDescription, heroImageUrl }: VenueExplorePageProps) {
   const venueName = venue.name;
   const cityName = venue.city ?? "the Area";
   const sections = groupByArea(places);
@@ -263,7 +264,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription }: Venue
 
       {/* Hero section with shaped image */}
       <PageHero
-        imageUrl={venue.cover_image_url}
+        imageUrl={heroImageUrl ?? venue.cover_image_url}
         imageAlt={venueName}
         fallbackNode={
           <div

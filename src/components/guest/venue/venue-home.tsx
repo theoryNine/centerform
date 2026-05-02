@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { WelcomeSplash } from "@/components/guest/primitives/welcome-splash";
@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { VenueEvent } from "@/types";
 import { Phone } from "lucide-react";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card";
@@ -62,6 +63,17 @@ export function VenueHomePage() {
   // Today's events
   const [todayEvents, setTodayEvents] = useState<VenueEvent[]>([]);
   const [navSublabels, setNavSublabels] = useState<Record<string, string>>({});
+  const [navImages, setNavImages] = useState<Record<string, string>>({});
+  const [navImagesReady, setNavImagesReady] = useState(false);
+  const navImageSettledRef = useRef(0);
+  const navImageTotalRef = useRef(0);
+
+  function handleNavImageSettle() {
+    navImageSettledRef.current += 1;
+    if (navImageSettledRef.current >= navImageTotalRef.current) {
+      setNavImagesReady(true);
+    }
+  }
 
   useEffect(() => {
     if (!venue?.id) return;
@@ -95,6 +107,21 @@ export function VenueHomePage() {
           setNavSublabels(map);
         }
       });
+
+    supabase
+      .from("venue_page_descriptions")
+      .select("page_slug, image_url")
+      .eq("venue_id", venue.id)
+      .in("page_slug", ["services", "dining", "explore"])
+      .then(({ data }) => {
+        const map: Record<string, string> = {};
+        data?.forEach((row) => {
+          if (row.image_url) map[row.page_slug] = row.image_url;
+        });
+        setNavImages(map);
+        navImageTotalRef.current = Object.keys(map).length;
+        if (navImageTotalRef.current === 0) setNavImagesReady(true);
+      });
   }, [venue?.id]);
 
   function handleSplashEnter() {
@@ -109,16 +136,22 @@ export function VenueHomePage() {
       label: "Your Room & Stay",
       sublabel: navSublabels["services"] ?? "Amenities, services, and requests",
       href: `/${slug}/services`,
+      imageUrl: navImages["services"],
+      onSettle: navImages["services"] ? handleNavImageSettle : undefined,
     },
     {
       label: "Dining",
       sublabel: navSublabels["dining"] ?? (venue?.name ? `At ${venue.name}` : "Restaurants and cafes"),
       href: `/${slug}/dining`,
+      imageUrl: navImages["dining"],
+      onSettle: navImages["dining"] ? handleNavImageSettle : undefined,
     },
     {
       label: `Explore ${cityName}`,
       sublabel: navSublabels["explore"] ?? "Let us show you around town",
       href: `/${slug}/explore`,
+      imageUrl: navImages["explore"],
+      onSettle: navImages["explore"] ? handleNavImageSettle : undefined,
     },
   ];
 
@@ -157,6 +190,8 @@ export function VenueHomePage() {
           />
         </div>
       )}
+
+      {!navImagesReady && <LoadingSpinner />}
 
       {/* Main scrollable page */}
       <div className="min-h-screen bg-background font-sans">

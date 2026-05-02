@@ -14,6 +14,7 @@ interface VenueDiningPageProps {
   places: NearbyPlace[];
   slug: string;
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
 }
 
 function placeHref(slug: string, place: NearbyPlace): string {
@@ -76,7 +77,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
   );
 }
 
-export function VenueDiningPage({ venue, places, slug, pageDescription }: VenueDiningPageProps) {
+export function VenueDiningPage({ venue, places, slug, pageDescription, heroImageUrl }: VenueDiningPageProps) {
   const { showStickyNav, headerRef } = useStickyNav();
   const venueName = venue.name;
 
@@ -118,7 +119,7 @@ export function VenueDiningPage({ venue, places, slug, pageDescription }: VenueD
         </div>
 
         <PageHero
-          imageUrl={venue.cover_image_url}
+          imageUrl={heroImageUrl ?? venue.cover_image_url}
           imageAlt={venueName}
           fallbackNode={
             <div

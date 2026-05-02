@@ -134,6 +134,7 @@ interface VenueServicesPageProps {
   services: Service[];
   slug: string;
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
   checkoutTime?: string | null;
   frontDeskHours?: string | null;
 }
@@ -143,6 +144,7 @@ export function VenueServicesPage({
   services,
   slug,
   pageDescription,
+  heroImageUrl,
   checkoutTime,
   frontDeskHours,
 }: VenueServicesPageProps) {
@@ -258,7 +260,7 @@ export function VenueServicesPage({
 
         {/* Hero: image + title */}
         <PageHero
-          imageUrl={venue.cover_image_url}
+          imageUrl={heroImageUrl ?? venue.cover_image_url}
           imageAlt={venueName}
           fallbackNode={
             <div

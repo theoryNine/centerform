@@ -16,10 +16,10 @@ export default async function ExplorePage({
   }
 
   const venue = resolved.data;
-  const [places, pageDescription] = await Promise.all([
+  const [places, { body: pageDescription, heroImageUrl }] = await Promise.all([
     getNearbyPlaces(venue.id),
     getVenuePageDescription(venue.id, "explore"),
   ]);
 
-  return <VenueExplorePage slug={slug} venue={venue} places={places} pageDescription={pageDescription} />;
+  return <VenueExplorePage slug={slug} venue={venue} places={places} pageDescription={pageDescription} heroImageUrl={heroImageUrl} />;
 }

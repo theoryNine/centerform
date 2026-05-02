@@ -15,7 +15,7 @@ export default async function ShipInfoPage({
     notFound();
   }
 
-  const [services, pageDescription, heroImageUrl] = await Promise.all([
+  const [services, { body: pageDescription }, heroImageUrl] = await Promise.all([
     getVenueServices(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "ship-info"),
     getCruiseNavImage(resolved.data.id, "ship-info"),

@@ -28,6 +28,7 @@ src/
 │   ├── api/auth/           # NextAuth API handler
 │   ├── api/admin/invites/  # Internal POST endpoint: generate venue invite tokens (ADMIN_API_KEY gated)
 │   ├── api/go/             # Affiliate link redirect + click tracking (see Affiliate Links below)
+│   ├── api/dashboard/upload/ # POST: authenticate + upload file → venue-assets bucket → insert venue_media row → return { url }
 │   ├── invite/             # Invite-based onboarding flow
 │   │   ├── [token]/        # Landing page + email form (Server Component + Client form)
 │   │   ├── check-email/    # "Check your inbox" screen (pages.verifyRequest destination)
@@ -39,14 +40,16 @@ src/
 │   │   ├── actions.ts      # switchVenueAction (cookie-based venue switcher)
 │   │   └── venue/
 │   │       ├── page.tsx                    # Venue settings (general info + theme)
-│   │       ├── actions.ts                  # updateVenueAction, updateVenueThemeAction
+│   │       ├── actions.ts                  # updateVenueAction, updateVenueThemeAction, updatePageImagesAction
 │   │       ├── services/                   # Services CRUD (Sheet)
 │   │       ├── events/                     # Venue events CRUD (Sheet)
 │   │       ├── places/                     # Nearby places CRUD (Sheet)
 │   │       ├── explore/                    # Collections list + detail
 │   │       │   └── [collectionId]/         # Collection items management
 │   │       ├── amenities/                  # Amenity toggles + CRUD (Sheet)
-│   │       └── info/                       # Hotel info key-value CRUD (Sheet)
+│   │       ├── info/                       # Hotel info key-value CRUD (Sheet)
+│   │       └── media/
+│   │           └── actions.ts              # listVenueMediaAction — returns VenueMedia[] for a venue (auth + role-gated)
 │   └── [slug]/             # Public venue/event pages
 │       ├── page.tsx        # Routes to VenueHomePage, CruiseHomePage, or EventHomePage by type
 │       ├── services/       # Venue: "Your Room & Stay" accordion
@@ -73,6 +76,7 @@ src/
 │   │   ├── venue-switcher.tsx  # Multi-venue dropdown (hidden for single-venue users)
 │   │   ├── color-picker.tsx    # Themed color picker: Radix Popover + react-colorful HexColorPicker + hex text input
 │   │   ├── font-picker.tsx     # Font selector: dropdown + live preview; loads Google Fonts on demand; exports HEADING_FONTS and BODY_FONTS lists
+│   │   ├── image-upload.tsx    # Image field for Sheet forms: upload-on-select (POST /api/dashboard/upload) + inline media library grid; outputs a hidden input with the selected URL; props: name, defaultValue, venueId
 │   │   ├── service-sheet.tsx   # Sheet form for Service create/edit/delete
 │   │   ├── event-sheet.tsx     # Sheet form for VenueEvent create/edit/delete
 │   │   ├── place-sheet.tsx     # Sheet form for NearbyPlace create/edit/delete; Area field hidden for dining categories (restaurant/bar/cafe)
@@ -160,12 +164,13 @@ Core tables (migrations in `supabase/migrations/`):
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
 - **cruise_nav_images** — optional hero images for the four nav tiles on the cruise homepage. One row per tile per venue: `nav_key` is one of `"ship-info"` | `"food-onboard"` | `"group-plan"` | `"the-crew"` (matching the route segment). Also has `sublabel` (text, optional) for secondary label text on the tile. Unique constraint on `(venue_id, nav_key)`. Fetched client-side on mount alongside `cruise_links`; passed as `imageUrl` to `NavCard`.
 - **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, `body`, and `expires_at` (timestamptz, nullable). The query fetches the most recent row where `effective_at <= NOW() AND (expires_at IS NULL OR expires_at > NOW())`. Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_cruise_daily_welcome.sql`.
-- **venue_page_descriptions** — optional flavor text shown at the top of L1 venue/cruise pages. Keyed by `(venue_id, page_slug)` where `page_slug` matches the route segment (e.g. `"services"`, `"dining"`, `"events"`, `"explore"`, `"food-onboard"`, `"ship-info"`, `"group-plan"`, `"the-crew"`). See migration `016_venue_page_descriptions.sql`.
+- **venue_page_descriptions** — optional flavor text and hero image shown at the top of L1 venue/cruise pages. Keyed by `(venue_id, page_slug)` where `page_slug` matches the route segment (e.g. `"services"`, `"dining"`, `"events"`, `"explore"`, `"food-onboard"`, `"ship-info"`, `"group-plan"`, `"the-crew"`). Fields: `body` (NOT NULL, empty string when a row is created for an image-only page), `image_url` (nullable — per-page hero image; guest pages fall back to `venues.cover_image_url` when null). Managed via `updatePageImagesAction` in `src/app/dashboard/venue/actions.ts`. Queried via `getVenuePageDescription(venueId, pageSlug)` in `queries.ts` which returns `{ body: string | null; heroImageUrl: string | null }`. See migrations `016_venue_page_descriptions.sql`, `033_page_hero_images.sql`.
 - **venue_nav_tiles** — sublabel text for nav tiles on standard venue homepages (hotel/resort/etc.). `nav_key` is one of `"services"` | `"dining"` | `"explore"`. Analogous to `cruise_nav_images` but for non-cruise venues. See migration `022_cruise_nav_sublabel.sql`.
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
 - **standalone_event_themes** — theming for standalone events
 - **standalone_event_members** — user roles for standalone events
 - **event_schedule_items** — schedule/agenda for standalone events
+- **venue_media** — media library for a venue. Each row tracks one uploaded image: `url` (public Supabase Storage URL), `filename`, `size`. All uploads go to `venue-assets/{slug}/media/{uuid}.{ext}` so they're isolated from entity-specific paths. Written by `POST /api/dashboard/upload`; queried by `listVenueMediaAction`. No RLS permissive policies — only accessible via service role (admin client). See migration `032_venue_media.sql`.
 - **venue_invites** — invite tokens for owner onboarding. Fields: `token` (unique random string), `venue_id`, `role` (default `owner`), `email_hint` (display only — not enforced), `claimed_by`/`claimed_at` (set on claim), `expires_at`. No RLS permissive policies — only accessible via service role. See migration `029_venue_invites.sql`.
 - **users / accounts / verification_tokens** — NextAuth adapter tables managed by `@auth/supabase-adapter`. Required for magic link verification token persistence. No app code reads these directly. See migration `028_nextauth_adapter_schema.sql`.
 
@@ -415,7 +420,7 @@ Every dashboard page calls this once at the top. The `VenueSwitcher` component i
 
 ```
 /dashboard                                    Overview (real counts: events, services, places, collections)
-/dashboard/venue                              Hotel Info & Branding: general info + welcome card + theme
+/dashboard/venue                              Hotel Info & Branding: general info (incl. cover image) + page images + welcome card + theme
 /dashboard/venue/info                         Hotel Details: key-value metadata (check-in, policies, etc.)
 /dashboard/venue/amenities                    Amenity toggles + CRUD (grouped by category)
 /dashboard/venue/services                     Services CRUD

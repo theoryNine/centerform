@@ -15,7 +15,7 @@ export default async function FoodOnboardPage({
     notFound();
   }
 
-  const [restaurants, pageDescription, heroImageUrl] = await Promise.all([
+  const [restaurants, { body: pageDescription }, heroImageUrl] = await Promise.all([
     getCruiseRestaurants(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "food-onboard"),
     getCruiseNavImage(resolved.data.id, "food-onboard"),

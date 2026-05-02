@@ -15,7 +15,7 @@ export default async function EventsPage({
     notFound();
   }
 
-  const [events, pageDescription] = await Promise.all([
+  const [events, { body: pageDescription, heroImageUrl }] = await Promise.all([
     getVenueEvents(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "events"),
   ]);
@@ -26,6 +26,7 @@ export default async function EventsPage({
       events={events}
       slug={slug}
       pageDescription={pageDescription}
+      heroImageUrl={heroImageUrl}
     />
   );
 }

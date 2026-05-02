@@ -15,7 +15,7 @@ export default async function GroupPlanPage({
     notFound();
   }
 
-  const [items, pageDescription, heroImageUrl] = await Promise.all([
+  const [items, { body: pageDescription }, heroImageUrl] = await Promise.all([
     getCruiseItineraryItems(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "group-plan"),
     getCruiseNavImage(resolved.data.id, "group-plan"),

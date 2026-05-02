@@ -44,6 +44,20 @@ export async function getNearbyPlaceById(placeId: string) {
   return data;
 }
 
+const DINING_CATEGORIES = '("restaurant","bar","cafe")';
+
+export async function getDiningPlaces(venueId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("nearby_places")
+    .select("*")
+    .eq("venue_id", venueId)
+    .in("category", ["restaurant", "bar", "cafe"])
+    .is("collection_id", null)
+    .order("display_order", { ascending: true });
+  return data ?? [];
+}
+
 export async function getNearbyPlacesByArea(venueId: string, area: string) {
   const supabase = await createClient();
   const { data } = await supabase
@@ -51,6 +65,7 @@ export async function getNearbyPlacesByArea(venueId: string, area: string) {
     .select("*")
     .eq("venue_id", venueId)
     .eq("area", area)
+    .not("category", "in", DINING_CATEGORIES)
     .order("display_order", { ascending: true });
   return data ?? [];
 }
@@ -61,6 +76,7 @@ export async function getNearbyPlaces(venueId: string) {
     .from("nearby_places")
     .select("*")
     .eq("venue_id", venueId)
+    .not("category", "in", DINING_CATEGORIES)
     .order("display_order", { ascending: true });
   return data ?? [];
 }
@@ -299,15 +315,15 @@ export async function getCruiseItineraryItemById(
 export async function getVenuePageDescription(
   venueId: string,
   pageSlug: string,
-): Promise<string | null> {
+): Promise<{ body: string | null; heroImageUrl: string | null }> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("venue_page_descriptions")
-    .select("body")
+    .select("body, image_url")
     .eq("venue_id", venueId)
     .eq("page_slug", pageSlug)
     .single();
-  return data?.body ?? null;
+  return { body: data?.body ?? null, heroImageUrl: data?.image_url ?? null };
 }
 
 export async function getCruiseDailyWelcome(
