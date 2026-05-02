@@ -2,7 +2,8 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { listVenueMediaAction } from "@/app/dashboard/venue/media/actions";
+import { Trash2 } from "lucide-react";
+import { listVenueMediaAction, deleteVenueMediaAction } from "@/app/dashboard/venue/media/actions";
 import type { VenueMedia } from "@/types";
 
 interface ImageUploadProps {
@@ -53,6 +54,12 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
   function handleSelect(url: string) {
     setValue(url);
     setShowLibrary(false);
+  }
+
+  async function handleDeleteMedia(mediaId: string, url: string) {
+    setMedia((prev) => prev.filter((m) => m.id !== mediaId));
+    if (value === url) setValue("");
+    await deleteVenueMediaAction(mediaId, venueId).catch(() => {});
   }
 
   return (
@@ -117,17 +124,28 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
           ) : (
             <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
               {media.map((item) => (
-                <button
+                <div
                   key={item.id}
-                  type="button"
-                  onClick={() => handleSelect(item.url)}
-                  className={`aspect-square rounded-default overflow-hidden border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  className={`group relative aspect-square rounded-default overflow-hidden border-2 transition-colors ${
                     value === item.url ? "border-primary" : "border-transparent hover:border-border"
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.url} alt={item.filename} className="w-full h-full object-cover" />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSelect(item.url)}
+                    className="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.url} alt={item.filename} className="w-full h-full object-cover" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteMedia(item.id, item.url); }}
+                    className="absolute right-1 top-1 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 bg-black/60 text-white hover:bg-red-600"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
               ))}
             </div>
           )}
