@@ -24,6 +24,7 @@ export async function updateVenueAction(formData: FormData): Promise<void> {
       phone: (formData.get("phone") as string) || null,
       email: (formData.get("email") as string) || null,
       website: (formData.get("website") as string) || null,
+      cover_image_url: (formData.get("cover_image_url") as string) || null,
       welcome_heading: (formData.get("welcome_heading") as string) || null,
       welcome_body: (formData.get("welcome_body") as string) || null,
       phone_label: (formData.get("phone_label") as string) || null,
@@ -31,6 +32,44 @@ export async function updateVenueAction(formData: FormData): Promise<void> {
     .eq("id", venueId);
 
   if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/venue");
+}
+
+const PAGE_SLUGS = ["services", "dining", "events", "explore"] as const;
+
+export async function updatePageImagesAction(formData: FormData): Promise<void> {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const venueId = formData.get("venueId") as string;
+  await requireVenueRole(session.user.id, venueId, "staff");
+
+  const supabase = createAdminClient();
+
+  await Promise.all(
+    PAGE_SLUGS.map(async (slug) => {
+      const url = (formData.get(slug) as string) || null;
+
+      const { data: existing } = await supabase
+        .from("venue_page_descriptions")
+        .select("id")
+        .eq("venue_id", venueId)
+        .eq("page_slug", slug)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from("venue_page_descriptions")
+          .update({ image_url: url })
+          .eq("id", existing.id);
+      } else if (url) {
+        await supabase
+          .from("venue_page_descriptions")
+          .insert({ venue_id: venueId, page_slug: slug, body: "", image_url: url });
+      }
+    }),
+  );
+
   revalidatePath("/dashboard/venue");
 }
 

@@ -32,9 +32,10 @@ interface VenueEventsPageProps {
   events: VenueEvent[];
   slug: string;
   pageDescription?: string | null;
+  heroImageUrl?: string | null;
 }
 
-export function VenueEventsPage({ venue, events, slug, pageDescription }: VenueEventsPageProps) {
+export function VenueEventsPage({ venue, events, slug, pageDescription, heroImageUrl }: VenueEventsPageProps) {
   const { showStickyNav, headerRef } = useStickyNav();
   const venueName = venue.name;
 
@@ -76,7 +77,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription }: VenueE
         </div>
 
         <PageHero
-          imageUrl={venue.cover_image_url}
+          imageUrl={heroImageUrl ?? venue.cover_image_url}
           imageAlt={venueName}
           fallbackNode={
             <div

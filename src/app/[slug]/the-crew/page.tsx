@@ -15,7 +15,7 @@ export default async function TheCrewPage({
     notFound();
   }
 
-  const [pageDescription, heroImageUrl] = await Promise.all([
+  const [{ body: pageDescription }, heroImageUrl] = await Promise.all([
     getVenuePageDescription(resolved.data.id, "the-crew"),
     getCruiseNavImage(resolved.data.id, "the-crew"),
   ]);

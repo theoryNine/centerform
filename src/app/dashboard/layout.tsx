@@ -68,6 +68,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <NavLink href="/dashboard/venue/places?type=places" activeParam={{ key: "type", value: "places" }}>Nearby Places</NavLink>
             <NavLink href="/dashboard/venue/explore">Explore Collections</NavLink>
           </div>
+
+          <Separator />
+
+          <div className="py-2">
+            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Media
+            </p>
+            <NavLink href="/dashboard/venue/media">Images</NavLink>
+          </div>
         </nav>
 
         <div className="border-t p-4">

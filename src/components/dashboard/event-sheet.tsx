@@ -17,6 +17,7 @@ import {
   upsertVenueEventAction,
   deleteVenueEventAction,
 } from "@/app/dashboard/venue/events/actions";
+import { ImageUpload } from "@/components/dashboard/image-upload";
 import type { VenueEvent } from "@/types";
 
 interface EventSheetProps {
@@ -131,13 +132,8 @@ export function EventSheet({ open, onOpenChange, event, venueId }: EventSheetPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="evt-image">Image URL</Label>
-            <Input
-              id="evt-image"
-              name="image_url"
-              defaultValue={event?.image_url ?? ""}
-              placeholder="https://..."
-            />
+            <Label>Image</Label>
+            <ImageUpload name="image_url" defaultValue={event?.image_url} venueId={venueId} />
           </div>
 
           <div className="space-y-2">

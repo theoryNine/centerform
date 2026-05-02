@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { upsertPlaceAction, deletePlaceAction } from "@/app/dashboard/venue/places/actions";
+import { ImageUpload } from "@/components/dashboard/image-upload";
 import type { ExploreCollection, NearbyPlace, PlaceCategory } from "@/types";
 
 const DINING_CATEGORIES: PlaceCategory[] = ["restaurant", "bar", "cafe"];
@@ -219,13 +220,8 @@ export function PlaceSheet({ open, onOpenChange, place, venueId, collections }: 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="pl-image">Image URL</Label>
-            <Input
-              id="pl-image"
-              name="image_url"
-              defaultValue={place?.image_url ?? ""}
-              placeholder="https://..."
-            />
+            <Label>Image</Label>
+            <ImageUpload name="image_url" defaultValue={place?.image_url} venueId={venueId} />
           </div>
 
           <div className="space-y-2">

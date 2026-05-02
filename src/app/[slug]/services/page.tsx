@@ -15,7 +15,7 @@ export default async function ServicesPage({
     notFound();
   }
 
-  const [services, pageDescription, infoValues] = await Promise.all([
+  const [services, { body: pageDescription, heroImageUrl }, infoValues] = await Promise.all([
     getVenueServices(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "services"),
     getVenueInfoValues(resolved.data.id, ["check_out_time", "front_desk_hours"]),
@@ -27,6 +27,7 @@ export default async function ServicesPage({
       services={services}
       slug={slug}
       pageDescription={pageDescription}
+      heroImageUrl={heroImageUrl}
       checkoutTime={infoValues["check_out_time"] ?? null}
       frontDeskHours={infoValues["front_desk_hours"] ?? null}
     />

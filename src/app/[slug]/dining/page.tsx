@@ -1,5 +1,5 @@
 import { resolveSlug } from "@/lib/slug-resolver";
-import { getNearbyPlaces, getVenuePageDescription } from "@/lib/queries";
+import { getDiningPlaces, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { VenueDiningPage } from "@/components/guest/venue/venue-dining";
 
@@ -15,23 +15,18 @@ export default async function DiningPage({
     notFound();
   }
 
-  const [places, pageDescription] = await Promise.all([
-    getNearbyPlaces(resolved.data.id),
+  const [places, { body: pageDescription, heroImageUrl }] = await Promise.all([
+    getDiningPlaces(resolved.data.id),
     getVenuePageDescription(resolved.data.id, "dining"),
   ]);
-
-  const diningPlaces = places.filter(
-    (p) =>
-      !p.collection_id &&
-      (p.category === "restaurant" || p.category === "bar" || p.category === "cafe"),
-  );
 
   return (
     <VenueDiningPage
       venue={resolved.data}
-      places={diningPlaces}
+      places={places}
       slug={slug}
       pageDescription={pageDescription}
+      heroImageUrl={heroImageUrl}
     />
   );
 }
