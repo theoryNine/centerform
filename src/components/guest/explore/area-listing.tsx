@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
+import { NavCard } from "@/components/guest/primitives/nav-card";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 function placeHref(slug: string, place: NearbyPlace): string {
@@ -44,37 +43,13 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
         {/* Full place list */}
         <div className="flex flex-col gap-card-gap">
           {places.map((place) => (
-            <Link
+            <NavCard
               key={place.id}
+              label={place.name}
+              sublabel={place.description ?? ""}
               href={placeHref(slug, place)}
-              className="card-shadow flex items-center gap-4 overflow-hidden rounded-default bg-card no-underline"
-            >
-              <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
-                {place.image_url ? (
-                  <img
-                    src={place.image_url}
-                    alt={place.name}
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className="size-full"
-                    style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)" }}
-                  />
-                )}
-              </div>
-              <div className="min-w-0 flex-1 py-3 pr-1">
-                <p className="m-0 text-body-sm font-semibold leading-tight text-foreground">
-                  {place.name}
-                </p>
-                {place.description && (
-                  <p className="m-0 mt-1 text-[12px] leading-snug text-muted-foreground line-clamp-2">
-                    {place.description}
-                  </p>
-                )}
-              </div>
-              <ArrowRight size={16} className="mr-4 shrink-0 text-primary" />
-            </Link>
+              imageUrl={place.image_url ?? undefined}
+            />
           ))}
         </div>
 

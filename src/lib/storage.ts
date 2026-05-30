@@ -6,14 +6,15 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function uploadVenueAsset(
   venueSlug: string,
   path: string,
-  file: File
+  file: File | Buffer,
+  contentType?: string
 ): Promise<string> {
   const supabase = createAdminClient();
   const fullPath = `${venueSlug}/${path}`;
 
   const { error } = await supabase.storage
     .from("venue-assets")
-    .upload(fullPath, file, { upsert: true });
+    .upload(fullPath, file, { upsert: true, contentType });
 
   if (error) throw new Error(`Upload failed: ${error.message}`);
 
@@ -25,14 +26,15 @@ export async function uploadVenueAsset(
 export async function uploadEventAsset(
   eventSlug: string,
   path: string,
-  file: File
+  file: File | Buffer,
+  contentType?: string
 ): Promise<string> {
   const supabase = createAdminClient();
   const fullPath = `${eventSlug}/${path}`;
 
   const { error } = await supabase.storage
     .from("event-assets")
-    .upload(fullPath, file, { upsert: true });
+    .upload(fullPath, file, { upsert: true, contentType });
 
   if (error) throw new Error(`Upload failed: ${error.message}`);
 

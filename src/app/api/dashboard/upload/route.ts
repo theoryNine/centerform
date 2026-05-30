@@ -1,8 +1,11 @@
+import sharp from "sharp";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { uploadVenueAsset } from "@/lib/storage";
+
+const SKIP_CONVERSION = new Set(["svg", "gif"]);
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -36,11 +39,29 @@ export async function POST(req: NextRequest) {
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const uniqueId = crypto.randomUUID();
-  const path = `media/${uniqueId}.${ext}`;
+
+  const inputBuffer = Buffer.from(await file.arrayBuffer());
+  const convertToWebP = !SKIP_CONVERSION.has(ext);
+
+  let uploadBuffer: Buffer;
+  let outputExt: string;
+  let contentType: string;
+
+  if (convertToWebP) {
+    uploadBuffer = await sharp(inputBuffer).webp({ quality: 85 }).toBuffer();
+    outputExt = "webp";
+    contentType = "image/webp";
+  } else {
+    uploadBuffer = inputBuffer;
+    outputExt = ext;
+    contentType = file.type || `image/${ext}`;
+  }
+
+  const path = `media/${uniqueId}.${outputExt}`;
 
   let url: string;
   try {
-    url = await uploadVenueAsset(venue.slug, path, file);
+    url = await uploadVenueAsset(venue.slug, path, uploadBuffer, contentType);
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
@@ -48,8 +69,8 @@ export async function POST(req: NextRequest) {
   await supabase.from("venue_media").insert({
     venue_id: venueId,
     url,
-    filename: file.name,
-    size: file.size,
+    filename: file.name.replace(/\.[^.]+$/, `.${outputExt}`),
+    size: uploadBuffer.byteLength,
   });
 
   return NextResponse.json({ url });
