@@ -1,6 +1,10 @@
 "use client";
 
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import {
+  useWindowScroll,
+  ScrollRevealStickyHeader,
+  FloatingBackButton,
+} from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
@@ -38,7 +42,7 @@ interface PlaceListingProps {
 }
 
 export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
-  const { scrolled, sentinelRef } = useStickyScroll();
+  const scrolled = useWindowScroll();
   const { loaded, imgRef, settle } = useImageLoaded(place.image_url);
 
   const priceLabel = place.price_level ? "$".repeat(place.price_level) : null;
@@ -49,53 +53,67 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
     ? `https://maps.google.com/maps?q=${encodeURIComponent(place.address)}`
     : null;
 
+  const metaParts = [place.tagline, priceLabel].filter(Boolean);
+  const hasMetadata = !!(place.address || place.hours || priceLabel || place.phone);
+
   return (
     <div className="min-h-screen bg-background font-sans">
       {!loaded && <LoadingSpinner />}
-      <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
+      <ScrollRevealStickyHeader
         venueName={venue.name}
         scrolled={scrolled}
         onBack={() => history.back()}
         nameHref={`/${slug}`}
       />
+      <FloatingBackButton scrolled={scrolled} onBack={() => history.back()} />
 
-      {/* Hero image */}
-      {place.image_url ? (
-        <div className="aspect-[4/3] w-full overflow-hidden">
-          <img
-            ref={imgRef}
-            src={place.image_url}
-            alt={place.name}
-            className="size-full object-cover"
-            onLoad={settle}
-            onError={settle}
+      {/* Hero + floating name card */}
+      <div className="relative">
+        {place.image_url ? (
+          <div className="aspect-[4/3] w-full overflow-hidden">
+            <img
+              ref={imgRef}
+              src={place.image_url}
+              alt={place.name}
+              className="size-full object-cover"
+              onLoad={settle}
+              onError={settle}
+            />
+          </div>
+        ) : (
+          <div
+            className="h-[240px] w-full"
+            style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A89878 100%)" }}
           />
+        )}
+
+        {/* Name card — 50% overlaps the bottom of the hero */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 translate-y-1/2 px-page">
+          <div className="rounded-default bg-card px-card py-5 text-center shadow-md">
+            <h1 className="m-0 font-serif text-hotel-name font-semibold leading-tight text-foreground">
+              {place.name}
+            </h1>
+            {metaParts.length > 0 && (
+              <p className="m-0 mt-1.5 text-label font-semibold uppercase tracking-widest text-muted-foreground">
+                {metaParts.join(" · ")}
+              </p>
+            )}
+          </div>
         </div>
-      ) : (
-        <div
-          className="h-[120px] w-full"
-          style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A89878 100%)" }}
-        />
-      )}
+      </div>
 
-      {/* Content — slides up slightly over image when image present */}
-      <div
-        className={`relative z-10 bg-background ${place.image_url ? "-mt-6 rounded-t-xl" : ""}`}
-      >
-        <div className="px-page pb-10 pt-6">
-          {/* Name + tagline */}
-          <h1 className="m-0 font-serif text-hotel-name font-semibold leading-tight text-foreground">
-            {place.name}
-          </h1>
-          {place.tagline && (
-            <p className="m-0 mt-1 text-body-sm text-muted-foreground">{place.tagline}</p>
-          )}
-
+      {/* Content — top padding clears the overlapping card */}
+      <div className="bg-background">
+        <div className="px-page pb-10 pt-20">
           {/* Description */}
           {place.description && (
-            <p className="m-0 mt-4 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
-              {place.description}
+            <p className="m-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
+              {place.description.split("\n").map((line, i) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))}
             </p>
           )}
 
@@ -124,55 +142,59 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
           )}
 
           {/* Metadata */}
-          <div className="mt-6 flex flex-col gap-4 border-t border-border pt-5">
-            {place.address && mapsHref && (
-              <div>
-                <p className="m-0 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Address
-                </p>
-                <a
-                  href={mapsHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-body-sm text-primary no-underline"
-                >
-                  {place.address}
-                </a>
+          {hasMetadata && (
+            <>
+              <div className="mt-6 flex justify-center">
+                <div className="w-10 border-t border-border" />
               </div>
-            )}
-
-            {place.hours && (
-              <div>
-                <p className="m-0 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Hours
-                </p>
-                <p className="m-0 text-body-sm text-foreground">{place.hours}</p>
+              <div className="mt-6 flex flex-col">
+                {place.address && mapsHref && (
+                  <div className="border-b border-border py-4">
+                    <p className="m-0 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      Address
+                    </p>
+                    <a
+                      href={mapsHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-body-sm text-primary no-underline"
+                    >
+                      {place.address}
+                    </a>
+                  </div>
+                )}
+                {place.hours && (
+                  <div className="border-b border-border py-4">
+                    <p className="m-0 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      Hours
+                    </p>
+                    <p className="m-0 text-body-sm text-foreground">{place.hours}</p>
+                  </div>
+                )}
+                {priceLabel && (
+                  <div className="border-b border-border py-4">
+                    <p className="m-0 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      Price
+                    </p>
+                    <p className="m-0 text-body-sm text-foreground">{priceLabel}</p>
+                  </div>
+                )}
+                {place.phone && (
+                  <div className="border-b border-border py-4">
+                    <p className="m-0 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      Phone
+                    </p>
+                    <a
+                      href={`tel:${place.phone.replace(/\D/g, "")}`}
+                      className="flex min-h-[44px] items-center text-body-sm text-primary no-underline"
+                    >
+                      {place.phone}
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
-
-            {priceLabel && (
-              <div>
-                <p className="m-0 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Price
-                </p>
-                <p className="m-0 text-body-sm text-foreground">{priceLabel}</p>
-              </div>
-            )}
-
-            {place.phone && (
-              <div>
-                <p className="m-0 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Phone
-                </p>
-                <a
-                  href={`tel:${place.phone.replace(/\D/g, "")}`}
-                  className="text-body-sm text-primary no-underline"
-                >
-                  {place.phone}
-                </a>
-              </div>
-            )}
-          </div>
+            </>
+          )}
 
           {/* What to know */}
           {place.tips && place.tips.length > 0 && (
@@ -192,11 +214,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
           )}
 
           <div className="mt-8">
-            <VenueFooter
-              venueName={venue.name}
-              address={venue.address}
-              phone={venue.phone}
-            />
+            <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />
           </div>
 
           <div className="h-safe-bottom" />

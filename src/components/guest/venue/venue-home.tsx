@@ -185,7 +185,7 @@ export function VenueHomePage() {
                 </span>
               </div>
             }
-            variant={venue?.splash_variant ?? "text"}
+            variant={venue?.splash_variant ?? "oversized"}
             onEnter={handleSplashEnter}
           />
         </div>
