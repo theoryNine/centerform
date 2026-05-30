@@ -137,7 +137,23 @@ export function PlaceSheet({ open, onOpenChange, place, venueId, collections }: 
             />
           </div>
 
-          {!isDining && (
+          {isDining ? (
+            <div className="space-y-2">
+              <Label htmlFor="pl-location">Location</Label>
+              <select
+                id="pl-location"
+                name="area"
+                defaultValue={place?.area === "on-site" ? "on-site" : ""}
+                className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              >
+                <option value="">Nearby recommendation</option>
+                <option value="on-site">On-site at the hotel</option>
+              </select>
+              <p className="text-[11px] text-muted-foreground">
+                "On-site" places appear in the "At the Hotel" section on the Dining page.
+              </p>
+            </div>
+          ) : (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="pl-area">Area</Label>

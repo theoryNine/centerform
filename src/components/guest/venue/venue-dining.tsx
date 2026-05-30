@@ -1,13 +1,32 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Star } from "lucide-react";
+import { useState, useCallback } from "react";
 import type { NearbyPlace, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
-import { useStickyNav } from "@/hooks/use-sticky-nav";
-import { usePressScale } from "@/hooks/use-press-scale";
+import { SectionHeader } from "@/components/guest/primitives/section-header";
+import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { NavCard } from "@/components/guest/primitives/nav-card";
+import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
 import { formatPrice } from "@/lib/utils";
+
+const CATEGORY_LABELS: Record<string, string> = {
+  restaurant: "Restaurant",
+  bar: "Bar",
+  cafe: "Café",
+};
+
+function diningFooter(place: NearbyPlace) {
+  const price = formatPrice(place.price_level);
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="rounded-chip bg-secondary px-2.5 py-0.5 text-label font-medium capitalize text-muted-foreground">
+        {CATEGORY_LABELS[place.category] ?? place.category}
+      </span>
+      {price && <span className="text-label text-muted-foreground">{price}</span>}
+    </div>
+  );
+}
 
 interface VenueDiningPageProps {
   venue: Venue;
@@ -17,129 +36,54 @@ interface VenueDiningPageProps {
   heroImageUrl?: string | null;
 }
 
-function placeHref(slug: string, place: NearbyPlace): string {
-  return place.collection_id
-    ? `/${slug}/explore/${place.collection_id}`
-    : `/${slug}/explore/place/${place.id}`;
-}
+export function VenueDiningPage({
+  venue,
+  places,
+  slug,
+  pageDescription,
+  heroImageUrl,
+}: VenueDiningPageProps) {
+  const { scrolled, sentinelRef } = useStickyScroll();
 
-function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
-  const press = usePressScale();
+  const totalWithImages = places.filter((p) => p.image_url).length;
+  const [loadedCount, setLoadedCount] = useState(0);
+  const allLoaded = loadedCount >= totalWithImages;
+  const handleImageSettle = useCallback(() => setLoadedCount((n) => n + 1), []);
 
-  return (
-    <Link
-      href={placeHref(slug, place)}
-      className="block no-underline transition-transform duration-[var(--cf-press-duration)]"
-      {...press}
-    >
-      <div className="card-shadow rounded-default bg-card p-card">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="m-0 font-serif text-[15px] font-medium leading-snug text-foreground">
-              {place.name}
-            </p>
-            {place.tagline && (
-              <p className="mb-0 mt-1 text-[13px] leading-snug text-muted-foreground">
-                {place.tagline}
-              </p>
-            )}
-          </div>
-          {place.image_url && (
-            <img
-              src={place.image_url}
-              alt={place.name}
-              className="size-14 shrink-0 rounded-[4px] object-cover"
-            />
-          )}
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {!place.collection_id && (
-            <span className="rounded-chip bg-secondary px-2.5 py-0.5 text-label font-medium capitalize text-muted-foreground">
-              {place.category}
-            </span>
-          )}
-          {place.distance && (
-            <span className="text-label text-muted-foreground">{place.distance}</span>
-          )}
-          {place.rating != null && (
-            <span className="flex items-center gap-0.5 text-label font-semibold text-foreground">
-              {place.rating}
-              <Star size={10} fill="var(--accent)" color="var(--accent)" />
-            </span>
-          )}
-          {place.price_level != null && (
-            <span className="text-label text-muted-foreground">{formatPrice(place.price_level)}</span>
-          )}
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-export function VenueDiningPage({ venue, places, slug, pageDescription, heroImageUrl }: VenueDiningPageProps) {
-  const { showStickyNav, headerRef } = useStickyNav();
-  const venueName = venue.name;
+  const onSite = places.filter((p) => p.area === "on-site");
+  const nearby = places.filter((p) => p.area !== "on-site");
+  const hasBoth = onSite.length > 0 && nearby.length > 0;
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      {/* Sticky nav — slides in after scrolling past hero */}
-      <div
-        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
-        style={{
-          transform: showStickyNav ? "translateY(0)" : "translateY(-100%)",
-        }}
-      >
-        <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <div className="flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
-              <ArrowLeft size={20} />
-            </Link>
-            <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
-          </div>
-          <div className="h-px bg-border" />
-        </div>
-      </div>
+      <div ref={sentinelRef} className="h-0" />
+      <StickyHeader
+        venueName={venue.name}
+        scrolled={scrolled}
+        backHref={`/${slug}`}
+        nameHref={`/${slug}`}
+      />
 
-      {/* Main header area */}
-      <div ref={headerRef}>
-        <div
-          className="flex items-center px-5"
-          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
-        >
-          <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            href={`/${slug}`}
-            className="font-serif text-base font-normal text-foreground no-underline"
+      <PageHero
+        imageUrl={heroImageUrl ?? venue.cover_image_url}
+        imageAlt={venue.name}
+        fallbackNode={
+          <div
+            className="flex size-full items-center justify-center"
+            style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A09680 100%)" }}
           >
-            {venueName}
-          </Link>
-        </div>
+            <span className="font-serif text-[40px] font-light text-white/50">
+              {venue.name.charAt(0)}
+            </span>
+          </div>
+        }
+        title="Dining & Drinks"
+        className="pt-8"
+      />
 
-        <PageHero
-          imageUrl={heroImageUrl ?? venue.cover_image_url}
-          imageAlt={venueName}
-          fallbackNode={
-            <div
-              className="flex size-full items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 50%, #A09680 100%)" }}
-            >
-              <span className="font-serif text-[40px] font-light text-white/50">
-                {venueName.charAt(0)}
-              </span>
-            </div>
-          }
-          title="Dining & Drinks"
-          className="pt-8"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="px-page pb-10 pt-6">
+      <div className="px-page pb-10 pt-2">
         {pageDescription && (
-          <p className="mb-6 text-body leading-[var(--cf-body-line-height)] text-foreground">
+          <p className="mb-6 mt-2 text-body leading-[var(--cf-body-line-height)] text-foreground">
             {pageDescription.split("\n").map((line, i) => (
               <span key={i}>
                 {i > 0 && <br />}
@@ -150,23 +94,62 @@ export function VenueDiningPage({ venue, places, slug, pageDescription, heroImag
         )}
 
         {places.length === 0 ? (
-          <p className="py-12 text-center text-body text-muted-foreground">
-            No nearby places listed yet.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-card-gap">
-            {places.map((place) => (
-              <PlaceCard key={place.id} place={place} slug={slug} />
-            ))}
+          <div className="py-12 text-center text-body text-muted-foreground">
+            No dining options listed yet.
           </div>
+        ) : (
+          <>
+            {onSite.length > 0 && (
+              <div>
+                <SectionHeader number="01" title="At the Hotel" />
+                <div className="flex flex-col gap-card-gap">
+                  {onSite.map((p) => (
+                    <NavCard
+                      key={p.id}
+                      label={p.name}
+                      sublabel={p.tagline ?? ""}
+                      href={`/${slug}/explore/place/${p.id}`}
+                      imageUrl={p.image_url ?? undefined}
+                      onSettle={p.image_url ? handleImageSettle : undefined}
+                      footer={diningFooter(p)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {nearby.length > 0 && (
+              <div>
+                <SectionHeader
+                  number={hasBoth ? "02" : "01"}
+                  title="Nearby Recommendations"
+                />
+                <div className="flex flex-col gap-card-gap">
+                  {nearby.map((p) => (
+                    <NavCard
+                      key={p.id}
+                      label={p.name}
+                      sublabel={p.tagline ?? ""}
+                      href={`/${slug}/explore/place/${p.id}`}
+                      imageUrl={p.image_url ?? undefined}
+                      onSettle={p.image_url ? handleImageSettle : undefined}
+                      footer={diningFooter(p)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         <div className="mt-section">
-          <VenueFooter venueName={venueName} address={venue.address} phone={venue.phone} />
+          <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />
         </div>
 
         <div className="h-safe-bottom" />
       </div>
+
+      {!allLoaded && <LoadingSpinner />}
     </div>
   );
 }
