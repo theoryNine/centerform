@@ -11,9 +11,11 @@ interface NavCardProps {
   imageUrl?: string;
   onSettle?: () => void;
   footer?: ReactNode;
+  sublabelClassName?: string;
+  hideImage?: boolean;
 }
 
-export function NavCard({ label, sublabel, href, imageUrl, onSettle, footer }: NavCardProps) {
+export function NavCard({ label, sublabel, href, imageUrl, onSettle, footer, sublabelClassName, hideImage }: NavCardProps) {
   const router = useRouter();
 
   return (
@@ -27,23 +29,25 @@ export function NavCard({ label, sublabel, href, imageUrl, onSettle, footer }: N
       onTouchStart={(e) => (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)}
       onTouchEnd={(e) => (e.currentTarget.style.transform = "scale(1)")}
     >
-      <div
-        className="relative w-[30%] shrink-0 self-stretch overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)" }}
-      >
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt=""
-            onLoad={onSettle}
-            onError={onSettle}
-            className="absolute inset-0 size-full object-cover"
-          />
-        )}
-      </div>
-      <div className="min-w-0 flex-1 py-4">
+      {!hideImage && (
+        <div
+          className="relative w-[30%] shrink-0 self-stretch overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)" }}
+        >
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt=""
+              onLoad={onSettle}
+              onError={onSettle}
+              className="absolute inset-0 size-full object-cover"
+            />
+          )}
+        </div>
+      )}
+      <div className={`min-w-0 flex-1 py-4 ${hideImage ? "pl-4" : ""}`}>
         <div className="mb-0.5 font-serif text-card-title-lg font-normal text-foreground">{label}</div>
-        {sublabel && <div className="text-body-sm leading-snug text-muted-foreground">{sublabel}</div>}
+        {sublabel && <div className={`text-body-sm leading-snug text-muted-foreground ${sublabelClassName ?? ""}`}>{sublabel}</div>}
         {footer && <div className="mt-1.5">{footer}</div>}
       </div>
       <ArrowRight size={18} color="var(--primary, #1A7A6D)" className="mr-3 shrink-0" />

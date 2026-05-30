@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
+import { NavCard } from "@/components/guest/primitives/nav-card";
 import { formatPrice } from "@/lib/utils";
 import type {
   ExploreCollectionWithItems,
@@ -88,9 +88,9 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
 
   if (item.is_start || item.is_end) {
     return (
-      <div className="flex items-center gap-2">
-        <div className="relative z-10 h-3 w-3 shrink-0 rounded-full bg-primary" />
-        <p className="m-0 text-label font-semibold tracking-widest text-primary">
+      <div className="relative pb-5 flex items-center">
+        <div className="absolute left-[24px] z-10 h-3 w-3 rounded-full bg-primary" />
+        <p className="m-0 pl-[48px] text-label font-semibold tracking-widest text-primary">
           {item.is_start ? "START" : "END"} · {place.name.toUpperCase()}
         </p>
       </div>
@@ -98,32 +98,24 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
   }
 
   return (
-    <div className="flex items-start gap-3">
-      {/* Dot on timeline */}
-      <div className="relative z-10 mt-[6px] -ml-[2px] h-2 w-2 shrink-0 rounded-full bg-muted-foreground/60" />
+    <div className="pb-3">
+      {item.time_label && (
+        <p className="relative z-10 m-0 mb-2 bg-background text-body-sm font-semibold text-foreground">
+          {item.time_label}
+        </p>
+      )}
+      <div className="relative pl-[60px]">
+        <div className="absolute left-[26px] top-[10px] z-10 h-2 w-2 rounded-full bg-muted-foreground/60" />
+        <div className="absolute left-[34px] top-[13px] h-px w-[26px] bg-muted-foreground/25" />
+        <NavCard
+          label={place.name}
+          sublabel={place.description ?? ""}
+          href={`/${slug}/explore/place/${place.id}`}
 
-      {/* Card */}
-      <Link
-        href={`/${slug}/explore/place/${place.id}`}
-        className="card-shadow mb-3 flex flex-1 items-center gap-3 overflow-hidden rounded-default bg-card no-underline"
-      >
-        {place.image_url && (
-          <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
-            <img src={place.image_url} alt={place.name} className="size-full object-cover" />
-          </div>
-        )}
-        <div className="min-w-0 flex-1 py-3 pr-2 pl-3">
-          <p className="m-0 font-serif text-cta-button font-semibold leading-tight text-foreground">
-            {place.name}
-          </p>
-          {place.description && (
-            <p className="m-0 mt-1 text-[12px] leading-snug text-muted-foreground line-clamp-2">
-              {place.description}
-            </p>
-          )}
-        </div>
-        <ArrowRight size={15} className="mr-3 shrink-0 text-primary" />
-      </Link>
+          sublabelClassName="line-clamp-2"
+          hideImage
+        />
+      </div>
     </div>
   );
 }
@@ -136,11 +128,13 @@ function TimelineLayout({
   slug: string;
 }) {
   return (
-    <div className="relative pl-1">
-      {/* Vertical line — sits behind dots */}
-      <div className="absolute left-[5px] top-3 bottom-3 w-px bg-muted-foreground/25" />
-
-      <div className="flex flex-col gap-2">
+    <div className="relative">
+      {/* Vertical line */}
+      <div
+        className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
+        style={{ left: "30px" }}
+      />
+      <div className="flex flex-col">
         {items.map((item) => (
           <TimelineCard key={item.id} item={item} slug={slug} />
         ))}
