@@ -76,7 +76,7 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
       {value && (
         <div className="relative rounded-default overflow-hidden border border-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="" className="w-full h-36 object-cover" />
+          <img src={value} alt="" className="w-full max-h-48 object-contain bg-muted" />
         </div>
       )}
 

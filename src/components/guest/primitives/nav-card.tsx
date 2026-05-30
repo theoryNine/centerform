@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
@@ -9,9 +10,10 @@ interface NavCardProps {
   href: string;
   imageUrl?: string;
   onSettle?: () => void;
+  footer?: ReactNode;
 }
 
-export function NavCard({ label, sublabel, href, imageUrl, onSettle }: NavCardProps) {
+export function NavCard({ label, sublabel, href, imageUrl, onSettle, footer }: NavCardProps) {
   const router = useRouter();
 
   return (
@@ -41,7 +43,8 @@ export function NavCard({ label, sublabel, href, imageUrl, onSettle }: NavCardPr
       </div>
       <div className="min-w-0 flex-1 py-4">
         <div className="mb-0.5 font-serif text-card-title-lg font-normal text-foreground">{label}</div>
-        <div className="text-body-sm leading-snug text-muted-foreground">{sublabel}</div>
+        {sublabel && <div className="text-body-sm leading-snug text-muted-foreground">{sublabel}</div>}
+        {footer && <div className="mt-1.5">{footer}</div>}
       </div>
       <ArrowRight size={18} color="var(--primary, #1A7A6D)" className="mr-3 shrink-0" />
     </button>
