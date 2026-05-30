@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Send, Bot, User } from "lucide-react";
+import { StickyHeader } from "@/components/guest/primitives/sticky-header";
 
 function formatVenueName(slug: string) {
   return slug
@@ -60,9 +61,10 @@ export default function ConciergePage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-7.5rem)] flex-col">
+    <div className="flex h-screen flex-col">
+      <StickyHeader venueName={venueName} scrolled={false} onBack={() => history.back()} />
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-1 py-4">
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-page py-4">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -91,7 +93,7 @@ export default function ConciergePage() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="flex gap-2 border-t px-1 py-3">
+      <form onSubmit={handleSend} className="flex gap-2 border-t px-page py-3">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
