@@ -28,7 +28,7 @@ src/
 │   ├── api/auth/           # NextAuth API handler
 │   ├── api/admin/invites/  # Internal POST endpoint: generate venue invite tokens (ADMIN_API_KEY gated)
 │   ├── api/go/             # Affiliate link redirect + click tracking (see Affiliate Links below)
-│   ├── api/dashboard/upload/ # POST: authenticate + upload file → venue-assets bucket → insert venue_media row → return { url }
+│   ├── api/dashboard/upload/ # POST: authenticate + upload file → convert to WebP (sharp, quality 85; SVG/GIF pass through) → venue-assets bucket → insert venue_media row → return { url }
 │   ├── invite/             # Invite-based onboarding flow
 │   │   ├── [token]/        # Landing page + email form (Server Component + Client form)
 │   │   ├── check-email/    # "Check your inbox" screen (pages.verifyRequest destination)
@@ -126,7 +126,7 @@ src/
 │   ├── dashboard.ts        # getActiveDashboardVenue(userId) — resolves active venue from cookie
 │   ├── queries.ts          # Supabase query functions (public + admin variants)
 │   ├── permissions.ts      # Dashboard auth: getVenueRole, requireVenueRole, getVenuesForUser
-│   ├── storage.ts          # uploadVenueAsset / uploadEventAsset / deleteVenueAsset
+│   ├── storage.ts          # uploadVenueAsset / uploadEventAsset / deleteVenueAsset — accept `File | Buffer` with optional `contentType`
 │   ├── utils.ts            # cn() utility + formatPrice()
 │   ├── slug-resolver.ts    # Route resolution (venue vs event)
 │   ├── cruise-crew-data.ts # Hardcoded CREW array (name, slug, photos[]) for anniversary cruise photo galleries
@@ -501,7 +501,7 @@ All list pages use a right-side shadcn `Sheet` (`side="right"`) for create/edit.
 - **Styling**: Tailwind classes for layout; CSS variables for dynamic theming per venue/event; `--cf-*` design tokens for all typography, spacing, radius, and interactive values (see Design Token System above)
 - **Components**: Follow shadcn/ui patterns with `data-slot` attributes and CVA variants
 - **Database queries**: Public/guest queries go in `src/lib/queries.ts` using `createClient()` (anon key). Dashboard admin queries that need to bypass RLS use `createAdminClient()` directly in the Server Action or Server Component — or use the `getAll*` / `getVenuesForUser` / `getVenueMemberRole` variants already in `queries.ts`.
-- **Image uploads**: Use `uploadVenueAsset(slug, path, file)` from `src/lib/storage.ts`. The `path` arg is relative within the slug folder, e.g. `"places/{place-id}/photo.jpg"`. See the Supabase Storage section for the full bucket layout.
+- **Image uploads**: Use `uploadVenueAsset(slug, path, file, contentType?)` from `src/lib/storage.ts` — accepts `File | Buffer`. The `path` arg is relative within the slug folder, e.g. `"places/{place-id}/photo.jpg"`. All uploads through `POST /api/dashboard/upload` are automatically converted to WebP (quality 85) by `sharp` before storage; SVGs and GIFs pass through unchanged. See the Supabase Storage section for the full bucket layout.
 - **Path alias**: `@/*` maps to `src/*`
 - **Branches**: `develop` for active work, `main` for production
 
