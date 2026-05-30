@@ -216,11 +216,14 @@ export function VenueServicesPage({
       >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
           {/* Sticky header row */}
-          <div className="flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
+          <div className="relative flex items-center px-5 py-3">
+            <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
               <ArrowLeft size={20} />
             </Link>
-            <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
+            <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+              <span className="font-serif text-[20px] font-medium text-foreground">{venueName}</span>
+            </div>
+            <div className="w-5 shrink-0" />
           </div>
 
           {/* Section tabs */}
@@ -244,18 +247,21 @@ export function VenueServicesPage({
       <div ref={headerRef}>
         {/* Top bar with back arrow and venue name */}
         <div
-          className="flex items-center px-5"
+          className="relative flex items-center px-5"
           style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
         >
-          <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
+          <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
             <ArrowLeft size={20} />
           </Link>
-          <Link
-            href={`/${slug}`}
-            className="font-serif text-base font-normal text-foreground no-underline"
-          >
-            {venueName}
-          </Link>
+          <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+            <Link
+              href={`/${slug}`}
+              className="pointer-events-auto font-serif text-[20px] font-medium text-foreground no-underline"
+            >
+              {venueName}
+            </Link>
+          </div>
+          <div className="w-5 shrink-0" />
         </div>
 
         {/* Hero: image + title */}
@@ -277,7 +283,7 @@ export function VenueServicesPage({
         />
 
         {/* Subheader: address, hours, checkout */}
-        <div className="flex justify-between gap-4 px-5 py-4 text-xs text-muted-foreground">
+        <div className="flex justify-between gap-4 px-5 py-4 text-body text-muted-foreground">
           <div>
             {venue.address && (
               <a
