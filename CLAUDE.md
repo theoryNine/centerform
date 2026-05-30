@@ -90,13 +90,13 @@ src/
 │       │   ├── copy-button.tsx         # Inline copy-to-clipboard with check feedback
 │       │   ├── corner-bracket-card.tsx # Card with decorative corner bracket spans
 │       │   ├── loading-spinner.tsx     # Fixed full-screen loading overlay
-│       │   ├── nav-card.tsx            # Navigation tile card; optional `footer?: ReactNode` renders a third content row below the sublabel (used by venue-dining for category pill + price)
+│       │   ├── nav-card.tsx            # Navigation tile card; optional `footer?: ReactNode` renders a third content row below the sublabel (used by venue-dining for category pill + price); `sublabelClassName?: string` for extra classes on the sublabel (e.g. `line-clamp-2`); `hideImage?: boolean` suppresses the image column and adds `pl-4` to the content area
 │       │   ├── page-hero.tsx           # Full-bleed hero image with gradient
 │       │   ├── section-header.tsx      # Numbered section header (e.g. "01 · Title")
-│       │   ├── sticky-header.tsx       # Sticky nav header + floating back button
+│       │   ├── sticky-header.tsx       # Three sticky nav patterns: `StickyHeader` (always visible, used on Dining/Info/Explore list pages), `ScrollRevealStickyHeader` (fades in on scroll, used on hero detail pages like place-listing and cruise-restaurant-listing), `FloatingBackButton` (glass pill over hero, paired with ScrollRevealStickyHeader). Hooks: `useStickyScroll` (IntersectionObserver, for pages with in-flow headers), `useWindowScroll` (scroll event, for pages with fixed/absolute headers)
 │       │   ├── venue-footer.tsx        # Venue branding footer
 │       │   ├── welcome-envelope.tsx    # Animated envelope reveal
-│       │   ├── welcome-splash.tsx      # Welcome card (delegates to oversized/text variants)
+│       │   ├── welcome-splash.tsx      # Welcome card (delegates to oversized/text variants). Default is `"oversized"` for both hotel and cruise venues — full-bleed image with name card floating over lower half. `"text"` variant uses a shorter in-flow image above the card. Individual venues can override via `venues.splash_variant`.
 │       │   ├── welcome-splash-oversized.tsx
 │       │   └── welcome-splash-text.tsx
 │       ├── cruise/         # Cruise venue pages
@@ -222,7 +222,7 @@ Explore index         /:slug/explore
 
 - **Explore index** groups `nearby_places` by `area`. Cards with `collection_id` set link to the collection; cards without link to the place listing.
 - **Collection page** renders either `cards` layout (Date Night style) or `timeline` layout (Open Wander/itinerary style) based on `explore_collections.layout`.
-- **Place listing** shows full detail for an individual `nearby_place` — hero image, metadata sections (address, hours, price, phone), tips bullets, and venue footer. Back button uses `history.back()` to return to whichever page linked here.
+- **Place listing** shows full detail for an individual `nearby_place`. Uses the same floating name card pattern as cruise restaurant/itinerary detail pages: `ScrollRevealStickyHeader` + `FloatingBackButton` over a full `aspect-[4/3]` hero, with a centered card (`translate-y-1/2` over the hero bottom) containing the place name and tagline/price meta. Content starts at `pt-20` to clear the card. Back button uses `history.back()` to return to whichever page linked here.
 - **`nearby_places.collection_id`** is the key field that makes an explore card a gateway to a collection rather than an individual place listing.
 
 ## Affiliate Links
@@ -341,7 +341,9 @@ Before adding inline UI patterns to a guest component, check if a shared primiti
 | Card with decorative corner brackets | `<CornerBracketCard className?>` from `@/components/guest/primitives/corner-bracket-card` |
 | Numbered section header + underline | `<SectionHeader number="01" title="..." />` from `@/components/guest/primitives/section-header` |
 | Button press scale animation | `const p = usePressScale(); <button {...p}>` from `@/hooks/use-press-scale` |
-| Sticky nav visibility on scroll | `const { showStickyNav, headerRef } = useStickyNav()` from `@/hooks/use-sticky-nav` |
+| Sticky nav (list pages: Dining, Info, Explore) | `<StickyHeader venueName scrolled backHref nameHref />` + `const { scrolled, sentinelRef } = useStickyScroll()` from `@/components/guest/primitives/sticky-header` — always visible, border appears on scroll |
+| Sticky nav (hero detail pages: place, restaurant) | `<ScrollRevealStickyHeader ... />` + `<FloatingBackButton scrolled ... />` + `const scrolled = useWindowScroll()` from `@/components/guest/primitives/sticky-header` — header fades in on scroll, glass back pill visible over hero |
+| Sticky nav with section tabs (services, ship-info) | Custom fixed div using `const { showStickyNav, headerRef } = useStickyNav()` from `@/hooks/use-sticky-nav` — slides down from top, name row uses absolute-centered pattern matching `StickyHeader` |
 
 ## Auth Configuration
 
