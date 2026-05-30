@@ -120,6 +120,7 @@ export function PlacesClient({ places, collections, venueId, type }: PlacesClien
       )}
 
       <PlaceSheet
+        key={selected?.id ?? "new"}
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         place={selected}

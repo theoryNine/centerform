@@ -79,7 +79,7 @@ src/
 │   │   ├── image-upload.tsx    # Image field for Sheet forms: upload-on-select (POST /api/dashboard/upload) + inline media library grid; outputs a hidden input with the selected URL; props: name, defaultValue, venueId
 │   │   ├── service-sheet.tsx   # Sheet form for Service create/edit/delete
 │   │   ├── event-sheet.tsx     # Sheet form for VenueEvent create/edit/delete
-│   │   ├── place-sheet.tsx     # Sheet form for NearbyPlace create/edit/delete; Area field hidden for dining categories (restaurant/bar/cafe)
+│   │   ├── place-sheet.tsx     # Sheet form for NearbyPlace create/edit/delete; dining categories (restaurant/bar/cafe) show a "Location" select (Nearby recommendation / On-site at the hotel) instead of the free-text Area field; selecting "On-site" writes area = "on-site"
 │   │   ├── collection-sheet.tsx # Sheet form for ExploreCollection create/edit/delete
 │   │   ├── amenity-sheet.tsx   # Sheet form for VenueAmenity create/edit/delete
 │   │   └── info-sheet.tsx      # Sheet form for VenueInfo create/edit/delete; "Label" field stores the key (snake_case keys like check_out_time are formatted for display via formatKey())
@@ -90,7 +90,7 @@ src/
 │       │   ├── copy-button.tsx         # Inline copy-to-clipboard with check feedback
 │       │   ├── corner-bracket-card.tsx # Card with decorative corner bracket spans
 │       │   ├── loading-spinner.tsx     # Fixed full-screen loading overlay
-│       │   ├── nav-card.tsx            # Navigation tile card
+│       │   ├── nav-card.tsx            # Navigation tile card; optional `footer?: ReactNode` renders a third content row below the sublabel (used by venue-dining for category pill + price)
 │       │   ├── page-hero.tsx           # Full-bleed hero image with gradient
 │       │   ├── section-header.tsx      # Numbered section header (e.g. "01 · Title")
 │       │   ├── sticky-header.tsx       # Sticky nav header + floating back button
@@ -152,7 +152,7 @@ Core tables (migrations in `supabase/migrations/`):
 - **venue_members** — links users to venues with roles (owner/admin/staff)
 - **services** — detailed venue service descriptions (WiFi instructions, housekeeping details, etc.)
 - **events** — venue-hosted events (wine hour, live jazz, etc.). Optional `booking_url` field — when set, event cards show a "Book Now" button that routes through `/api/go?event=<id>` for click tracking.
-- **nearby_places** — recommended spots near the venue. Dual-purpose: some rows are real places (restaurants, parks, etc.) that link to individual listing pages; others are gateway cards on the Explore page that link to a collection (when `collection_id` is set). Grouped by `area` for the Explore page. Extra detail fields: `tagline`, `hours`, `tips` (text[]), `cta_label`, `price_level` (0 = FREE), `collection_id`, `booking_url` (optional affiliate/booking link — routes through `/api/go?place=<id>` for click tracking; when set, `website` drops to a secondary "Visit Website" button)
+- **nearby_places** — recommended spots near the venue. Dual-purpose: some rows are real places (restaurants, parks, etc.) that link to individual listing pages; others are gateway cards on the Explore page that link to a collection (when `collection_id` is set). Grouped by `area` for the Explore page. Extra detail fields: `tagline`, `hours`, `tips` (text[]), `cta_label`, `price_level` (0 = FREE), `collection_id`, `booking_url` (optional affiliate/booking link — routes through `/api/go?place=<id>` for click tracking; when set, `website` drops to a secondary "Visit Website" button). **Dining `area` convention**: for dining categories (restaurant/bar/cafe), `area = "on-site"` marks the place as a hotel restaurant/bar shown in the "At the Hotel" section of the Dining page; all other area values (including null) appear under "Nearby Recommendations". Set via the "Location" select in PlaceSheet.
 - **affiliate_clicks** — click log for affiliate/booking links. Fields: `entity_type` (`'place'` | `'event'`), `entity_id` (uuid), `venue_id`, `clicked_at`. Written fire-and-forget by `/api/go` via the admin client so it never blocks the redirect. Indexed on `(entity_type, entity_id)` and `(venue_id, clicked_at DESC)`. See migration `030_affiliate_links.sql`.
 - **explore_collections** — curated editorial lists (e.g. "Date Night", "A Walk Through Ballard"). Two layout variants: `cards` (stacked image cards with CTA) and `timeline` (vertical dot-and-line itinerary). Each collection belongs to a venue and optionally maps to an `area`
 - **explore_collection_items** — ordered join table linking a collection to its `nearby_places`. Supports `time_label`, `is_start`, and `is_end` for the timeline variant

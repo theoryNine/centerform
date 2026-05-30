@@ -6,6 +6,8 @@ import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sti
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { PageHero } from "@/components/guest/primitives/page-hero";
+import { NavCard } from "@/components/guest/primitives/nav-card";
+import { SectionHeader } from "@/components/guest/primitives/section-header";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 
 interface AreaSection {
@@ -38,52 +40,6 @@ function placeHref(slug: string, place: NearbyPlace): string {
     : `/${slug}/explore/place/${place.id}`;
 }
 
-function PlaceCardList({ place, slug }: { place: NearbyPlace; slug: string }) {
-  return (
-    <Link
-      href={placeHref(slug, place)}
-      className="card-shadow flex items-center gap-4 overflow-hidden rounded-default bg-card no-underline"
-    >
-      {/* Thumbnail */}
-      <div className="h-[80px] w-[80px] shrink-0 overflow-hidden">
-        {place.image_url ? (
-          <img
-            src={place.image_url}
-            alt={place.name}
-            className="size-full object-cover"
-          />
-        ) : (
-          <div
-            className="size-full"
-            style={{
-              background:
-                "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)",
-            }}
-          />
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="min-w-0 flex-1 py-3 pr-1">
-        <p className="m-0 text-body-sm font-semibold leading-tight text-foreground">
-          {place.name}
-        </p>
-        {place.description && (
-          <p className="m-0 mt-1 text-[12px] leading-snug text-muted-foreground">
-            {place.description}
-          </p>
-        )}
-      </div>
-
-      {/* Arrow */}
-      <ArrowRight
-        size={16}
-        className="mr-4 shrink-0 text-primary"
-      />
-    </Link>
-  );
-}
-
 function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
   return (
     <Link
@@ -111,11 +67,11 @@ function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
 
       {/* Text below image */}
       <div className="px-3 py-2.5">
-        <p className="m-0 text-body-sm font-semibold leading-tight text-foreground">
+        <p className="m-0 font-serif text-card-title-lg font-normal leading-tight text-foreground">
           {place.name}
         </p>
         {place.description && (
-          <p className="m-0 mt-0.5 text-[11px] leading-snug text-muted-foreground">
+          <p className="m-0 mt-0.5 text-body-sm leading-snug text-muted-foreground">
             {place.description}
           </p>
         )}
@@ -152,25 +108,19 @@ function AreaSectionView({
 
   return (
     <div className="mb-section">
-      {/* Section header */}
-      <div className="mb-heading-gap">
-        <div className="flex items-baseline gap-2.5">
-          <span className="text-[12px] font-medium text-primary">
-            {sectionNumber}
-          </span>
-          <span className="text-[8px] text-primary">·</span>
-          <h2 className="m-0 mb-2 font-serif text-card-title-md font-medium text-foreground">
-            {section.name}
-          </h2>
-        </div>
-        <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
-      </div>
+      <SectionHeader number={sectionNumber} title={section.name} />
 
       {useListLayout ? (
         /* List layout for first section — capped at 4 */
         <div className="flex flex-col gap-card-gap">
           {visiblePlaces.map((place) => (
-            <PlaceCardList key={place.id} place={place} slug={slug} />
+            <NavCard
+              key={place.id}
+              href={placeHref(slug, place)}
+              label={place.name}
+              sublabel={place.description ?? ""}
+              imageUrl={place.image_url ?? undefined}
+            />
           ))}
         </div>
       ) : (
@@ -200,11 +150,11 @@ function AreaSectionView({
                 )}
               </div>
               <div className="px-4 py-2.5">
-                <p className="m-0 text-body-sm font-semibold text-foreground">
+                <p className="m-0 font-serif text-card-title-lg font-normal text-foreground">
                   {featuredPlace.name}
                 </p>
                 {featuredPlace.description && (
-                  <p className="m-0 mt-0.5 text-[12px] text-muted-foreground">
+                  <p className="m-0 mt-0.5 text-body-sm leading-snug text-muted-foreground">
                     {featuredPlace.description}
                   </p>
                 )}
