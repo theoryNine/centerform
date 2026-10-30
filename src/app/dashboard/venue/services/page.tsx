@@ -1,55 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { getActiveDashboardVenue } from "@/lib/dashboard";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { ServicesClient } from "./services-client";
+import type { Service } from "@/types";
 
-const placeholderServices = [
-  { name: "Room Service", category: "room_service", active: true },
-  { name: "Spa & Wellness", category: "spa", active: true },
-  { name: "Concierge", category: "concierge", active: true },
-  { name: "Airport Transfer", category: "transportation", active: true },
-  { name: "Fitness Center", category: "activities", active: true },
-  { name: "Laundry", category: "other", active: false },
-];
+export default async function ManageServicesPage() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/sign-in");
 
-export default function ManageServicesPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Services</h1>
-          <p className="text-muted-foreground">
-            Manage the services available to your guests.
-          </p>
-        </div>
-        <Button>Add Service</Button>
-      </div>
+  const active = await getActiveDashboardVenue(session.user.id);
+  if (!active) redirect("/sign-in");
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="divide-y">
-            {placeholderServices.map((service) => (
-              <div key={service.name} className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <p className="text-sm font-medium">{service.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {service.category.replace("_", " ")}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={service.active ? "default" : "secondary"}>
-                    {service.active ? "Active" : "Inactive"}
-                  </Badge>
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("services")
+    .select("*")
+    .eq("venue_id", active.venue.id)
+    .not("category", "in", '("welcome_aboard","ship_amenities","ship_bars","ship_entertainment")')
+    .order("display_order", { ascending: true });
+
+  return <ServicesClient services={(data as Service[]) ?? []} venueId={active.venue.id} />;
 }

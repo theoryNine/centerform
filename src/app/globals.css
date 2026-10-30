@@ -37,77 +37,193 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-serif: "Nunito Sans", sans-serif;
+
+  /* ── Design token → Tailwind mappings ─────────────────────── */
+
+  /* Spacing: px-page, mb-section, p-card, gap-card-gap, mb-heading-gap, etc. */
+  --spacing-page: var(--cf-page-padding);
+  --spacing-section: var(--cf-section-gap);
+  --spacing-card: var(--cf-card-padding);
+  --spacing-card-compact: var(--cf-card-padding-compact);
+  --spacing-card-gap: var(--cf-card-gap);
+  --spacing-heading-gap: var(--cf-heading-to-content);
+  --spacing-breath: var(--cf-breath-mark-width);
+
+  /* Radius: rounded-default, rounded-chip */
+  --radius-default: var(--cf-radius-default);
+  --radius-chip: var(--cf-radius-chip);
+
+  /* Typography: text-hotel-name, text-body, text-label, etc. */
+  --text-hotel-name: var(--cf-text-hotel-name);
+  --text-page-title: var(--cf-text-page-title);
+  --text-section-heading: var(--cf-text-section-heading);
+  --text-card-title-lg: var(--cf-text-card-title-lg);
+  --text-card-title-md: var(--cf-text-card-title-md);
+  --text-card-title-sm: var(--cf-text-card-title-sm);
+  --text-concierge-heading: var(--cf-text-concierge-heading);
+  --text-header-nav: var(--cf-text-header-nav);
+  --text-body: var(--cf-text-body);
+  --text-body-sm: var(--cf-text-body-sm);
+  --text-label: var(--cf-text-label);
+  --text-chip: var(--cf-text-chip);
+  --text-cta-button: var(--cf-text-cta-button);
+  --text-cta-link: var(--cf-text-cta-link);
+  --text-section-number: var(--cf-text-section-number);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+
+  /* ── Design tokens (source of truth) ──────────────────────── */
+
+  /* Typography — font families */
+  --cf-font-display: "Nunito Sans", sans-serif;
+  --cf-font-body: "Source Sans 3", sans-serif;
+
+  /* Typography — font sizes (display / Nunito Sans) */
+  --cf-text-hotel-name: 30px;        /* 28–32px  homepage hero name */
+  --cf-text-page-title: 26px;        /* mini-hero page titles */
+  --cf-text-section-heading: 24px;   /* numbered section headings */
+  --cf-text-card-title-lg: 20px;     /* 22–24px  venue names, card titles */
+  --cf-text-card-title-md: 19px;     /* 18–20px  card titles in lists, timeline stops */
+  --cf-text-card-title-sm: 16px;     /* 16–17px  compact cards, photo-on-left titles */
+  --cf-text-concierge-heading: 22px; /* "Or just ask.", "Something else?" */
+  --cf-text-header-nav: 20px;        /* sticky header venue name */
+
+  /* Typography — font sizes (body / Source Sans 3) */
+  --cf-text-body: 16px;              /* concierge notes, body text */
+  --cf-text-body-sm: 15px;           /* practical details, secondary text, card subtitles */
+  --cf-text-label: 12px;             /* 11–12px  uppercase info labels */
+  --cf-text-chip: 15px;              /* suggestion chips */
+  --cf-text-cta-button: 16px;        /* outline button text */
+  --cf-text-cta-link: 15px;          /* 13–14px  text link CTAs */
+  --cf-text-section-number: 15px;    /* "01" prefix in section headings */
+
+  /* Typography — other */
+  --cf-text-label-spacing: 1.5px;      /* 0.5–1px  letter-spacing on uppercase labels */
+  --cf-body-line-height: 1.5;       /* 1.6–1.7  body line height */
+
+  /* Spacing */
+  --cf-page-padding: 20px;           /* side padding on all pages */
+  --cf-section-gap: 40px;            /* between major sections */
+  --cf-heading-to-content: 16px;     /* section heading to first item */
+  --cf-card-gap: 14px;               /* 12–16px  between cards in a list */
+  --cf-card-padding: 20px;           /* internal card padding */
+  --cf-card-padding-compact: 13px;   /* 12–14px  compact cards (timeline) */
+  --cf-accordion-row-height: 52px;
+  --cf-breath-mark-width: 40px;      /* centered decorative divider */
+
+  /* Radius */
+  --cf-radius-default: 4px;          /* cards, buttons, containers, photos */
+  --cf-radius-chip: 20px;            /* suggestion chips, meal period pills */
+  --cf-radius-archway-tr: 70px;      /* 60–80px  organic archway, top-right */
+  --cf-radius-archway-br: 70px;      /* 60–80px  organic archway, bottom-right */
+
+  /* Interactive */
+  --cf-touch-target-min: 44px;       /* minimum tappable area */
+  --cf-press-scale: 0.98;            /* card press state */
+  --cf-press-duration: 150ms;        /* press state transition */
+  --cf-fade-duration: 200ms;         /* scroll-reveal header fade */
+
+  /* Component-level tokens (overridable per theme) */
+  --cf-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --cf-glass-bg: rgba(250, 247, 242, 0.9);  /* floating back button bg */
+
+  --background: #F5F0E8;
+  --foreground: #2D2A26;
+  --card: #FFFFFF;
+  --card-foreground: #2D2A26;
+  --popover: #FFFFFF;
+  --popover-foreground: #2D2A26;
+  --primary: #1A7A6D;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EDE8DE;
+  --secondary-foreground: #2D2A26;
+  --muted: #EDE8DE;
+  --muted-foreground: #8B8680;
+  --accent: #EDE8DE;
+  --accent-foreground: #2D2A26;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: #DDD8CE;
+  --input: #DDD8CE;
+  --ring: #1A7A6D;
+  --chart-1: #1A7A6D;
+  --chart-2: #D4B483;
+  --chart-3: #8B8680;
+  --chart-4: #2D2A26;
+  --chart-5: #EDE8DE;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #2D2A26;
+  --sidebar-primary: #1A7A6D;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EDE8DE;
+  --sidebar-accent-foreground: #2D2A26;
+  --sidebar-border: #DDD8CE;
+  --sidebar-ring: #1A7A6D;
+}
+
+/* Applied via CSS before any JS runs — eliminates dark mode flash on first render. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1C1A17;
+    --foreground: #EDE8DE;
+    --card: #252220;
+    --card-foreground: #EDE8DE;
+    --popover: #252220;
+    --popover-foreground: #EDE8DE;
+    --secondary: #2E2B27;
+    --secondary-foreground: #EDE8DE;
+    --muted: #2E2B27;
+    --muted-foreground: #8B8680;
+    --border: #3A3632;
+    --input: #3A3632;
+    --ring: #22A090;
+    --cf-card-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.4);
+    --cf-glass-bg: rgba(28, 26, 23, 0.9);
+  }
+
+  body {
+    background-color: #1C1A17;
+  }
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #1C1A17;
+  --foreground: #EDE8DE;
+  --card: #252220;
+  --card-foreground: #EDE8DE;
+  --popover: #252220;
+  --popover-foreground: #EDE8DE;
+  --primary: #22A090;
+  --primary-foreground: #FFFFFF;
+  --secondary: #2E2B27;
+  --secondary-foreground: #EDE8DE;
+  --muted: #2E2B27;
+  --muted-foreground: #8B8680;
+  --accent: #2E2B27;
+  --accent-foreground: #EDE8DE;
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --border: #3A3632;
+  --input: #3A3632;
+  --ring: #22A090;
+  --chart-1: #22A090;
+  --chart-2: #D4B483;
+  --chart-3: #8B8680;
+  --chart-4: #EDE8DE;
+  --chart-5: #2E2B27;
+  --sidebar: #1C1A17;
+  --sidebar-foreground: #EDE8DE;
+  --sidebar-primary: #22A090;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #2E2B27;
+  --sidebar-accent-foreground: #EDE8DE;
+  --sidebar-border: #3A3632;
+  --sidebar-ring: #22A090;
+  --cf-card-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.4);
+  --cf-glass-bg: rgba(28, 26, 23, 0.9);
 }
 
 @layer base {
@@ -116,6 +232,94 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans, system-ui, sans-serif);
+    font-family: var(--font-sans, "Source Sans 3", sans-serif);
+  }
+}
+
+@utility card-shadow {
+  box-shadow: var(--cf-card-shadow);
+}
+
+@utility pt-safe {
+  padding-top: calc(env(safe-area-inset-top, 16px) + 12px);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+@utility h-safe-bottom {
+  height: env(safe-area-inset-bottom, 20px);
+}
+
+/* Venue homepage header animations */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 1.3s ease-out both;
+}
+
+/* react-colorful — dashboard theme overrides */
+.cf-color-picker .react-colorful {
+  width: 100%;
+  height: 160px;
+  gap: 10px;
+}
+.cf-color-picker .react-colorful__saturation {
+  border-radius: 6px;
+  flex: 1;
+}
+.cf-color-picker .react-colorful__hue {
+  height: 12px;
+  border-radius: 6px;
+}
+.cf-color-picker .react-colorful__saturation-pointer,
+.cf-color-picker .react-colorful__hue-pointer {
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Accessibility: visible keyboard focus for the custom (non-shadcn) controls on guest pages. */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--primary, currentColor);
+  outline-offset: 2px;
+}
+
+/* Accessibility: honor the OS "reduce motion" setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
