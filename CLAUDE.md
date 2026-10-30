@@ -14,139 +14,58 @@ Digital concierge platform (PWA) for venues, standalone events, and cruise ships
 ## Commands
 
 - `pnpm dev` — Start dev server (Turbopack)
-- `pnpm build` — Production build
-- `pnpm lint` — **Broken**: `next lint` was removed in Next.js 16 and no ESLint config exists. Use `npx tsc --noEmit` for type-checking instead.
-- `pnpm format` — Prettier (format all files)
-- `pnpm format:check` — Check formatting
+- `pnpm build` — Production build (also the way to check which routes are static `●` vs dynamic `ƒ`)
+- `pnpm typecheck` — `tsc --noEmit`
+- `pnpm test` — Vitest unit tests
+- `pnpm format` / `pnpm format:check` — Prettier (many older files are not yet formatted; only format files you change)
+- `pnpm lint` — **Broken**: `next lint` was removed in Next.js 16 and no ESLint config exists. Use `pnpm typecheck`.
+
+## Hard rules
+
+These cause real bugs when forgotten. Details are in the scoped CLAUDE.md files.
+
+1. **Tenant scoping.** The dashboard uses the service-role client, which bypasses RLS. Every `update`/`delete` by `id` must also filter by `venue_id` (or the parent id), and foreign ids from forms must be verified to belong to the venue. Use `authorizeVenue` (`src/lib/venue-action.ts`), which enforces auth + role.
+2. **Guest pages are cached (ISR, `revalidate = 300`).** Never call `cookies()`, `headers()` or read `searchParams` in guest routes (`src/app/[slug]/**`) — it makes them dynamic. New dynamic guest pages must export `generateStaticParams`. Any dashboard write that changes what guests see must call `revalidateGuestPages(venueId)` (`finishVenueWrite` in `src/lib/venue-action.ts` does this).
+3. **URLs from users** go through `parseOptionalHttpUrl` (forms) / `safeHttpUrl` (rendering, redirects) in `src/lib/url.ts` — http(s) only.
+4. **Never** import `createAdminClient` in client components; the service-role key is server-only.
+5. **Guest UI accessibility** (zoom, ARIA on interactive rows, focus, reduced motion) — see `src/components/guest/CLAUDE.md`.
+6. **Database changes** are SQL files in `supabase/migrations/` applied manually to the remote Supabase — remember to apply new ones.
 
 ## Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── (auth)/             # Sign-in/sign-up routes
-│   ├── api/auth/           # NextAuth API handler
-│   ├── api/admin/invites/  # Internal POST endpoint: generate venue invite tokens (ADMIN_API_KEY gated, validated)
-│   ├── api/dashboard/upload/ # Authenticated image upload: 10 MB cap, raster only, re-encoded to WebP (no SVG)
-│   ├── api/go/             # Affiliate redirect for place/event booking_url; logs rate-limited clicks to affiliate_clicks
-│   ├── api/go/             # Affiliate link redirect + click tracking (see Affiliate Links below)
-│   ├── api/dashboard/upload/ # POST: authenticate + upload file → convert to WebP (sharp, quality 85; SVG/GIF pass through) → venue-assets bucket → insert venue_media row → return { url }
-│   ├── invite/             # Invite-based onboarding flow
-│   │   ├── [token]/        # Landing page + email form (Server Component + Client form)
-│   │   ├── check-email/    # "Check your inbox" screen (pages.verifyRequest destination)
-│   │   ├── claim/          # Post-auth claim handler → inserts venue_members → /dashboard
-│   │   └── error/          # NextAuth error page (expired magic link, config errors)
-│   ├── dashboard/          # Protected admin routes — see Dashboard Architecture below
-│   │   ├── layout.tsx      # Auth guard, venue switcher, sidebar nav
-│   │   ├── page.tsx        # Overview: real counts (events, services, places, collections)
-│   │   ├── actions.ts      # switchVenueAction (cookie-based venue switcher)
-│   │   └── venue/
-│   │       ├── page.tsx                    # Venue settings (general info + theme)
-│   │       ├── actions.ts                  # updateVenueAction, updateVenueThemeAction, updatePageImagesAction
-│   │       ├── services/                   # Services CRUD (Sheet)
-│   │       ├── events/                     # Venue events CRUD (Sheet)
-│   │       ├── places/                     # Nearby places CRUD (Sheet)
-│   │       ├── explore/                    # Collections list + detail
-│   │       │   └── [collectionId]/         # Collection items management
-│   │       ├── amenities/                  # Amenity toggles + CRUD (Sheet)
-│   │       ├── info/                       # Hotel info key-value CRUD (Sheet)
-│   │       └── media/
-│   │           └── actions.ts              # listVenueMediaAction — returns VenueMedia[] for a venue (auth + role-gated)
-│   └── [slug]/             # Public venue/event pages
-│       ├── page.tsx        # Routes to VenueHomePage, CruiseHomePage, or EventHomePage by type
-│       ├── services/       # Venue: "Your Room & Stay" accordion
-│       ├── dining/         # Venue: nearby dining/drinks list
-│       ├── events/         # Venue: venue-hosted events list
-│       ├── explore/        # Explore hub + collections + place listings
-│       │   ├── [collectionId]/  # Collection page (cards or timeline layout)
-│       │   ├── place/[placeId]/ # Individual place detail
-│       │   └── area/[area]/     # Area-filtered explore view
-│       ├── concierge/      # Concierge chat
-│       ├── info/           # Event-only: event details (date, location, contact)
-│       ├── schedule/       # Event-only: grouped schedule items
-│       ├── ship-info/      # Cruise: accordion info (Welcome Aboard / Amenities / Bars / Entertainment)
-│       ├── food-onboard/   # Cruise: restaurant list grouped by sit_down vs walk_up
-│       │   └── [restaurantId]/  # Cruise: individual restaurant detail page
-│       ├── group-plan/     # Cruise: day-by-day timeline with scrolling pill selector
-│       │   └── [itemId]/   # Cruise: individual itinerary item detail page
-│       └── the-crew/       # Cruise: crew/group member listing
-│           └── [name]/     # Cruise: individual crew member photo gallery
+├── app/
+│   ├── (auth)/             # Sign-in/sign-up
+│   ├── api/auth/           # NextAuth handler
+│   ├── api/admin/invites/  # POST: generate venue invite tokens (ADMIN_API_KEY gated, validated)
+│   ├── api/dashboard/upload/ # POST: authenticated image upload (see Conventions)
+│   ├── api/go/             # Affiliate redirect for booking_url + rate-limited click log
+│   ├── invite/             # Invite onboarding: [token], check-email, claim, error
+│   ├── dashboard/          # Protected admin app        → see src/app/dashboard/CLAUDE.md
+│   └── [slug]/             # Public venue/event/cruise pages (ISR) → see src/app/[slug]/CLAUDE.md
 ├── components/
-│   ├── ui/                 # shadcn/ui components (textarea.tsx added manually)
-│   ├── dashboard/          # Dashboard-only components
-│   │   ├── nav-link.tsx        # pathname-aware Link with active state; `exact` prop for exact-match only; `activeParam={{ key, value }}` prop for query-param-aware active state (used by Dining & Drinks / Nearby Places)
-│   │   ├── venue-switcher.tsx  # Multi-venue dropdown (hidden for single-venue users)
-│   │   ├── color-picker.tsx    # Themed color picker: Radix Popover + react-colorful HexColorPicker + hex text input
-│   │   ├── font-picker.tsx     # Font selector: dropdown + live preview; loads Google Fonts on demand; exports HEADING_FONTS and BODY_FONTS lists
-│   │   ├── image-upload.tsx    # Image field for Sheet forms: upload-on-select (POST /api/dashboard/upload) + inline media library grid; outputs a hidden input with the selected URL; props: name, defaultValue, venueId
-│   │   ├── service-sheet.tsx   # Sheet form for Service create/edit/delete
-│   │   ├── event-sheet.tsx     # Sheet form for VenueEvent create/edit/delete
-│   │   ├── place-sheet.tsx     # Sheet form for NearbyPlace create/edit/delete; dining categories (restaurant/bar/cafe) show a "Location" select (Nearby recommendation / On-site at the hotel) instead of the free-text Area field; selecting "On-site" writes area = "on-site"
-│   │   ├── collection-sheet.tsx # Sheet form for ExploreCollection create/edit/delete
-│   │   ├── amenity-sheet.tsx   # Sheet form for VenueAmenity create/edit/delete
-│   │   └── info-sheet.tsx      # Sheet form for VenueInfo create/edit/delete; "Label" field stores the key (snake_case keys like check_out_time are formatted for display via formatKey())
-│   └── guest/              # Guest-facing components
-│       ├── primitives/     # Shared building blocks
-│       │   ├── accordion-item.tsx      # Animated expand/collapse row
-│       │   ├── concierge-prompt.tsx    # Concierge chat prompt card
-│       │   ├── copy-button.tsx         # Inline copy-to-clipboard with check feedback
-│       │   ├── corner-bracket-card.tsx # Card with decorative corner bracket spans
-│       │   ├── loading-spinner.tsx     # Fixed full-screen loading overlay
-│       │   ├── nav-card.tsx            # Navigation tile card; optional `footer?: ReactNode` renders a third content row below the sublabel (used by venue-dining for category pill + price); `sublabelClassName?: string` for extra classes on the sublabel (e.g. `line-clamp-2`); `hideImage?: boolean` suppresses the image column and adds `pl-4` to the content area
-│       │   ├── page-hero.tsx           # Full-bleed hero image with gradient
-│       │   ├── section-header.tsx      # Numbered section header (e.g. "01 · Title")
-│       │   ├── sticky-header.tsx       # Three sticky nav patterns: `StickyHeader` (always visible, used on Dining/Info/Explore list pages), `ScrollRevealStickyHeader` (fades in on scroll, used on hero detail pages like place-listing and cruise-restaurant-listing), `FloatingBackButton` (glass pill over hero, paired with ScrollRevealStickyHeader). Hooks: `useStickyScroll` (IntersectionObserver, for pages with in-flow headers), `useWindowScroll` (scroll event, for pages with fixed/absolute headers)
-│       │   ├── venue-footer.tsx        # Venue branding footer
-│       │   ├── welcome-envelope.tsx    # Animated envelope reveal
-│       │   ├── welcome-splash.tsx      # Welcome card (delegates to oversized/text variants). Default is `"oversized"` for both hotel and cruise venues — full-bleed image with name card floating over lower half. `"text"` variant uses a shorter in-flow image above the card. Individual venues can override via `venues.splash_variant`.
-│       │   ├── welcome-splash-oversized.tsx
-│       │   └── welcome-splash-text.tsx
-│       ├── cruise/         # Cruise venue pages
-│       │   ├── cruise-home.tsx
-│       │   ├── cruise-ship-info.tsx
-│       │   ├── cruise-food-onboard.tsx
-│       │   ├── cruise-restaurant-listing.tsx
-│       │   ├── cruise-group-plan.tsx
-│       │   ├── cruise-itinerary-listing.tsx
-│       │   ├── cruise-crew.tsx
-│       │   └── cruise-crew-listing.tsx
-│       ├── venue/          # Hotel/resort venue pages
-│       │   ├── venue-home.tsx
-│       │   ├── venue-services.tsx
-│       │   ├── venue-dining.tsx
-│       │   ├── venue-events.tsx
-│       │   └── venue-explore.tsx
-│       ├── explore/        # Explore hub pages
-│       │   ├── area-listing.tsx
-│       │   ├── explore-collection.tsx
-│       │   └── place-listing.tsx
-│       └── event/          # Standalone event pages
-│           └── event-home.tsx
+│   ├── ui/                 # shadcn/ui (textarea.tsx added manually)
+│   ├── dashboard/          # Dashboard-only components (sheets, pickers, upload)
+│   └── guest/              # Guest components: primitives/, cruise/, venue/, explore/, event/ → see src/components/guest/CLAUDE.md
 ├── lib/
-│   ├── auth.ts             # NextAuth config (Resend magic link + SupabaseAdapter + JWT strategy)
-│   ├── invites.ts          # getInviteByToken(), claimInvite() — all invite DB logic
-│   ├── dashboard.ts        # getActiveDashboardVenue(userId) — resolves active venue from cookie
-│   ├── queries.ts          # Supabase query functions (public + admin variants)
-│   ├── permissions.ts      # Dashboard auth: getVenueRole, requireVenueRole, getVenuesForUser
-│   ├── storage.ts          # uploadVenueAsset / uploadEventAsset / deleteVenueAsset — accept `File | Buffer` with optional `contentType`
-│   ├── utils.ts            # cn() utility + formatPrice()
-│   ├── url.ts              # safeHttpUrl() / parseOptionalHttpUrl() — http(s)-only URL validation for hrefs, redirects and form input
-│   ├── rate-limit.ts       # Best-effort in-memory rate limiter (per instance) + clientIp()
-│   ├── auth-helpers.ts     # normalizeEmail(), allowMagicLinkSend() — shared by sign-in and invite actions
-│   ├── env.ts              # requireEnv() — clear error for missing env vars
-│   ├── slug-resolver.ts    # Route resolution (venue vs event)
-│   ├── cruise-crew-data.ts # Hardcoded CREW array (name, slug, photos[]) for anniversary cruise photo galleries
-│   └── supabase/           # Supabase clients
-│       ├── server.ts       # Anon key client for Server Components (respects RLS)
-│       ├── client.ts       # Anon key client for Client Components
-│       ├── middleware.ts   # Session refresh middleware
-│       └── admin.ts        # Service role client — server-only, bypasses RLS
+│   ├── auth.ts, auth-helpers.ts   # NextAuth config; normalizeEmail(), allowMagicLinkSend()
+│   ├── invites.ts                 # getInviteByToken(), claimInvite() (atomic claim, never downgrades roles)
+│   ├── dashboard.ts               # getActiveDashboardVenue(userId) — active venue from cookie
+│   ├── permissions.ts             # getVenueRole, requireVenueRole, getVenuesForUser (cached per request)
+│   ├── venue-action.ts            # authorizeVenue / nextDisplayOrder / finishVenueWrite for dashboard actions
+│   ├── queries.ts                 # Guest Supabase queries (anon, cacheable)
+│   ├── slug-resolver.ts           # resolveSlug() — venue vs standalone event (React cache())
+│   ├── revalidate.ts              # revalidateGuestPages(venueId)
+│   ├── storage.ts                 # uploadVenueAsset / uploadEventAsset / deleteVenueAsset
+│   ├── url.ts, rate-limit.ts, env.ts, utils.ts
+│   ├── cruise-crew-data.ts        # Hardcoded crew photo galleries for the anniversary cruise
+│   └── supabase/
+│       ├── public.ts       # Cookie-free anon client — guest reads (cacheable)
+│       ├── client.ts       # Anon client for Client Components
+│       └── admin.ts        # Service-role client — server-only, bypasses RLS
 ├── types/index.ts          # All TypeScript interfaces
-└── hooks/
-    ├── use-debounce.ts
-    ├── use-image-loaded.ts # Returns { loaded, imgRef, settle } — spinner until image loads or errors
-    ├── use-press-scale.ts  # Returns press event handlers (scale animation, no re-render)
-    └── use-sticky-nav.ts   # Returns { showStickyNav, headerRef } scroll-past-header state
+└── hooks/                  # use-debounce, use-image-loaded, use-press-scale, use-sticky-nav
 ```
 
 ## Database Schema
@@ -159,7 +78,7 @@ Core tables (migrations in `supabase/migrations/`):
 - **services** — detailed venue service descriptions (WiFi instructions, housekeeping details, etc.)
 - **events** — venue-hosted events (wine hour, live jazz, etc.). Optional `booking_url` field — when set, event cards show a "Book Now" button that routes through `/api/go?event=<id>` for click tracking.
 - **nearby_places** — recommended spots near the venue. Dual-purpose: some rows are real places (restaurants, parks, etc.) that link to individual listing pages; others are gateway cards on the Explore page that link to a collection (when `collection_id` is set). Grouped by `area` for the Explore page. Extra detail fields: `tagline`, `hours`, `tips` (text[]), `cta_label`, `price_level` (0 = FREE), `collection_id`, `booking_url` (optional affiliate/booking link — routes through `/api/go?place=<id>` for click tracking; when set, `website` drops to a secondary "Visit Website" button). **Dining `area` convention**: for dining categories (restaurant/bar/cafe), `area = "on-site"` marks the place as a hotel restaurant/bar shown in the "At the Hotel" section of the Dining page; all other area values (including null) appear under "Nearby Recommendations". Set via the "Location" select in PlaceSheet.
-- **affiliate_clicks** — click log for affiliate/booking links. Fields: `entity_type` (`'place'` | `'event'`), `entity_id` (uuid), `venue_id`, `clicked_at`. Written fire-and-forget by `/api/go` via the admin client so it never blocks the redirect. Indexed on `(entity_type, entity_id)` and `(venue_id, clicked_at DESC)`. See migration `030_affiliate_links.sql`.
+- **affiliate_clicks** — click log for affiliate/booking links. Fields: `entity_type` (`'place'` | `'event'`), `entity_id` (uuid), `venue_id`, `clicked_at`. Written fire-and-forget by `/api/go` via the admin client so it never blocks the redirect. Indexed on `(entity_type, entity_id)` and `(venue_id, clicked_at DESC)`. RLS enabled with no policies (service role only) — see migrations `030_affiliate_links.sql`, `034_affiliate_clicks_rls.sql`.
 - **explore_collections** — curated editorial lists (e.g. "Date Night", "A Walk Through Ballard"). Two layout variants: `cards` (stacked image cards with CTA) and `timeline` (vertical dot-and-line itinerary). Each collection belongs to a venue and optionally maps to an `area`
 - **explore_collection_items** — ordered join table linking a collection to its `nearby_places`. Supports `time_label`, `is_start`, and `is_end` for the timeline variant
 - **venue_amenities** — categorized feature flags (free WiFi, pool, parking, etc.) with icon + toggle
@@ -168,8 +87,8 @@ Core tables (migrations in `supabase/migrations/`):
 - **cruise_itinerary_items** — group plan timeline entries per cruise venue. `is_start=true` items serve as day headers (e.g. "SAT NOV 11" with `location` = port name); all items until the next `is_start` belong to that day. `is_end=true` marks the final disembarkation entry — it renders as a regular tappable card like all other items. `time_label` holds display time (e.g. "8:30pm"). `restaurant_id` (nullable FK) links a timeline item directly to a restaurant detail page (bypasses the itinerary detail page entirely). Two text fields intentionally carry different content: `card_description` is the short subheader shown on the timeline card (line-clamped to 2 lines); `description` is the body text rendered on the individual item detail page (split on `\n\n` into paragraphs). Items with `restaurant_id` set only need `card_description` — their detail page is the restaurant page. See migration `027_itinerary_card_description.sql`.
 - **cruise_crew** — crew/group members for a cruise venue (name, role, bio, image, display_order)
 - **cruise_links** — external URL links shown on the cruise homepage (e.g. iOS shared album, Google shared album, Virgin Voyages site)
-- **cruise_nav_images** — optional hero images for the four nav tiles on the cruise homepage. One row per tile per venue: `nav_key` is one of `"ship-info"` | `"food-onboard"` | `"group-plan"` | `"the-crew"` (matching the route segment). Also has `sublabel` (text, optional) for secondary label text on the tile. Unique constraint on `(venue_id, nav_key)`. Fetched client-side on mount alongside `cruise_links`; passed as `imageUrl` to `NavCard`.
-- **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, `body`, and `expires_at` (timestamptz, nullable). The query fetches the most recent row where `effective_at <= NOW() AND (expires_at IS NULL OR expires_at > NOW())`. Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_cruise_daily_welcome.sql`.
+- **cruise_nav_images** — optional hero images for the four nav tiles on the cruise homepage. One row per tile per venue: `nav_key` is one of `"ship-info"` | `"food-onboard"` | `"group-plan"` | `"the-crew"` (matching the route segment). Also has `sublabel` (text, optional) for secondary label text on the tile. Unique constraint on `(venue_id, nav_key)`. Fetched server-side in `[slug]/page.tsx` (`getCruiseNavTiles`) and passed to `CruiseHomePage`; each tile's image is passed as `imageUrl` to `NavCard`.
+- **cruise_daily_welcome** — time-scheduled welcome card content for cruise venues. Each row has `venue_id`, `effective_at` (timestamptz), `heading`, `body`, and `expires_at` (timestamptz, nullable). The server fetches **all** rows (`getCruiseDailyWelcomes`, newest first) so the cached page stays valid; `CruiseHomePage` picks the most recent row where `effective_at <= now AND (expires_at IS NULL OR expires_at > now)` on the client. Falls back to `venues.welcome_heading/body`, then hardcoded defaults. See migrations `018_cruise_daily_welcome.sql` and `019_sample_cruise_daily_welcome.sql`.
 - **venue_page_descriptions** — optional flavor text and hero image shown at the top of L1 venue/cruise pages. Keyed by `(venue_id, page_slug)` where `page_slug` matches the route segment (e.g. `"services"`, `"dining"`, `"events"`, `"explore"`, `"food-onboard"`, `"ship-info"`, `"group-plan"`, `"the-crew"`). Fields: `body` (NOT NULL, empty string when a row is created for an image-only page), `image_url` (nullable — per-page hero image; guest pages fall back to `venues.cover_image_url` when null). Managed via `updatePageImagesAction` in `src/app/dashboard/venue/actions.ts`. Queried via `getVenuePageDescription(venueId, pageSlug)` in `queries.ts` which returns `{ body: string | null; heroImageUrl: string | null }`. See migrations `016_venue_page_descriptions.sql`, `033_page_hero_images.sql`.
 - **venue_nav_tiles** — sublabel text for nav tiles on standard venue homepages (hotel/resort/etc.). `nav_key` is one of `"services"` | `"dining"` | `"explore"`. Analogous to `cruise_nav_images` but for non-cruise venues. See migration `022_cruise_nav_sublabel.sql`.
 - **standalone_events** — events independent of venues (conferences, festivals, weddings)
@@ -178,8 +97,6 @@ Core tables (migrations in `supabase/migrations/`):
 - **event_schedule_items** — schedule/agenda for standalone events
 - **venue_media** — media library for a venue. Each row tracks one uploaded image: `url` (public Supabase Storage URL), `filename`, `size`. All uploads go to `venue-assets/{slug}/media/{uuid}.{ext}` so they're isolated from entity-specific paths. Written by `POST /api/dashboard/upload`; queried by `listVenueMediaAction`. No RLS permissive policies — only accessible via service role (admin client). See migration `032_venue_media.sql`.
 - **venue_invites** — invite tokens for owner onboarding. Fields: `token` (unique random string), `venue_id`, `role` (default `owner`), `email_hint` (display only — not enforced), `claimed_by`/`claimed_at` (set on claim), `expires_at`. No RLS permissive policies — only accessible via service role. See migration `029_venue_invites.sql`.
-- **venue_media** — media library of uploaded images per venue (`url`, `filename`, `size`). Service-role only. See migration `032_venue_media.sql`.
-- **affiliate_clicks** — click log written by `/api/go` (`entity_type`, `entity_id`, `venue_id`). RLS enabled with no policies (service role only) — see migration `034_affiliate_clicks_rls.sql`.
 - **users / accounts / verification_tokens** — NextAuth adapter tables managed by `@auth/supabase-adapter`. Required for magic link verification token persistence. No app code reads these directly. See migration `028_nextauth_adapter_schema.sql`.
 
 Key patterns:
@@ -187,171 +104,6 @@ Key patterns:
 - RLS: public read access, write restricted to venue/event members by role
 - Slugs are globally unique across venues and standalone events (enforced by trigger)
 - `venue_type = "cruise"` routes to cruise-specific pages; hotel/resort/etc. routes to the standard venue pages. The `[slug]/page.tsx` checks `venue_type` to dispatch to the right homepage component.
-
-## Cruise Ship Architecture
-
-Four pages under `/:slug/` for `venue_type = "cruise"`. All four routes return 404 for non-cruise venues.
-
-```
-Cruise home       /:slug                          (cruise-home.tsx)
-Ship Info         /:slug/ship-info                (cruise-ship-info.tsx)
-Food Onboard      /:slug/food-onboard             (cruise-food-onboard.tsx)
-  └── Detail      /:slug/food-onboard/[id]        (cruise-restaurant-listing.tsx)
-Group Plan        /:slug/group-plan               (cruise-group-plan.tsx)
-  └── Detail      /:slug/group-plan/[itemId]      (cruise-itinerary-listing.tsx)
-The Crew          /:slug/the-crew                 (cruise-crew.tsx)
-  └── Detail      /:slug/the-crew/[name]          (cruise-crew-listing.tsx — photo gallery, uses cruise-crew-data.ts)
-```
-
-**Ship Info** uses the existing `services` table with four cruise-specific categories:
-- `welcome_aboard` → section 01 Welcome Aboard
-- `ship_amenities` → section 02 Amenities
-- `ship_bars` → section 03 Bars
-- `ship_entertainment` → section 04 Entertainment
-
-**Food Onboard** groups `cruise_restaurants` into Sit Down Restaurants (`restaurant_type = "sit_down"`) and Walk Up Eateries (`restaurant_type = "walk_up"`). Each row links to an individual detail page.
-
-**Group Plan** renders a day-by-day timeline. `is_start=true` items are parsed as day headers and drive horizontal scrolling pill navigation at the top. Selecting a pill filters the timeline to show only that day's items. Every regular timeline card (non-`is_start`, non-`is_end`) links to its own detail page at `/:slug/group-plan/[itemId]`, which uses the same hero + floating name card design as the restaurant listing. If the item has a `restaurant_id`, the detail page also shows a "View Restaurant →" button linking to `/:slug/food-onboard/[restaurantId]`.
-
-**Cruise home** fetches `cruise_daily_welcome` and `cruise_links` client-side on mount. The welcome card displays the most recent `cruise_daily_welcome` entry where `effective_at <= NOW() AND (expires_at IS NULL OR expires_at > NOW())`, falling back to `venue.welcome_heading/body` then hardcoded defaults. Multiple entries per day are supported for time-of-day updates (e.g. a morning message and a Scarlet Night evening message). All timestamps are stored in UTC.
-
-**Sample cruise**: "Adam & Ansel's Anniversary" at slug `adam-ansel` — Virgin Voyages Resilient Lady, Nov 11–18, 2025. See migrations `012_sample_anniversary_cruise.sql` and `019_sample_cruise_daily_welcome.sql`. The group plan itinerary was fully replaced in `027_itinerary_card_description.sql` (do not re-run `012` data for itinerary items). Crew photo galleries for this cruise use `cruise-crew-data.ts` (hardcoded, not the `cruise_crew` DB table).
-
-## Explore Page Architecture
-
-Three-tier navigation under `/:slug/explore/`:
-
-```
-Explore index         /:slug/explore
-  ├── Collection      /:slug/explore/[collectionId]      (explore-collection.tsx)
-  │     └── Place     /:slug/explore/place/[placeId]     (place-listing.tsx)
-  └── Area            /:slug/explore/area/[area]         (area-filtered explore view)
-```
-
-- **Explore index** groups `nearby_places` by `area`. Cards with `collection_id` set link to the collection; cards without link to the place listing.
-- **Collection page** renders either `cards` layout (Date Night style) or `timeline` layout (Open Wander/itinerary style) based on `explore_collections.layout`.
-- **Place listing** shows full detail for an individual `nearby_place`. Uses the same floating name card pattern as cruise restaurant/itinerary detail pages: `ScrollRevealStickyHeader` + `FloatingBackButton` over a full `aspect-[4/3]` hero, with a centered card (`translate-y-1/2` over the hero bottom) containing the place name and tagline/price meta. Content starts at `pt-20` to clear the card. Back button uses `history.back()` to return to whichever page linked here.
-- **`nearby_places.collection_id`** is the key field that makes an explore card a gateway to a collection rather than an individual place listing.
-
-## Affiliate Links
-
-Optional booking/affiliate URLs on `nearby_places` and `events`. When a `booking_url` is set, guest-facing cards route clicks through `/api/go` before redirecting, logging each click to `affiliate_clicks`.
-
-### Flow
-
-```
-Guest taps CTA → /api/go?place=<id>  (or ?event=<id>)
-                → INSERT affiliate_clicks (fire-and-forget, admin client)
-                → 302 → booking_url
-```
-
-### Guest behavior
-
-- **Place listing** (`place-listing.tsx`): when `booking_url` is set, the primary CTA button (`cta_label` or category default) routes through `/api/go?place=<id>`. The place's `website` drops to a secondary "Visit Website" outline button below it. When no `booking_url`, behavior is unchanged — CTA links directly to `website` or Google Maps.
-- **Venue events** (`venue-events.tsx`): event cards show a "Book Now →" pill button when `booking_url` is set. No button when absent.
-
-### Dashboard
-
-Both `PlaceSheet` and `EventSheet` have a "Booking URL" field. Managed via `upsertPlaceAction` / `upsertVenueEventAction` — the field is nullable and optional.
-
-### Querying clicks
-
-```sql
--- Clicks per place for a venue (last 30 days)
-SELECT entity_id, COUNT(*) AS clicks
-FROM affiliate_clicks
-WHERE venue_id = '<venue-id>'
-  AND entity_type = 'place'
-  AND clicked_at > now() - interval '30 days'
-GROUP BY entity_id
-ORDER BY clicks DESC;
-```
-
-## Dark Mode
-
-All guest-facing venue and event pages (`[slug]/` routes) support system dark mode via `prefers-color-scheme`. The dashboard does not currently implement dark mode.
-
-### Architecture
-
-Dark mode is **CSS-first**: `globals.css` has a `@media (prefers-color-scheme: dark)` block that overrides `:root` token values before any JavaScript runs. This is critical — JS-only approaches (e.g. `useEffect` or `useLayoutEffect`) cause race conditions with component lifecycle that produce inconsistent results, especially on the welcome splash screen.
-
-```css
-/* globals.css */
-@media (prefers-color-scheme: dark) {
-  :root { --background: #1C1A17; --foreground: #EDE8DE; ... }
-  body { background-color: #1C1A17; }  /* for iOS status bar */
-}
-```
-
-`VenueThemeProvider` (`src/components/theme-provider.tsx`) also applies dark overrides as inline CSS vars after mount via `useEffect` for tokens not handled by the CSS cascade (e.g. `--cf-card-shadow`, `--cf-glass-bg`). It also sets `document.body.style.backgroundColor` to ensure the iOS Safari status bar matches the page background.
-
-### Dark palette tokens
-
-The `DARK_MODE` constant in `[slug]/layout.tsx` defines the structural neutral tokens applied to all venue/event pages. **Venue brand colors (`--primary`, `--accent`) are intentionally excluded** — they stay the same in both modes as configured in `venue_themes`.
-
-Key dark values: background `#1C1A17`, card `#252220`, foreground `#EDE8DE`, muted `#2E2B27`, border `#3A3632`.
-
-### Critical constraints
-
-- **Do not add `--background` or `--foreground` to `VenueThemeProvider`'s `lightStyle`**. These must come from the CSS cascade (`:root` in `globals.css`) so the dark media query can take effect on first render before JS fires. Adding them as inline styles would override the CSS and break dark mode on first paint.
-- **Do not put `bg-background` on `VenueThemeProvider`'s wrapper div**. The body provides the page background; the wrapper is intentionally transparent so the body color is visible in the iOS status bar area.
-- **Splash components (`welcome-splash-oversized.tsx`, `welcome-splash-text.tsx`) use `bg-background`** on their root div — this is correct and intentional. It gives the splash an opaque background that blocks underlying content, and it resolves correctly from the CSS dark media query (not from inline styles).
-- **`FloatingBackButton`** uses `var(--cf-glass-bg)` for its background (not a hardcoded color), so it adapts to dark mode.
-- **`card-shadow` utility** uses `var(--cf-card-shadow)` which is overridden in dark mode.
-- **`theme-color` meta tag** in `src/app/layout.tsx` uses a media-conditional array so Safari's browser chrome matches the dark background.
-
-## Design Token System
-
-All design tokens live in `src/app/globals.css` as `--cf-*` CSS custom properties on `:root`. They are the single source of truth — change a value there and it propagates everywhere. Tokens cover typography, spacing, radius, and interactive states.
-
-**Font families:** `--cf-font-display: "Nunito Sans"` (display/headings, loaded via `--font-serif` CSS variable) and `--cf-font-body: "Source Sans 3"` (body, loaded via `--font-sans`). Use `font-serif` Tailwind class for display text, `font-sans` for body. Both fonts are **per-venue configurable** via `venue_themes.heading_font_family` (→ `--font-serif`) and `venue_themes.font_family` (→ `--font-sans`). Custom fonts are loaded client-side via Google Fonts; Nunito Sans and Source Sans 3 are pre-loaded by Next.js and need no injection. The `FontPicker` dashboard component (`src/components/dashboard/font-picker.tsx`) handles selection and live preview.
-
-**Font weight conventions for display (`font-serif`) text:**
-- Hero h1 (`text-hotel-name`, `text-page-title`): `font-semibold` (600)
-- Section headings, sticky header venue name, card titles: `font-medium` (500)
-- Nav card labels, timeline card titles, decorative/secondary display text: `font-normal` (400)
-
-Tokens are registered in the `@theme inline {}` block so Tailwind generates real utility classes from them:
-
-| Token group | CSS var example | Tailwind utility |
-|---|---|---|
-| Font size | `--cf-text-hotel-name: 30px` | `text-hotel-name` |
-| Font size | `--cf-text-body: 15px` | `text-body` |
-| Font size | `--cf-text-label: 11px` | `text-label` |
-| Font size | `--cf-text-cta-button: 15px` | `text-cta-button` |
-| Font size | `--cf-text-card-title-lg: 20px` | `text-card-title-lg` |
-| Spacing | `--cf-page-padding: 20px` | `px-page`, `-ml-page` |
-| Spacing | `--cf-section-gap: 40px` | `mb-section` |
-| Spacing | `--cf-card-padding: 20px` | `p-card` |
-| Spacing | `--cf-card-gap: 14px` | `gap-card-gap` |
-| Spacing | `--cf-heading-to-content: 16px` | `mb-heading-gap` |
-| Radius | `--cf-radius-default: 4px` | `rounded-default` |
-| Radius | `--cf-radius-chip: 20px` | `rounded-chip` |
-
-For tokens not suited to Tailwind utilities (line-height, letter-spacing, interactive values), use them directly as `var(--cf-...)` in arbitrary values or inline styles:
-- `leading-[var(--cf-body-line-height)]`
-- `tracking-[var(--cf-text-label-spacing)]`
-- `style={{ transitionDuration: "var(--cf-press-duration)" }}`
-
-`guest/cruise/cruise-home.tsx` is the reference implementation. Apply the same token utilities when working on other guest components.
-
-## Shared Guest Primitives
-
-Before adding inline UI patterns to a guest component, check if a shared primitive already exists:
-
-| Need | Use |
-|---|---|
-| Price display (`FREE` / `$$$`) | `formatPrice(priceLevel)` from `@/lib/utils` |
-| Full-screen loading overlay | `<LoadingSpinner />` from `@/components/guest/primitives/loading-spinner` |
-| Wait for image before showing page | `const { loaded, imgRef, settle } = useImageLoaded(url)` from `@/hooks/use-image-loaded` — then `{!loaded && <LoadingSpinner />}` and `<img ref={imgRef} onLoad={settle} onError={settle} />` |
-| Inline clipboard copy button | `<CopyButton text={...} label={...} />` from `@/components/guest/primitives/copy-button` |
-| Animated accordion row | `<AccordionItem title isOpen onToggle>` from `@/components/guest/primitives/accordion-item` |
-| Card with decorative corner brackets | `<CornerBracketCard className?>` from `@/components/guest/primitives/corner-bracket-card` |
-| Numbered section header + underline | `<SectionHeader number="01" title="..." />` from `@/components/guest/primitives/section-header` |
-| Button press scale animation | `const p = usePressScale(); <button {...p}>` from `@/hooks/use-press-scale` |
-| Sticky nav (list pages: Dining, Info, Explore) | `<StickyHeader venueName scrolled backHref nameHref />` + `const { scrolled, sentinelRef } = useStickyScroll()` from `@/components/guest/primitives/sticky-header` — always visible, border appears on scroll |
-| Sticky nav (hero detail pages: place, restaurant) | `<ScrollRevealStickyHeader ... />` + `<FloatingBackButton scrolled ... />` + `const scrolled = useWindowScroll()` from `@/components/guest/primitives/sticky-header` — header fades in on scroll, glass back pill visible over hero |
-| Sticky nav with section tabs (services, ship-info) | Custom fixed div using `const { showStickyNav, headerRef } = useStickyNav()` from `@/hooks/use-sticky-nav` — slides down from top, name row uses absolute-centered pattern matching `StickyHeader` |
 
 ## Auth Configuration
 
@@ -412,110 +164,16 @@ export async function signInWithMagicLink(_prev, formData): Promise<{ error: str
 
 ---
 
-## Dashboard Architecture
-
-**Auth identity gap:** NextAuth and Supabase are separate auth systems. Supabase RLS relies on `auth.uid()` from a Supabase JWT, but the app uses NextAuth sessions — so `auth.uid()` is always NULL in dashboard requests, causing all write RLS policies to silently block.
-
-**Solution:** Dashboard Server Actions and Server Components use `createAdminClient()` (service role key, bypasses RLS) and manually enforce permissions via `src/lib/permissions.ts`.
-
-**Never** import `createAdminClient` in client components or `"use client"` files — the service role key must stay server-side only.
-
-### Active Venue Context
-
-Multi-venue support is handled via a cookie (`active-venue-id`). The active venue is resolved by `getActiveDashboardVenue(userId)` in `src/lib/dashboard.ts`, which reads the cookie and matches it against the user's memberships (from `getVenuesForUser`), falling back to the first membership if the cookie is absent or stale.
-
-Every dashboard page calls this once at the top. The `VenueSwitcher` component in the sidebar calls `switchVenueAction(venueId)` (in `src/app/dashboard/actions.ts`) which updates the cookie and revalidates the layout.
-
-### Dashboard Routes
-
-```
-/dashboard                                    Overview (real counts: events, services, places, collections)
-/dashboard/venue                              Hotel Info & Branding: general info (incl. cover image) + page images + welcome card + theme
-/dashboard/venue/info                         Hotel Details: key-value metadata (check-in, policies, etc.)
-/dashboard/venue/amenities                    Amenity toggles + CRUD (grouped by category)
-/dashboard/venue/services                     Services CRUD
-/dashboard/venue/events                       Venue events CRUD
-/dashboard/venue/places?type=dining           Dining & Drinks: places with category restaurant/bar/cafe (flat list, no area grouping)
-/dashboard/venue/places?type=places           Nearby Places: all non-dining places (grouped by area)
-/dashboard/venue/explore                      Explore Collections list
-/dashboard/venue/explore/[collectionId]       Collection detail + ordered items management
-```
-
-The nav is organized into two sections — **Hotel** (Hotel Info & Branding, Hotel Details, Amenities, Services, Events) and **Places** (Dining & Drinks, Nearby Places, Explore Collections). `NavLink` uses `activeParam={{ key: "type", value: "..." }}` to correctly highlight the Dining vs Places links independently despite sharing the same route path.
-
-The `/dashboard/events/*` standalone event routes still exist but are not linked from the nav. Cruise content has no dashboard coverage yet.
-
-### Server Component Page Pattern
-
-All dashboard page.tsx files follow this structure:
-
-```ts
-const session = await auth();
-if (!session?.user?.id) redirect("/sign-in");
-
-const active = await getActiveDashboardVenue(session.user.id);
-if (!active) redirect("/sign-in");
-
-const supabase = createAdminClient();
-const { data: items } = await supabase
-  .from("table")
-  .select("*")
-  .eq("venue_id", active.venue.id);
-
-return <PageClient items={items ?? []} venueId={active.venue.id} role={active.role} />;
-```
-
-Do **not** use the shared `getAllNearbyPlaces()` / `getAllExploreCollections()` helpers in dashboard pages — those use the regular anon client which doesn't see data without Supabase Auth. Call `createAdminClient()` directly.
-
-### Server Action Pattern
-
-All mutations in `actions.ts` files follow this structure:
-
-```ts
-"use server";
-import { auth } from "@/lib/auth";
-import { requireVenueRole } from "@/lib/permissions";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { revalidatePath } from "next/cache";
-
-export async function upsertXAction(formData: FormData): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
-  const venueId = formData.get("venueId") as string;
-  await requireVenueRole(session.user.id, venueId, "staff"); // redirects to /dashboard if denied
-
-  const supabase = createAdminClient();
-  const { error } = await supabase.from("table").upsert({ venue_id: venueId, ...data });
-  if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/venue/section");
-}
-```
-
-**Always scope mutations by tenant.** Because the service role bypasses RLS, every `update`/`delete` by `id` must also filter `.eq("venue_id", venueId)` (or the parent `collection_id`), and any foreign IDs from the form (`collection_id`, `place_id`) must be verified to belong to that venue. User-supplied URLs go through `parseOptionalHttpUrl`; theme colors/fonts are validated in `venue/actions.ts`.
-
-Server Actions are colocated in `actions.ts` files beside their page, e.g. `src/app/dashboard/venue/services/actions.ts`. Note: `requireVenueRole` redirects to `/dashboard` on role failure — that's the intended behavior.
-
-### Forms Strategy
-
-All list pages use a right-side shadcn `Sheet` (`side="right"`) for create/edit. One exception: Venue Settings stays as an inline full-page form.
-
-- List pages are split into a Server Component (`page.tsx`) that fetches data, and a `"use client"` sibling (`*-client.tsx`) that holds sheet open state
-- Sheet components live in `src/components/dashboard/` (e.g. `ServiceSheet`, `PlaceSheet`)
-- On action success: close sheet + `router.refresh()`
-- Delete confirmation: inline toggle in sheet footer (no separate Dialog)
-- Delete requires `"admin"` role minimum; upsert requires `"staff"`
-- One exception: Hotel Info & Branding (`/dashboard/venue`) stays as an inline full-page form (no Sheet)
-
 ## Conventions
 
 - **Formatting**: Double quotes, semicolons, 2-space indent, trailing commas, 100 char width
-- **Styling**: Tailwind classes for layout; CSS variables for dynamic theming per venue/event; `--cf-*` design tokens for all typography, spacing, radius, and interactive values (see Design Token System above)
+- **Styling**: Tailwind classes for layout; CSS variables for dynamic theming per venue/event; `--cf-*` design tokens (see `src/components/guest/CLAUDE.md`)
 - **Components**: Follow shadcn/ui patterns with `data-slot` attributes and CVA variants
-- **Database queries**: Public/guest queries go in `src/lib/queries.ts` using `createClient()` (anon key). Dashboard admin queries that need to bypass RLS use `createAdminClient()` directly in the Server Action or Server Component — or use the `getAll*` / `getVenuesForUser` / `getVenueMemberRole` variants already in `queries.ts`.
-- **Image uploads**: Use `uploadVenueAsset(slug, path, file, contentType?)` from `src/lib/storage.ts` — accepts `File | Buffer`. The `path` arg is relative within the slug folder, e.g. `"places/{place-id}/photo.jpg"`. All uploads through `POST /api/dashboard/upload` are automatically converted to WebP (quality 85) by `sharp` before storage; SVGs and GIFs pass through unchanged. See the Supabase Storage section for the full bucket layout.
+- **Database queries**: Guest queries live in `src/lib/queries.ts` and use `createPublicClient()` (cookie-free anon client). Dashboard reads/writes use `createAdminClient()` directly in the Server Component/Action (see `src/app/dashboard/CLAUDE.md`).
+- **Image uploads**: Use `uploadVenueAsset(slug, path, file, contentType?)` from `src/lib/storage.ts` — accepts `File | Buffer`. `path` is relative within the slug folder, e.g. `"places/{place-id}/photo.jpg"`. Uploads through `POST /api/dashboard/upload` are validated (10 MB cap, raster types only — **SVG is rejected**), then re-encoded to WebP (quality 85, max 2400px, EXIF rotated, metadata stripped; animated GIFs stay animated).
 - **Path alias**: `@/*` maps to `src/*`
-- **Branches**: `develop` for active work, `main` for production
+- **Branches**: `develop` for active work, `main` for production. **Open PRs against `develop`.** `gh` is installed for creating PRs.
+- **Where things live**: area-specific rules are in directory-scoped CLAUDE.md files (`src/app/dashboard/`, `src/app/[slug]/`, `src/components/guest/`) — read them before working there.
 
 ## Supabase Storage
 
