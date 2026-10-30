@@ -302,3 +302,24 @@
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
+
+/* Accessibility: visible keyboard focus for the custom (non-shadcn) controls on guest pages. */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--primary, currentColor);
+  outline-offset: 2px;
+}
+
+/* Accessibility: honor the OS "reduce motion" setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

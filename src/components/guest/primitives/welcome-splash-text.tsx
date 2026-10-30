@@ -26,7 +26,12 @@ export function WelcomeSplashText({
   const { loaded, imgRef, settle } = useImageLoaded(coverImageUrl);
 
   return (
-    <div className="flex size-full flex-col overflow-hidden bg-background font-sans">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Welcome"
+      className="flex size-full flex-col overflow-hidden bg-background font-sans"
+    >
       {!loaded && <LoadingSpinner />}
       {/* Image — in-flow, bleeds off top edge, rounded right */}
       <div
@@ -64,6 +69,7 @@ export function WelcomeSplashText({
         <div className="mt-5 flex justify-center">
           <button
             onClick={onEnter}
+            autoFocus
             {...pressHandlers}
             className="flex cursor-pointer items-center gap-2 rounded-default border-none bg-foreground px-8 py-3.5 text-cta-button font-semibold text-background transition-transform duration-150 ease-[cubic-bezier(0.16,1,0.3,1)]"
           >

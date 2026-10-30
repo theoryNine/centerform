@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { MemberRole, Venue } from "@/types";
@@ -30,7 +31,8 @@ export async function requireVenueRole(
 }
 
 // Returns all venues the user is a member of, with their role and venue details.
-export async function getVenuesForUser(
+// Wrapped in cache() so the layout and page share one query per request.
+export const getVenuesForUser = cache(async function getVenuesForUser(
   userId: string
 ): Promise<Array<{ role: MemberRole; venue: Venue }>> {
   const supabase = createAdminClient();
@@ -46,4 +48,4 @@ export async function getVenuesForUser(
     role: row.role as MemberRole,
     venue: row.venues as unknown as Venue,
   }));
-}
+});

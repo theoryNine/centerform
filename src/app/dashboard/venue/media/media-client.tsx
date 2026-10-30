@@ -79,7 +79,7 @@ export function MediaClient({ media: initialMedia, venueId }: MediaClientProps) 
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif"
           multiple
           className="hidden"
           onChange={(e) => e.target.files?.length && handleUpload(e.target.files)}
@@ -103,7 +103,7 @@ export function MediaClient({ media: initialMedia, venueId }: MediaClientProps) 
               className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.url} alt={item.filename} className="h-full w-full object-cover" />
+              <img loading="lazy" decoding="async" src={item.url} alt={item.filename} className="h-full w-full object-cover" />
 
               {confirmDeleteId === item.id ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70">

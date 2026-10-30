@@ -41,7 +41,12 @@ export function WelcomeEnvelope({
   const initial = hotelInitial ?? hotelName.charAt(0);
 
   return (
-    <div className="relative flex size-full flex-col overflow-hidden bg-gradient-to-b from-[#1a1612] to-[#0d0b09] font-sans">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Welcome"
+      className="relative flex size-full flex-col overflow-hidden bg-gradient-to-b from-[#1a1612] to-[#0d0b09] font-sans"
+    >
       {/* Ambient light */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/4 size-[400px] -translate-x-1/2"
@@ -134,6 +139,7 @@ export function WelcomeEnvelope({
       <div className="flex justify-center px-8 pb-14 pt-8">
         <button
           onClick={onEnter}
+          autoFocus
           onMouseDown={() => setPressed(true)}
           onMouseUp={() => setPressed(false)}
           onMouseLeave={() => setPressed(false)}

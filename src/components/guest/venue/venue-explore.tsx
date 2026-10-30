@@ -49,7 +49,7 @@ function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
       {/* Image */}
       <div className="aspect-[4/3] w-full overflow-hidden rounded-t-[5px]">
         {place.image_url ? (
-          <img
+          <img loading="lazy" decoding="async"
             src={place.image_url}
             alt={place.name}
             className="size-full object-cover"
@@ -134,7 +134,7 @@ function AreaSectionView({
             >
               <div className="aspect-[16/9] w-full overflow-hidden rounded-t-[5px]">
                 {featuredPlace.image_url ? (
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={featuredPlace.image_url}
                     alt={featuredPlace.name}
                     className="size-full object-cover"

@@ -120,6 +120,7 @@ function SectionTab({
   return (
     <button
       onClick={onClick}
+      aria-pressed={isActive}
       className={`cursor-pointer rounded-chip border-none px-4 py-2 text-body-sm font-medium transition-all duration-200 ease-out ${
         isActive ? "bg-primary text-primary-foreground" : "bg-transparent text-foreground"
       }`}

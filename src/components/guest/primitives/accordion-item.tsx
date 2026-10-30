@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useId, useRef, useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface AccordionItemProps {
@@ -13,6 +13,7 @@ interface AccordionItemProps {
 export function AccordionItem({ title, children, isOpen, onToggle }: AccordionItemProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
+  const panelId = useId();
 
   useEffect(() => {
     if (contentRef.current) {
@@ -24,6 +25,8 @@ export function AccordionItem({ title, children, isOpen, onToggle }: AccordionIt
     <div className="-mx-5 border-b border-border px-5">
       <button
         onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
         className="flex w-full cursor-pointer items-center justify-between border-none bg-none py-4 text-left"
       >
         <span className="text-cta-button font-medium text-foreground">{title}</span>
@@ -33,6 +36,8 @@ export function AccordionItem({ title, children, isOpen, onToggle }: AccordionIt
         />
       </button>
       <div
+        id={panelId}
+        inert={!isOpen}
         className="overflow-hidden transition-[height] duration-[250ms] ease-out"
         style={{ height: isOpen ? contentHeight : 0 }}
       >

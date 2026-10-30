@@ -26,7 +26,9 @@ src/
 ├── app/                    # Next.js App Router pages
 │   ├── (auth)/             # Sign-in/sign-up routes
 │   ├── api/auth/           # NextAuth API handler
-│   ├── api/admin/invites/  # Internal POST endpoint: generate venue invite tokens (ADMIN_API_KEY gated)
+│   ├── api/admin/invites/  # Internal POST endpoint: generate venue invite tokens (ADMIN_API_KEY gated, validated)
+│   ├── api/dashboard/upload/ # Authenticated image upload: 10 MB cap, raster only, re-encoded to WebP (no SVG)
+│   ├── api/go/             # Affiliate redirect for place/event booking_url; logs rate-limited clicks to affiliate_clicks
 │   ├── api/go/             # Affiliate link redirect + click tracking (see Affiliate Links below)
 │   ├── api/dashboard/upload/ # POST: authenticate + upload file → convert to WebP (sharp, quality 85; SVG/GIF pass through) → venue-assets bucket → insert venue_media row → return { url }
 │   ├── invite/             # Invite-based onboarding flow
@@ -128,6 +130,10 @@ src/
 │   ├── permissions.ts      # Dashboard auth: getVenueRole, requireVenueRole, getVenuesForUser
 │   ├── storage.ts          # uploadVenueAsset / uploadEventAsset / deleteVenueAsset — accept `File | Buffer` with optional `contentType`
 │   ├── utils.ts            # cn() utility + formatPrice()
+│   ├── url.ts              # safeHttpUrl() / parseOptionalHttpUrl() — http(s)-only URL validation for hrefs, redirects and form input
+│   ├── rate-limit.ts       # Best-effort in-memory rate limiter (per instance) + clientIp()
+│   ├── auth-helpers.ts     # normalizeEmail(), allowMagicLinkSend() — shared by sign-in and invite actions
+│   ├── env.ts              # requireEnv() — clear error for missing env vars
 │   ├── slug-resolver.ts    # Route resolution (venue vs event)
 │   ├── cruise-crew-data.ts # Hardcoded CREW array (name, slug, photos[]) for anniversary cruise photo galleries
 │   └── supabase/           # Supabase clients
@@ -172,6 +178,8 @@ Core tables (migrations in `supabase/migrations/`):
 - **event_schedule_items** — schedule/agenda for standalone events
 - **venue_media** — media library for a venue. Each row tracks one uploaded image: `url` (public Supabase Storage URL), `filename`, `size`. All uploads go to `venue-assets/{slug}/media/{uuid}.{ext}` so they're isolated from entity-specific paths. Written by `POST /api/dashboard/upload`; queried by `listVenueMediaAction`. No RLS permissive policies — only accessible via service role (admin client). See migration `032_venue_media.sql`.
 - **venue_invites** — invite tokens for owner onboarding. Fields: `token` (unique random string), `venue_id`, `role` (default `owner`), `email_hint` (display only — not enforced), `claimed_by`/`claimed_at` (set on claim), `expires_at`. No RLS permissive policies — only accessible via service role. See migration `029_venue_invites.sql`.
+- **venue_media** — media library of uploaded images per venue (`url`, `filename`, `size`). Service-role only. See migration `032_venue_media.sql`.
+- **affiliate_clicks** — click log written by `/api/go` (`entity_type`, `entity_id`, `venue_id`). RLS enabled with no policies (service role only) — see migration `034_affiliate_clicks_rls.sql`.
 - **users / accounts / verification_tokens** — NextAuth adapter tables managed by `@auth/supabase-adapter`. Required for magic link verification token persistence. No app code reads these directly. See migration `028_nextauth_adapter_schema.sql`.
 
 Key patterns:
@@ -483,6 +491,8 @@ export async function upsertXAction(formData: FormData): Promise<void> {
   revalidatePath("/dashboard/venue/section");
 }
 ```
+
+**Always scope mutations by tenant.** Because the service role bypasses RLS, every `update`/`delete` by `id` must also filter `.eq("venue_id", venueId)` (or the parent `collection_id`), and any foreign IDs from the form (`collection_id`, `place_id`) must be verified to belong to that venue. User-supplied URLs go through `parseOptionalHttpUrl`; theme colors/fonts are validated in `venue/actions.ts`.
 
 Server Actions are colocated in `actions.ts` files beside their page, e.g. `src/app/dashboard/venue/services/actions.ts`. Note: `requireVenueRole` redirects to `/dashboard` on role failure — that's the intended behavior.
 

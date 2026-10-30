@@ -235,6 +235,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
               refs.current[group.id] = el;
             }}
             onClick={() => scrollToDay(group.id)}
+            aria-pressed={activeDay === group.id}
             className={`shrink-0 cursor-pointer whitespace-nowrap rounded-chip border-none px-4 py-2 text-body-sm font-medium transition-all duration-200 ease-out ${
               activeDay === group.id
                 ? "bg-primary text-primary-foreground"

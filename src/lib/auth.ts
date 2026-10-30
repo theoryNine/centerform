@@ -2,11 +2,12 @@ import NextAuth from "next-auth";
 import Resend from "next-auth/providers/resend";
 import Credentials from "next-auth/providers/credentials";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
+import { requireEnv } from "@/lib/env";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    url: requireEnv("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL),
+    secret: requireEnv("SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY),
   }),
   providers: [
     Resend({
@@ -46,6 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // JWT strategy: adapter handles verification token persistence for magic link,
     // but sessions are stored client-side as JWTs (no sessions table needed).
     strategy: "jwt",
+    maxAge: 60 * 60 * 24 * 14, // 14 days
   },
   callbacks: {
     jwt({ token, user }) {

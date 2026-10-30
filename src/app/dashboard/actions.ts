@@ -18,6 +18,7 @@ export async function switchVenueAction(venueId: string): Promise<void> {
     path: "/dashboard",
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   });
 
   revalidatePath("/dashboard", "layout");

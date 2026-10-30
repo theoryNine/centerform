@@ -161,7 +161,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
                   </div>
 
                   {event.image_url && (
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={event.image_url}
                       alt={event.title}
                       className="size-16 shrink-0 rounded-[4px] object-cover"

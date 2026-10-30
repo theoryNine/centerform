@@ -26,7 +26,12 @@ export function WelcomeSplashOversized({
   const { loaded, imgRef, settle } = useImageLoaded(coverImageUrl);
 
   return (
-    <div className="relative size-full overflow-hidden bg-background font-sans">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Welcome"
+      className="relative size-full overflow-hidden bg-background font-sans"
+    >
       {!loaded && <LoadingSpinner />}
       {/* Image — absolutely positioned, bleeds off top and bottom edges */}
       <div
@@ -68,6 +73,7 @@ export function WelcomeSplashOversized({
           <div className="flex justify-center">
             <button
               onClick={onEnter}
+              autoFocus
               {...pressHandlers}
               className="flex cursor-pointer items-center gap-2 rounded-default border-none bg-foreground px-8 py-3.5 text-cta-button font-semibold text-background transition-transform duration-150 ease-[cubic-bezier(0.16,1,0.3,1)]"
             >

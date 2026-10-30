@@ -9,6 +9,7 @@ import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
+import { safeHttpUrl } from "@/lib/url";
 
 function getCTALabel(category: NearbyPlace["category"]): string {
   switch (category) {
@@ -25,7 +26,8 @@ function getCTALabel(category: NearbyPlace["category"]): string {
 }
 
 function getCTAHref(place: NearbyPlace): string | null {
-  if (place.website) return place.website;
+  const website = safeHttpUrl(place.website);
+  if (website) return website;
   if (
     (place.category === "outdoors" || place.category === "attraction") &&
     place.address

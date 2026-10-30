@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { getVenueRole } from "@/lib/permissions";
+import { getVenueRole, requireVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { deleteVenueAsset } from "@/lib/storage";
 import type { VenueMedia } from "@/types";
@@ -27,8 +27,7 @@ export async function deleteVenueMediaAction(mediaId: string, venueId: string): 
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const role = await getVenueRole(session.user.id, venueId);
-  if (!role) throw new Error("Forbidden");
+  await requireVenueRole(session.user.id, venueId, "admin");
 
   const supabase = createAdminClient();
 
@@ -41,7 +40,7 @@ export async function deleteVenueMediaAction(mediaId: string, venueId: string): 
 
   if (!media) throw new Error("Not found");
 
-  await supabase.from("venue_media").delete().eq("id", mediaId);
+  await supabase.from("venue_media").delete().eq("id", mediaId).eq("venue_id", venueId);
 
   // Extract storage path from the public URL and delete the file
   const pathMatch = media.url.match(/\/storage\/v1\/object\/public\/venue-assets\/(.+)/);

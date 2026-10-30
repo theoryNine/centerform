@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useStandaloneEvent } from "@/components/slug-context";
+import { safeHttpUrl } from "@/lib/url";
 
 // --- Color tokens (matching landing page) ---
 const colors = {
@@ -386,7 +387,7 @@ export function EventHomePage() {
             </div>
             {event.website && (
               <a
-                href={event.website}
+                href={safeHttpUrl(event.website) ?? undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3.5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] py-2.5 no-underline transition-all duration-200 ease-out"

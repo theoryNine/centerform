@@ -5,12 +5,29 @@ import { getVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { uploadVenueAsset } from "@/lib/storage";
 
-const SKIP_CONVERSION = new Set(["svg", "gif"]);
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const MAX_DIMENSION = 2400;
+// SVG is deliberately excluded: it can carry scripts and is served from our storage origin.
+// Everything else (including GIF) is re-encoded by sharp, which also strips metadata.
+const ALLOWED_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+  "image/heic",
+  "image/heif",
+]);
 
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const declaredLength = Number(req.headers.get("content-length") ?? 0);
+  if (declaredLength > MAX_UPLOAD_BYTES + 1024 * 1024) {
+    return NextResponse.json({ error: "File too large (max 10 MB)" }, { status: 413 });
   }
 
   const formData = await req.formData();
@@ -19,6 +36,13 @@ export async function POST(req: NextRequest) {
 
   if (!venueId || !file) {
     return NextResponse.json({ error: "Missing venueId or file" }, { status: 400 });
+  }
+
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return NextResponse.json({ error: "File too large (max 10 MB)" }, { status: 413 });
+  }
+  if (!ALLOWED_TYPES.has(file.type)) {
+    return NextResponse.json({ error: "Unsupported file type" }, { status: 415 });
   }
 
   const role = await getVenueRole(session.user.id, venueId);
@@ -37,25 +61,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Venue not found" }, { status: 404 });
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const uniqueId = crypto.randomUUID();
-
   const inputBuffer = Buffer.from(await file.arrayBuffer());
-  const convertToWebP = !SKIP_CONVERSION.has(ext);
 
+  // Always re-encode: validates the bytes really are an image (sharp throws otherwise),
+  // applies EXIF orientation, caps resolution, and strips embedded metadata.
   let uploadBuffer: Buffer;
-  let outputExt: string;
-  let contentType: string;
-
-  if (convertToWebP) {
-    uploadBuffer = await sharp(inputBuffer).webp({ quality: 85 }).toBuffer();
-    outputExt = "webp";
-    contentType = "image/webp";
-  } else {
-    uploadBuffer = inputBuffer;
-    outputExt = ext;
-    contentType = file.type || `image/${ext}`;
+  try {
+    uploadBuffer = await sharp(inputBuffer, { limitInputPixels: 100_000_000, animated: true })
+      .rotate()
+      .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 85 })
+      .toBuffer();
+  } catch {
+    return NextResponse.json({ error: "Invalid or unsupported image" }, { status: 415 });
   }
+  const outputExt = "webp";
+  const contentType = "image/webp";
 
   const path = `media/${uniqueId}.${outputExt}`;
 
@@ -63,7 +85,8 @@ export async function POST(req: NextRequest) {
   try {
     url = await uploadVenueAsset(venue.slug, path, uploadBuffer, contentType);
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    console.error("Venue upload failed", err);
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 
   await supabase.from("venue_media").insert({

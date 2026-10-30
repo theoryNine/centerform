@@ -68,7 +68,7 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
       <input
         type="file"
         ref={fileInputRef}
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif"
         className="hidden"
         onChange={handleFileChange}
       />
@@ -76,7 +76,7 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
       {value && (
         <div className="relative rounded-default overflow-hidden border border-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="" className="w-full max-h-48 object-contain bg-muted" />
+          <img loading="lazy" decoding="async" src={value} alt="Selected image preview" className="w-full max-h-48 object-contain bg-muted" />
         </div>
       )}
 
@@ -136,7 +136,7 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
                     className="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.url} alt={item.filename} className="w-full h-full object-cover" />
+                    <img loading="lazy" decoding="async" src={item.url} alt={item.filename} className="w-full h-full object-cover" />
                   </button>
                   <button
                     type="button"

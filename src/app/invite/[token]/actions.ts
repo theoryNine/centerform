@@ -3,16 +3,20 @@
 import { signIn } from "@/lib/auth";
 import { getInviteByToken } from "@/lib/invites";
 import { AuthError } from "next-auth";
+import { allowMagicLinkSend, normalizeEmail } from "@/lib/auth-helpers";
 
 export async function requestMagicLink(
   token: string,
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string } | null> {
-  const email = formData.get("email") as string;
+  const email = normalizeEmail(formData.get("email"));
 
   if (!email) {
-    return { error: "Please enter your email address." };
+    return { error: "Please enter a valid email address." };
+  }
+  if (!(await allowMagicLinkSend(email))) {
+    return { error: "Too many attempts. Please wait a few minutes and try again." };
   }
 
   // Re-validate the invite is still claimable before sending the magic link.

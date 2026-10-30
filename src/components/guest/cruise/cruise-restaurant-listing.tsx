@@ -11,6 +11,7 @@ import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { formatPrice } from "@/lib/utils";
+import { safeHttpUrl } from "@/lib/url";
 
 interface CruiseRestaurantListingProps {
   venue: Venue;
@@ -97,7 +98,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
             <div className="mt-5 flex flex-col gap-3">
               {restaurant.website && (
                 <a
-                  href={restaurant.website}
+                  href={safeHttpUrl(restaurant.website) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex min-h-[44px] items-center justify-center rounded-default border border-primary px-4 text-body-sm font-semibold text-primary no-underline"
@@ -108,7 +109,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
               {restaurant.menu_links?.map((link) => (
                 <a
                   key={link.url}
-                  href={link.url}
+                  href={safeHttpUrl(link.url) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex min-h-[44px] items-center justify-end text-body-sm text-primary no-underline"

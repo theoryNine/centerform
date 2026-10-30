@@ -2,15 +2,19 @@
 
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
+import { allowMagicLinkSend, normalizeEmail } from "@/lib/auth-helpers";
 
 export async function signInWithMagicLink(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string } | null> {
-  const email = formData.get("email") as string;
+  const email = normalizeEmail(formData.get("email"));
 
   if (!email) {
-    return { error: "Please enter your email address." };
+    return { error: "Please enter a valid email address." };
+  }
+  if (!(await allowMagicLinkSend(email))) {
+    return { error: "Too many attempts. Please wait a few minutes and try again." };
   }
 
   try {

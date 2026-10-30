@@ -27,6 +27,7 @@ export function CopyButton({ text, label }: { text: string; label?: string }) {
   return (
     <button
       onClick={handleCopy}
+      aria-label={label ? `${label}${copied ? " (copied)" : ""}` : copied ? "Copied" : "Copy to clipboard"}
       className="inline-flex cursor-pointer items-center gap-1 border-none bg-none p-0 text-[13px] font-semibold text-primary"
     >
       {label && <span>{label}</span>}

@@ -11,6 +11,7 @@ import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card"
 import { createClient } from "@/lib/supabase/client";
 import type { CruiseDailyWelcome, CruiseLink, CruiseNavImage } from "@/types";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { safeHttpUrl } from "@/lib/url";
 
 function formatVenueName(slug: string) {
   return slug
@@ -252,7 +253,7 @@ export function CruiseHomePage() {
               {links.map((link) => (
                 <a
                   key={link.id}
-                  href={link.url}
+                  href={safeHttpUrl(link.url) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between rounded-default bg-card px-4 py-3 text-cta-button font-medium text-primary no-underline card-shadow"

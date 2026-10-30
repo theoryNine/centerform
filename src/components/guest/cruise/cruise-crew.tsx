@@ -31,7 +31,7 @@ function CrewTile({
           <User size={32} color="rgba(255,255,255,0.4)" />
         </div>
         {photo && (
-          <img
+          <img loading="lazy" decoding="async"
             src={photo}
             alt={name}
             onLoad={onSettle}

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { requireVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { parseOptionalHttpUrl } from "@/lib/url";
 
 export async function upsertVenueEventAction(formData: FormData): Promise<void> {
   const session = await auth();
@@ -23,13 +24,13 @@ export async function upsertVenueEventAction(formData: FormData): Promise<void> 
     start_time: formData.get("start_time") as string,
     end_time: (formData.get("end_time") as string) || null,
     image_url: (formData.get("image_url") as string) || null,
-    booking_url: (formData.get("booking_url") as string) || null,
+    booking_url: parseOptionalHttpUrl(formData.get("booking_url"), "Booking URL"),
     is_featured: formData.get("is_featured") === "true",
     is_active: formData.get("is_active") === "true",
   };
 
   const { error } = id
-    ? await supabase.from("events").update(payload).eq("id", id)
+    ? await supabase.from("events").update(payload).eq("id", id).eq("venue_id", venueId)
     : await supabase.from("events").insert(payload);
 
   if (error) throw new Error(error.message);
@@ -45,7 +46,7 @@ export async function deleteVenueEventAction(formData: FormData): Promise<void> 
 
   const id = formData.get("id") as string;
   const supabase = createAdminClient();
-  const { error } = await supabase.from("events").delete().eq("id", id);
+  const { error } = await supabase.from("events").delete().eq("id", id).eq("venue_id", venueId);
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue/events");
 }

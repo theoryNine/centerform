@@ -54,7 +54,7 @@ interface BaseHeaderProps {
 function BackButton({ backHref, onBack }: { backHref?: string; onBack?: () => void }) {
   if (backHref) {
     return (
-      <Link href={backHref} className="shrink-0 text-primary no-underline">
+      <Link href={backHref} aria-label="Go back" className="shrink-0 text-primary no-underline">
         <ArrowLeft size={20} />
       </Link>
     );
@@ -63,6 +63,7 @@ function BackButton({ backHref, onBack }: { backHref?: string; onBack?: () => vo
     return (
       <button
         onClick={onBack}
+        aria-label="Go back"
         className="shrink-0 cursor-pointer border-none bg-transparent p-0 text-primary"
       >
         <ArrowLeft size={20} />
@@ -125,7 +126,7 @@ export function FloatingBackButton({ scrolled, backHref, onBack }: FloatingBackB
 
   if (backHref) {
     return (
-      <Link href={backHref} className={`${base} no-underline`} style={posStyle}>
+      <Link href={backHref} aria-label="Go back" className={`${base} no-underline`} style={posStyle}>
         {inner}
       </Link>
     );
@@ -134,6 +135,7 @@ export function FloatingBackButton({ scrolled, backHref, onBack }: FloatingBackB
     return (
       <button
         onClick={onBack}
+        aria-label="Go back"
         className={`${base} cursor-pointer border-none bg-transparent p-0`}
         style={posStyle}
       >

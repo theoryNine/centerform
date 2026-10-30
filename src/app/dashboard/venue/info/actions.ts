@@ -36,7 +36,7 @@ export async function upsertInfoAction(formData: FormData): Promise<void> {
   };
 
   const { error } = id
-    ? await supabase.from("venue_info").update(payload).eq("id", id)
+    ? await supabase.from("venue_info").update(payload).eq("id", id).eq("venue_id", venueId)
     : await supabase.from("venue_info").insert(payload);
 
   if (error) throw new Error(error.message);
@@ -52,7 +52,7 @@ export async function deleteInfoAction(formData: FormData): Promise<void> {
 
   const id = formData.get("id") as string;
   const supabase = createAdminClient();
-  const { error } = await supabase.from("venue_info").delete().eq("id", id);
+  const { error } = await supabase.from("venue_info").delete().eq("id", id).eq("venue_id", venueId);
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue/info");
 }

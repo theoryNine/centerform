@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { randomBytes } from "crypto";
+import { randomBytes, timingSafeEqual } from "crypto";
 
 // Internal-only endpoint for generating venue invite tokens.
 // Protect with ADMIN_API_KEY — never expose this to the client.
@@ -13,10 +13,18 @@ import { randomBytes } from "crypto";
 
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 
+const VALID_ROLES = ["owner", "admin", "staff"] as const;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isAuthorized(header: string | null): boolean {
+  if (!ADMIN_API_KEY || !header) return false;
+  const a = Buffer.from(header);
+  const b = Buffer.from(`Bearer ${ADMIN_API_KEY}`);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 export async function POST(request: NextRequest) {
-  // Auth check
-  const authHeader = request.headers.get("authorization");
-  if (!ADMIN_API_KEY || authHeader !== `Bearer ${ADMIN_API_KEY}`) {
+  if (!isAuthorized(request.headers.get("authorization"))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -36,8 +44,20 @@ export async function POST(request: NextRequest) {
 
   const { venueId, role = "owner", expiresInDays = 7, emailHint, invitedBy } = body;
 
-  if (!venueId) {
-    return NextResponse.json({ error: "venueId is required" }, { status: 400 });
+  if (!venueId || !UUID.test(venueId)) {
+    return NextResponse.json({ error: "venueId must be a valid UUID" }, { status: 400 });
+  }
+  if (!VALID_ROLES.includes(role as (typeof VALID_ROLES)[number])) {
+    return NextResponse.json({ error: "role must be owner, admin or staff" }, { status: 400 });
+  }
+  if (!Number.isFinite(expiresInDays) || expiresInDays < 1 || expiresInDays > 90) {
+    return NextResponse.json({ error: "expiresInDays must be between 1 and 90" }, { status: 400 });
+  }
+  if (invitedBy !== undefined && (typeof invitedBy !== "string" || invitedBy.length > 100)) {
+    return NextResponse.json({ error: "invitedBy must be a string up to 100 characters" }, { status: 400 });
+  }
+  if (emailHint !== undefined && (typeof emailHint !== "string" || emailHint.length > 254)) {
+    return NextResponse.json({ error: "emailHint must be a string up to 254 characters" }, { status: 400 });
   }
 
   const supabase = createAdminClient();

@@ -67,6 +67,8 @@ function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
               <button
                 key={i}
                 onClick={() => setIndex(i)}
+                aria-label={`Show photo ${i + 1} of ${photos.length}`}
+                aria-current={i === index}
                 className="h-1.5 cursor-pointer rounded-full border-none p-0 transition-all duration-200"
                 style={{
                   width: i === index ? 20 : 6,

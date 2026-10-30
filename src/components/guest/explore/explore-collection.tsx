@@ -7,6 +7,7 @@ import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt"
 import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import { formatPrice } from "@/lib/utils";
+import { safeHttpUrl } from "@/lib/url";
 import type {
   ExploreCollectionWithItems,
   CollectionItemWithPlace,
@@ -50,7 +51,8 @@ function getCTALabel(place: NearbyPlace): string {
 }
 
 function getCTAHref(place: NearbyPlace): string | null {
-  if (place.website) return place.website;
+  const website = safeHttpUrl(place.website);
+  if (website) return website;
   if (place.address) {
     return `https://maps.google.com/maps?q=${encodeURIComponent(place.address)}`;
   }
@@ -163,7 +165,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
       <Link href={`/${slug}/explore/place/${place.id}`} className="block no-underline">
         <div className="aspect-[16/7] w-full overflow-hidden">
           {place.image_url ? (
-            <img src={place.image_url} alt={place.name} className="size-full object-cover" />
+            <img loading="lazy" decoding="async" src={place.image_url} alt={place.name} className="size-full object-cover" />
           ) : (
             <div
               className="size-full"
