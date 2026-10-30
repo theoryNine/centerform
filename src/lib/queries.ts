@@ -1,9 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient as createClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseDailyWelcome, CruiseLink, MemberRole, Venue } from "@/types";
 
 export async function getVenueBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venues")
     .select("*")
@@ -13,7 +13,7 @@ export async function getVenueBySlug(slug: string) {
 }
 
 export async function getVenueEvents(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("events")
     .select("*")
@@ -24,7 +24,7 @@ export async function getVenueEvents(venueId: string) {
 }
 
 export async function getVenueServices(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("services")
     .select("*")
@@ -35,7 +35,7 @@ export async function getVenueServices(venueId: string) {
 }
 
 export async function getNearbyPlaceById(placeId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("nearby_places")
     .select("*")
@@ -47,7 +47,7 @@ export async function getNearbyPlaceById(placeId: string) {
 const DINING_CATEGORIES = '("restaurant","bar","cafe")';
 
 export async function getDiningPlaces(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("nearby_places")
     .select("*")
@@ -59,7 +59,7 @@ export async function getDiningPlaces(venueId: string) {
 }
 
 export async function getNearbyPlacesByArea(venueId: string, area: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("nearby_places")
     .select("*")
@@ -71,7 +71,7 @@ export async function getNearbyPlacesByArea(venueId: string, area: string) {
 }
 
 export async function getNearbyPlaces(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("nearby_places")
     .select("*")
@@ -82,7 +82,7 @@ export async function getNearbyPlaces(venueId: string) {
 }
 
 export async function getVenueAmenities(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_amenities")
     .select("*")
@@ -93,7 +93,7 @@ export async function getVenueAmenities(venueId: string) {
 }
 
 export async function getVenueAmenitiesByCategory(venueId: string, category: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_amenities")
     .select("*")
@@ -105,7 +105,7 @@ export async function getVenueAmenitiesByCategory(venueId: string, category: str
 }
 
 export async function getVenueInfo(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_info")
     .select("*")
@@ -115,7 +115,7 @@ export async function getVenueInfo(venueId: string) {
 }
 
 export async function getVenueInfoByCategory(venueId: string, category: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_info")
     .select("*")
@@ -129,7 +129,7 @@ export async function getVenueInfoValues(
   venueId: string,
   keys: string[],
 ): Promise<Record<string, string>> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_info")
     .select("key, value")
@@ -143,7 +143,7 @@ export async function getVenueInfoValues(
 }
 
 export async function getAllVenueAmenities(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_amenities")
     .select("*")
@@ -153,7 +153,7 @@ export async function getAllVenueAmenities(venueId: string) {
 }
 
 export async function getAllVenueInfo(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_info")
     .select("*")
@@ -163,7 +163,7 @@ export async function getAllVenueInfo(venueId: string) {
 }
 
 export async function getEventScheduleItems(eventId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("event_schedule_items")
     .select("*")
@@ -174,7 +174,7 @@ export async function getEventScheduleItems(eventId: string) {
 }
 
 export async function getStandaloneEventBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("standalone_events")
     .select("*")
@@ -184,7 +184,7 @@ export async function getStandaloneEventBySlug(slug: string) {
 }
 
 export async function getAllVenueEvents(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("events")
     .select("*")
@@ -194,7 +194,7 @@ export async function getAllVenueEvents(venueId: string) {
 }
 
 export async function getAllVenueServices(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("services")
     .select("*")
@@ -204,7 +204,7 @@ export async function getAllVenueServices(venueId: string) {
 }
 
 export async function getExploreCollections(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("explore_collections")
     .select("*")
@@ -217,7 +217,7 @@ export async function getExploreCollections(venueId: string) {
 export async function getExploreCollectionWithItems(
   collectionId: string,
 ): Promise<ExploreCollectionWithItems | null> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("explore_collections")
     .select(`*, explore_collection_items (*, nearby_places (*))`)
@@ -245,7 +245,7 @@ export async function getExploreCollectionWithItems(
 }
 
 export async function getAllStandaloneEvents() {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("standalone_events")
     .select("*")
@@ -254,7 +254,7 @@ export async function getAllStandaloneEvents() {
 }
 
 export async function getAllEventScheduleItems(eventId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("event_schedule_items")
     .select("*")
@@ -266,7 +266,7 @@ export async function getAllEventScheduleItems(eventId: string) {
 // ─── Cruise queries ───────────────────────────────────────────────────────────
 
 export async function getCruiseRestaurants(venueId: string): Promise<CruiseRestaurant[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("cruise_restaurants")
     .select("*")
@@ -277,7 +277,7 @@ export async function getCruiseRestaurants(venueId: string): Promise<CruiseResta
 }
 
 export async function getCruiseItineraryItems(venueId: string): Promise<CruiseItineraryItem[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("cruise_itinerary_items")
     .select("*")
@@ -289,7 +289,7 @@ export async function getCruiseItineraryItems(venueId: string): Promise<CruiseIt
 
 
 export async function getCruiseRestaurantById(restaurantId: string): Promise<CruiseRestaurant | null> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("cruise_restaurants")
     .select("*")
@@ -302,7 +302,7 @@ export async function getCruiseRestaurantById(restaurantId: string): Promise<Cru
 export async function getCruiseItineraryItemById(
   itemId: string,
 ): Promise<CruiseItineraryItem | null> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("cruise_itinerary_items")
     .select("*")
@@ -316,7 +316,7 @@ export async function getVenuePageDescription(
   venueId: string,
   pageSlug: string,
 ): Promise<{ body: string | null; heroImageUrl: string | null }> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("venue_page_descriptions")
     .select("body, image_url")
@@ -329,7 +329,7 @@ export async function getVenuePageDescription(
 export async function getCruiseDailyWelcome(
   venueId: string,
 ): Promise<CruiseDailyWelcome | null> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const now = new Date().toISOString();
   const { data } = await supabase
     .from("cruise_daily_welcome")
@@ -344,7 +344,7 @@ export async function getCruiseDailyWelcome(
 }
 
 export async function getCruiseLinks(venueId: string): Promise<CruiseLink[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("cruise_links")
     .select("*")
@@ -355,7 +355,7 @@ export async function getCruiseLinks(venueId: string): Promise<CruiseLink[]> {
 }
 
 export async function getCruiseNavImage(venueId: string, navKey: string): Promise<string | null> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("cruise_nav_images")
     .select("image_url")
@@ -363,6 +363,57 @@ export async function getCruiseNavImage(venueId: string, navKey: string): Promis
     .eq("nav_key", navKey)
     .maybeSingle();
   return data?.image_url ?? null;
+}
+
+// Every welcome row for a cruise. The "current" one depends on the viewer's clock, so the
+// client picks it (see CruiseHomePage) — that keeps this result safe to cache.
+export async function getCruiseDailyWelcomes(venueId: string): Promise<CruiseDailyWelcome[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("cruise_daily_welcome")
+    .select("*")
+    .eq("venue_id", venueId)
+    .order("effective_at", { ascending: false });
+  return (data ?? []) as CruiseDailyWelcome[];
+}
+
+export async function getCruiseNavTiles(
+  venueId: string,
+): Promise<Record<string, { imageUrl?: string; sublabel?: string }>> {
+  const supabase = createClient();
+  const { data } = await supabase.from("cruise_nav_images").select("*").eq("venue_id", venueId);
+  const map: Record<string, { imageUrl?: string; sublabel?: string }> = {};
+  (data ?? []).forEach((row) => {
+    map[row.nav_key] = { imageUrl: row.image_url || undefined, sublabel: row.sublabel ?? undefined };
+  });
+  return map;
+}
+
+export async function getVenueNavSublabels(venueId: string): Promise<Record<string, string>> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("venue_nav_tiles")
+    .select("nav_key, sublabel")
+    .eq("venue_id", venueId);
+  const map: Record<string, string> = {};
+  (data ?? []).forEach((row) => {
+    if (row.sublabel) map[row.nav_key] = row.sublabel;
+  });
+  return map;
+}
+
+export async function getVenueNavImages(venueId: string): Promise<Record<string, string>> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("venue_page_descriptions")
+    .select("page_slug, image_url")
+    .eq("venue_id", venueId)
+    .in("page_slug", ["services", "dining", "explore"]);
+  const map: Record<string, string> = {};
+  (data ?? []).forEach((row) => {
+    if (row.image_url) map[row.page_slug] = row.image_url;
+  });
+  return map;
 }
 
 // ─── Dashboard / admin queries ─────────────────────────────────────────────────
@@ -404,7 +455,7 @@ export async function getVenueMemberRole(
 
 // Returns all explore collections for a venue regardless of is_active (for dashboard listing).
 export async function getAllExploreCollections(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("explore_collections")
     .select("*")
@@ -415,7 +466,7 @@ export async function getAllExploreCollections(venueId: string) {
 
 // Returns all nearby places for a venue regardless of is_active (for dashboard listing).
 export async function getAllNearbyPlaces(venueId: string) {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("nearby_places")
     .select("*")

@@ -3,6 +3,10 @@ import { getCruiseItineraryItemById, getCruiseRestaurantById } from "@/lib/queri
 import { notFound } from "next/navigation";
 import { CruiseItineraryListing } from "@/components/guest/cruise/cruise-itinerary-listing";
 
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function ItineraryItemPage({
   params,
 }: {

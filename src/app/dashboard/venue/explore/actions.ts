@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { requireVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidateGuestPages } from "@/lib/revalidate";
 
 export async function upsertCollectionAction(formData: FormData): Promise<void> {
   const session = await auth();
@@ -44,6 +45,7 @@ export async function upsertCollectionAction(formData: FormData): Promise<void> 
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue/explore");
+  await revalidateGuestPages(venueId);
 }
 
 export async function deleteCollectionAction(formData: FormData): Promise<void> {
@@ -58,4 +60,5 @@ export async function deleteCollectionAction(formData: FormData): Promise<void> 
   const { error } = await supabase.from("explore_collections").delete().eq("id", id).eq("venue_id", venueId);
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue/explore");
+  await revalidateGuestPages(venueId);
 }

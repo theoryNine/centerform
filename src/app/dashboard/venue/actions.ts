@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { requireVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidateGuestPages } from "@/lib/revalidate";
 import { parseOptionalHttpUrl } from "@/lib/url";
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
@@ -53,6 +54,7 @@ export async function updateVenueAction(formData: FormData): Promise<void> {
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue");
+  await revalidateGuestPages(venueId);
 }
 
 const PAGE_SLUGS = ["services", "dining", "events", "explore"] as const;
@@ -99,6 +101,7 @@ export async function updatePageImagesAction(formData: FormData): Promise<void> 
   if (failed?.error) throw new Error(failed.error.message);
 
   revalidatePath("/dashboard/venue");
+  await revalidateGuestPages(venueId);
 }
 
 export async function updateVenueThemeAction(formData: FormData): Promise<void> {
@@ -128,4 +131,5 @@ export async function updateVenueThemeAction(formData: FormData): Promise<void> 
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue");
+  await revalidateGuestPages(venueId);
 }

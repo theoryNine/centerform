@@ -1,8 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
+import { createPublicClient as createClient } from "@/lib/supabase/public";
 import type { SlugResolution } from "@/types";
 
-export async function resolveSlug(slug: string): Promise<SlugResolution | null> {
-  const supabase = await createClient();
+// cache() dedupes the lookup between the layout and the page within one render.
+export const resolveSlug = cache(async function resolveSlug(
+  slug: string,
+): Promise<SlugResolution | null> {
+  const supabase = createClient();
 
   // Try venues first
   const { data: venue } = await supabase
@@ -27,4 +31,4 @@ export async function resolveSlug(slug: string): Promise<SlugResolution | null> 
   }
 
   return null;
-}
+});
