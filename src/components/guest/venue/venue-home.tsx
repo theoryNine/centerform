@@ -4,7 +4,6 @@ import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useSlug } from "@/components/slug-context";
 import { WelcomeSplash } from "@/components/guest/primitives/welcome-splash";
-import { createClient } from "@/lib/supabase/client";
 import type { VenueEvent } from "@/types";
 import { Phone } from "lucide-react";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
@@ -36,7 +35,13 @@ function formatEventTime(startTime: string, endTime: string | null): string {
   return formatTime(start);
 }
 
-export function VenueHomePage() {
+interface VenueHomePageProps {
+  events: VenueEvent[];
+  navSublabels: Record<string, string>;
+  navImages: Record<string, string>;
+}
+
+export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePageProps) {
   const { slug } = useParams<{ slug: string }>();
   const resolved = useSlug();
   const venue = resolved.type === "venue" ? resolved.data : null;
@@ -62,11 +67,9 @@ export function VenueHomePage() {
 
   // Today's events
   const [todayEvents, setTodayEvents] = useState<VenueEvent[]>([]);
-  const [navSublabels, setNavSublabels] = useState<Record<string, string>>({});
-  const [navImages, setNavImages] = useState<Record<string, string>>({});
-  const [navImagesReady, setNavImagesReady] = useState(false);
+  const navImageTotalRef = useRef(Object.keys(navImages).length);
+  const [navImagesReady, setNavImagesReady] = useState(navImageTotalRef.current === 0);
   const navImageSettledRef = useRef(0);
-  const navImageTotalRef = useRef(0);
 
   function handleNavImageSettle() {
     navImageSettledRef.current += 1;
@@ -75,54 +78,18 @@ export function VenueHomePage() {
     }
   }
 
+  // "Today" is the guest's local day, so it can't be decided on the (cached) server render.
   useEffect(() => {
-    if (!venue?.id) return;
-    const supabase = createClient();
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
-
-    supabase
-      .from("events")
-      .select("*")
-      .eq("venue_id", venue.id)
-      .eq("is_active", true)
-      .gte("start_time", startOfDay)
-      .lt("start_time", endOfDay)
-      .order("start_time", { ascending: true })
-      .then(({ data }) => {
-        if (data) setTodayEvents(data);
-      });
-
-    supabase
-      .from("venue_nav_tiles")
-      .select("nav_key, sublabel")
-      .eq("venue_id", venue.id)
-      .then(({ data }) => {
-        if (data) {
-          const map: Record<string, string> = {};
-          data.forEach((row) => {
-            if (row.sublabel) map[row.nav_key] = row.sublabel;
-          });
-          setNavSublabels(map);
-        }
-      });
-
-    supabase
-      .from("venue_page_descriptions")
-      .select("page_slug, image_url")
-      .eq("venue_id", venue.id)
-      .in("page_slug", ["services", "dining", "explore"])
-      .then(({ data }) => {
-        const map: Record<string, string> = {};
-        data?.forEach((row) => {
-          if (row.image_url) map[row.page_slug] = row.image_url;
-        });
-        setNavImages(map);
-        navImageTotalRef.current = Object.keys(map).length;
-        if (navImageTotalRef.current === 0) setNavImagesReady(true);
-      });
-  }, [venue?.id]);
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime();
+    setTodayEvents(
+      events.filter((e) => {
+        const t = new Date(e.start_time).getTime();
+        return t >= start && t < end;
+      }),
+    );
+  }, [events]);
 
   function handleSplashEnter() {
     setSplashDismissed(true);

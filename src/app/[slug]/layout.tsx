@@ -94,6 +94,17 @@ function buildColorSchemeScript(colorScheme: ColorScheme): string {
   return `(function(){try{if(window.matchMedia('(prefers-color-scheme:dark)').matches){document.body.style.backgroundColor='${darkBg}';}}catch(e){}})();`;
 }
 
+// Guest pages are cached and regenerated at most every 5 minutes. Dashboard writes call
+// revalidateGuestPages() for instant updates; this window is the safety net for edits made
+// outside the dashboard (e.g. direct SQL).
+export const revalidate = 300;
+
+// Declares the route cacheable: pages are rendered on first request, then served from the
+// ISR cache (see `revalidate`). Returning [] means nothing is pre-rendered at build time.
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function SlugLayout({
   children,
   params,

@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { CruiseCrewListing } from "@/components/guest/cruise/cruise-crew-listing";
 import { CREW } from "@/lib/cruise-crew-data";
 
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function CrewMemberPage({
   params,
 }: {

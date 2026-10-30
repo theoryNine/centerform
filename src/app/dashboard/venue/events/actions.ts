@@ -1,19 +1,12 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
-import { requireVenueRole } from "@/lib/permissions";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { parseOptionalHttpUrl } from "@/lib/url";
+import { authorizeVenue, finishVenueWrite } from "@/lib/venue-action";
 
 export async function upsertVenueEventAction(formData: FormData): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
   const venueId = formData.get("venueId") as string;
-  await requireVenueRole(session.user.id, venueId, "staff");
+  const { supabase } = await authorizeVenue(venueId, "staff");
 
-  const supabase = createAdminClient();
   const id = formData.get("id") as string | null;
 
   const payload = {
@@ -34,19 +27,15 @@ export async function upsertVenueEventAction(formData: FormData): Promise<void> 
     : await supabase.from("events").insert(payload);
 
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/venue/events");
+  await finishVenueWrite(venueId, "/dashboard/venue/events");
 }
 
 export async function deleteVenueEventAction(formData: FormData): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
   const venueId = formData.get("venueId") as string;
-  await requireVenueRole(session.user.id, venueId, "admin");
+  const { supabase } = await authorizeVenue(venueId, "admin");
 
   const id = formData.get("id") as string;
-  const supabase = createAdminClient();
   const { error } = await supabase.from("events").delete().eq("id", id).eq("venue_id", venueId);
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/venue/events");
+  await finishVenueWrite(venueId, "/dashboard/venue/events");
 }
