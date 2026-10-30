@@ -1,11 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
-import { requireVenueRole } from "@/lib/permissions";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { revalidateGuestPages } from "@/lib/revalidate";
 import { parseOptionalHttpUrl } from "@/lib/url";
+import { authorizeVenue, finishVenueWrite } from "@/lib/venue-action";
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 const FONT_NAME = /^[A-Za-z0-9 ]{1,60}$/;
@@ -27,13 +23,9 @@ function optionalMatch(value: FormDataEntryValue | null, re: RegExp, label: stri
 }
 
 export async function updateVenueAction(formData: FormData): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
   const venueId = formData.get("venueId") as string;
-  await requireVenueRole(session.user.id, venueId, "staff");
+  const { supabase } = await authorizeVenue(venueId, "staff");
 
-  const supabase = createAdminClient();
   const { error } = await supabase
     .from("venues")
     .update({
@@ -53,20 +45,14 @@ export async function updateVenueAction(formData: FormData): Promise<void> {
     .eq("id", venueId);
 
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/venue");
-  await revalidateGuestPages(venueId);
+  await finishVenueWrite(venueId, "/dashboard/venue");
 }
 
 const PAGE_SLUGS = ["services", "dining", "events", "explore"] as const;
 
 export async function updatePageImagesAction(formData: FormData): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
   const venueId = formData.get("venueId") as string;
-  await requireVenueRole(session.user.id, venueId, "staff");
-
-  const supabase = createAdminClient();
+  const { supabase } = await authorizeVenue(venueId, "staff");
 
   const urls = PAGE_SLUGS.map((slug) => ({
     slug,
@@ -100,18 +86,13 @@ export async function updatePageImagesAction(formData: FormData): Promise<void> 
   const failed = results.find((r) => r?.error);
   if (failed?.error) throw new Error(failed.error.message);
 
-  revalidatePath("/dashboard/venue");
-  await revalidateGuestPages(venueId);
+  await finishVenueWrite(venueId, "/dashboard/venue");
 }
 
 export async function updateVenueThemeAction(formData: FormData): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
   const venueId = formData.get("venueId") as string;
-  await requireVenueRole(session.user.id, venueId, "staff");
+  const { supabase } = await authorizeVenue(venueId, "staff");
 
-  const supabase = createAdminClient();
   const { error } = await supabase.from("venue_themes").upsert(
     {
       venue_id: venueId,
@@ -130,6 +111,5 @@ export async function updateVenueThemeAction(formData: FormData): Promise<void> 
   );
 
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/venue");
-  await revalidateGuestPages(venueId);
+  await finishVenueWrite(venueId, "/dashboard/venue");
 }
