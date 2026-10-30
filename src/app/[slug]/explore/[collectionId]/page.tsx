@@ -3,6 +3,10 @@ import { getExploreCollectionWithItems, getExploreCollections } from "@/lib/quer
 import { notFound } from "next/navigation";
 import { ExploreCollectionPage } from "@/components/guest/explore/explore-collection";
 
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function CollectionPage({
   params,
 }: {

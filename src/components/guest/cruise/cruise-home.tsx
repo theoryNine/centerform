@@ -8,8 +8,7 @@ import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { WelcomeSplash } from "@/components/guest/primitives/welcome-splash";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card";
-import { createClient } from "@/lib/supabase/client";
-import type { CruiseDailyWelcome, CruiseLink, CruiseNavImage } from "@/types";
+import type { CruiseDailyWelcome, CruiseLink } from "@/types";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { safeHttpUrl } from "@/lib/url";
 
@@ -20,7 +19,13 @@ function formatVenueName(slug: string) {
     .join(" ");
 }
 
-export function CruiseHomePage() {
+interface CruiseHomePageProps {
+  dailyWelcomes: CruiseDailyWelcome[];
+  links: CruiseLink[];
+  navTiles: Record<string, { imageUrl?: string; sublabel?: string }>;
+}
+
+export function CruiseHomePage({ dailyWelcomes, links, navTiles }: CruiseHomePageProps) {
   const { slug } = useParams<{ slug: string }>();
   const resolved = useSlug();
   const venue = resolved.type === "venue" ? resolved.data : null;
@@ -47,9 +52,6 @@ export function CruiseHomePage() {
   }
 
   const [dailyWelcome, setDailyWelcome] = useState<CruiseDailyWelcome | null>(null);
-  const [links, setLinks] = useState<CruiseLink[]>([]);
-  const [navTiles, setNavTiles] = useState<Record<string, { imageUrl?: string; sublabel?: string }>>({});
-  const [navImagesReady, setNavImagesReady] = useState(false);
   const [loadedCount, setLoadedCount] = useState(0);
 
   const handleImageSettle = useCallback(() => {
@@ -57,51 +59,19 @@ export function CruiseHomePage() {
   }, []);
 
   const totalWithImages = Object.values(navTiles).filter((t) => t.imageUrl).length;
-  const allLoaded = navImagesReady && loadedCount >= totalWithImages;
+  const allLoaded = loadedCount >= totalWithImages;
 
+  // The active welcome depends on the guest's clock, so it's picked here rather than on the
+  // (cached) server render. dailyWelcomes arrives newest-first.
   useEffect(() => {
-    if (!venue?.id) return;
-    const supabase = createClient();
-    const now = new Date().toISOString();
-    supabase
-      .from("cruise_daily_welcome")
-      .select("*")
-      .eq("venue_id", venue.id)
-      .lte("effective_at", now)
-      .or(`expires_at.is.null,expires_at.gt.${now}`)
-      .order("effective_at", { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setDailyWelcome(data as CruiseDailyWelcome);
-      });
-    supabase
-      .from("cruise_links")
-      .select("*")
-      .eq("venue_id", venue.id)
-      .eq("is_active", true)
-      .order("display_order", { ascending: true })
-      .then(({ data }) => {
-        if (data) setLinks(data as CruiseLink[]);
-      });
-    supabase
-      .from("cruise_nav_images")
-      .select("*")
-      .eq("venue_id", venue.id)
-      .then(({ data }) => {
-        if (data) {
-          const map: Record<string, { imageUrl?: string; sublabel?: string }> = {};
-          (data as CruiseNavImage[]).forEach((row) => {
-            map[row.nav_key] = {
-              imageUrl: row.image_url || undefined,
-              sublabel: row.sublabel ?? undefined,
-            };
-          });
-          setNavTiles(map);
-        }
-        setNavImagesReady(true);
-      });
-  }, [venue?.id]);
+    const now = Date.now();
+    const active = dailyWelcomes.find(
+      (w) =>
+        new Date(w.effective_at).getTime() <= now &&
+        (!w.expires_at || new Date(w.expires_at).getTime() > now),
+    );
+    setDailyWelcome(active ?? null);
+  }, [dailyWelcomes]);
 
   const navItems = [
     {

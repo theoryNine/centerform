@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { requireVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidateGuestPages } from "@/lib/revalidate";
 
 export async function upsertInfoAction(formData: FormData): Promise<void> {
   const session = await auth();
@@ -41,6 +42,7 @@ export async function upsertInfoAction(formData: FormData): Promise<void> {
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue/info");
+  await revalidateGuestPages(venueId);
 }
 
 export async function deleteInfoAction(formData: FormData): Promise<void> {
@@ -55,4 +57,5 @@ export async function deleteInfoAction(formData: FormData): Promise<void> {
   const { error } = await supabase.from("venue_info").delete().eq("id", id).eq("venue_id", venueId);
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/venue/info");
+  await revalidateGuestPages(venueId);
 }

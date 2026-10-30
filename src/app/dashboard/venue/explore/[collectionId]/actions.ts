@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { requireVenueRole } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidateGuestPages } from "@/lib/revalidate";
 
 async function assertCollectionInVenue(
   supabase: ReturnType<typeof createAdminClient>,
@@ -67,6 +68,7 @@ export async function upsertCollectionItemAction(formData: FormData): Promise<vo
 
   if (error) throw new Error(error.message);
   revalidatePath(`/dashboard/venue/explore/${collectionId}`);
+  await revalidateGuestPages(venueId);
 }
 
 export async function removeCollectionItemAction(formData: FormData): Promise<void> {
@@ -88,6 +90,7 @@ export async function removeCollectionItemAction(formData: FormData): Promise<vo
     .eq("collection_id", collectionId);
   if (error) throw new Error(error.message);
   revalidatePath(`/dashboard/venue/explore/${collectionId}`);
+  await revalidateGuestPages(venueId);
 }
 
 export async function reorderCollectionItemsAction(
@@ -114,4 +117,5 @@ export async function reorderCollectionItemsAction(
   const failed = results.find((r) => r.error);
   if (failed?.error) throw new Error(failed.error.message);
   revalidatePath(`/dashboard/venue/explore/${collectionId}`);
+  await revalidateGuestPages(venueId);
 }

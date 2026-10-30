@@ -3,6 +3,10 @@ import { getNearbyPlaceById } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { PlaceListing } from "@/components/guest/explore/place-listing";
 
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function PlacePage({
   params,
 }: {

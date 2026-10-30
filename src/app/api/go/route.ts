@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { safeHttpUrl } from "@/lib/url";
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   // Always redirect, but only count clicks inside the rate limit (stops stat inflation / table spam).
   const countClick = rateLimit(`go:${ip}:${entityId}`, 3, 60_000) && rateLimit(`go:${ip}`, 60, 60_000);
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const isPlace = Boolean(placeId);
 
   const { data } = await supabase
