@@ -56,13 +56,15 @@ export function VenueDiningPage({
   const hasBoth = onSite.length > 0 && nearby.length > 0;
 
   return (
-    <PageFrame>
+    <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
         scrolled={scrolled}
         backHref={`/${slug}`}
         nameHref={`/${slug}`}
+        wide
+        phone={venue.phone}
       />
 
       <PageHero
@@ -80,6 +82,7 @@ export function VenueDiningPage({
         }
         title="Dining & Drinks"
         className="pt-8"
+        wide
       />
 
       <div className="px-page pb-10 pt-2">
@@ -102,8 +105,8 @@ export function VenueDiningPage({
           <>
             {onSite.length > 0 && (
               <div>
-                <SectionHeader number="01" title="At the Hotel" />
-                <div className="flex flex-col gap-card-gap">
+                <SectionHeader number="01" title="At the Hotel" wide />
+                <div className="flex flex-col gap-card-gap cmp:grid cmp:grid-cols-2 lg:grid-cols-3">
                   {onSite.map((p) => (
                     <NavCard
                       key={p.id}
@@ -113,6 +116,8 @@ export function VenueDiningPage({
                       imageUrl={p.image_url ?? undefined}
                       onSettle={p.image_url ? handleImageSettle : undefined}
                       footer={diningFooter(p)}
+                      responsive
+                      featured={onSite.length === 1}
                     />
                   ))}
                 </div>
@@ -124,8 +129,9 @@ export function VenueDiningPage({
                 <SectionHeader
                   number={hasBoth ? "02" : "01"}
                   title="Nearby Recommendations"
+                  wide
                 />
-                <div className="flex flex-col gap-card-gap">
+                <div className="flex flex-col gap-card-gap cmp:grid cmp:grid-cols-2 lg:grid-cols-3">
                   {nearby.map((p) => (
                     <NavCard
                       key={p.id}
@@ -135,6 +141,8 @@ export function VenueDiningPage({
                       imageUrl={p.image_url ?? undefined}
                       onSettle={p.image_url ? handleImageSettle : undefined}
                       footer={diningFooter(p)}
+                      responsive
+                      featured={nearby.length === 1}
                     />
                   ))}
                 </div>
@@ -144,7 +152,12 @@ export function VenueDiningPage({
         )}
 
         <div className="mt-section">
-          <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />
+          <VenueFooter
+            venueName={venue.name}
+            address={venue.address}
+            phone={venue.phone}
+            layout="responsive"
+          />
         </div>
 
         <div className="h-safe-bottom" />
