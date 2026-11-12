@@ -90,3 +90,22 @@ for (const width of [390, 599]) {
     }
   });
 }
+
+// The first-visit welcome splash (an overlay, so a viewport shot). Unlike the page tests above this
+// does NOT pre-dismiss it: a fresh context has no `splash-dismissed:<slug>` flag.
+for (const width of WIDTHS) {
+  test.describe(`${width}px splash`, () => {
+    test.use({ viewport: { width, height: 844 } });
+
+    test("welcome splash", async ({ page }) => {
+      await page.clock.setFixedTime(new Date("2026-01-15T12:00:00-08:00"));
+      await page.goto(`/${SLUG}`);
+      await page.getByRole("dialog", { name: "Welcome" }).waitFor();
+      await settle(page);
+      await expect(page).toHaveScreenshot(`splash-${width}.png`, {
+        stylePath: "e2e/hide-dev-overlay.css",
+        maxDiffPixels: 0,
+      });
+    });
+  });
+}

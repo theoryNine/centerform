@@ -17,7 +17,7 @@ Loaded in addition to the root CLAUDE.md when working here. Layout: `primitives/
 - `venue-footer.tsx` — Venue branding footer (`layout="responsive"` for wide-frame pages)
 - `welcome-envelope.tsx` — Animated envelope reveal
 - `welcome-splash.tsx` — Welcome card (delegates to oversized/text variants). Default is `"oversized"` for both hotel and cruise venues — full-bleed image with name card floating over lower half. `"text"` variant uses a shorter in-flow image above the card. Individual venues can override via `venues.splash_variant`.
-- `welcome-splash-oversized.tsx`
+- `welcome-splash-oversized.tsx` — Has two compositions, switched by the `splash-port` / `splash-land` custom variants in `globals.css` (orientation + width, not just width): portrait is the original tall oval; landscape (and any window ≥1024px) is a half-oval photo with the card centered in the dark panel. `splash-short` / `splash-mid` / `splash-lap` size the landscape one. The `text` variant is not responsive yet.
 - `welcome-splash-text.tsx`
 
 Other folders: `cruise/` (cruise venue pages), `venue/` (hotel/resort pages), `explore/` (explore hub: area-listing, explore-collection, place-listing), `event/` (standalone event home). `cruise/cruise-home.tsx` is the design-token reference implementation. Home components (`venue-home`, `cruise-home`) receive their data as props from the server page.

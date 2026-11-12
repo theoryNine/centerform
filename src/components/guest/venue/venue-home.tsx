@@ -175,7 +175,7 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
       {!navImagesReady && <LoadingSpinner />}
 
       {/* Main scrollable page */}
-      <PageFrame width="wide">
+      <PageFrame width="wide" inert={splashVisible}>
         {/* Safe-area spacer: real DOM element so Safari doesn't skip it on initial load */}
         <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
         {/* Header section with shaped image */}

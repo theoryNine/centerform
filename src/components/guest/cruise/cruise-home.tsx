@@ -135,7 +135,7 @@ export function CruiseHomePage({ dailyWelcomes, links, navTiles }: CruiseHomePag
         </div>
       )}
 
-      <PageFrame>
+      <PageFrame inert={splashVisible}>
         {/* Safe-area spacer: real DOM element so Safari doesn't skip it on initial load */}
         <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
         {/* Header */}

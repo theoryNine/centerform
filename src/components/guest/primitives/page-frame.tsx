@@ -19,13 +19,15 @@ interface PageFrameProps {
   width?: PageFrameWidth;
   /** Extra classes on the outer (full-width, page-background) element. */
   className?: string;
+  /** Takes the page out of the tab order and accessibility tree (e.g. behind a modal splash). */
+  inert?: boolean;
   children: ReactNode;
 }
 
 /** Page root for every guest page: full-width background with the content frame inside. */
-export function PageFrame({ width = "narrow", className, children }: PageFrameProps) {
+export function PageFrame({ width = "narrow", className, inert, children }: PageFrameProps) {
   return (
-    <div className={cn("min-h-screen bg-background font-sans", className)}>
+    <div className={cn("min-h-screen bg-background font-sans", className)} inert={inert}>
       <div className={FRAME_CLASSES[width]}>{children}</div>
     </div>
   );
