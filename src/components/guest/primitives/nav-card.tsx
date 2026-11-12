@@ -5,6 +5,9 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/** Grid for a list of `responsive` NavCards: one column on phones, two from 600px, three from 1024px. */
+export const NAV_CARD_GRID = "gap-card-gap cmp:grid cmp:grid-cols-2 lg:grid-cols-3";
+
 interface NavCardProps {
   label: string;
   sublabel: string;

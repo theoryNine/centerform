@@ -4,7 +4,7 @@ import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/stic
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
-import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { PageFrame, FrameBody } from "@/components/guest/primitives/page-frame";
 import { usePageLabel } from "@/components/guest-nav-history";
 
 function placeHref(slug: string, place: NearbyPlace): string {
@@ -39,7 +39,7 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
 
       {/* The header uses the wide frame so the back button matches every other page; the list
           keeps its narrow column underneath. */}
-      <div className="mx-auto w-full max-w-frame-narrow px-page pb-10 pt-6 [--cf-page-padding:20px]">
+      <FrameBody narrow className="px-page pb-10 pt-6">
         {/* Section heading */}
         <div className="mb-6">
           <h1 className="m-0 font-serif text-page-title font-semibold text-foreground">{heading}</h1>
@@ -64,7 +64,7 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
         </div>
 
         <div className="h-safe-bottom" />
-      </div>
+      </FrameBody>
     </PageFrame>
   );
 }

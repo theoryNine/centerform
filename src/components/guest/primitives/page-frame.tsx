@@ -46,3 +46,23 @@ interface FrameInnerProps {
 export function FrameInner({ width = "narrow", className, children }: FrameInnerProps) {
   return <div className={cn(FRAME_CLASSES[width], className)}>{children}</div>;
 }
+
+interface FrameBodyProps {
+  /** Pin the body to the narrow phone column (centered, phone gutters). */
+  narrow?: boolean;
+  className?: string;
+  children: ReactNode;
+}
+
+/**
+ * Page body under a wide header. Pages without a wide design yet (Date Night, area lists) keep
+ * their phone column here while the header above uses the wide frame, so the back button is in
+ * the same place on every page.
+ */
+export function FrameBody({ narrow, className, children }: FrameBodyProps) {
+  return (
+    <div className={cn(narrow && "mx-auto w-full max-w-frame-narrow [--cf-page-padding:20px]", className)}>
+      {children}
+    </div>
+  );
+}

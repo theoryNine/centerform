@@ -16,7 +16,7 @@ import type {
   PlaceCategory,
   VenueWithTheme,
 } from "@/types";
-import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { PageFrame, FrameBody } from "@/components/guest/primitives/page-frame";
 import { usePageLabel } from "@/components/guest-nav-history";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -355,11 +355,7 @@ export function ExploreCollectionPage({
 
       {/* Content. The header above always uses the wide frame so the back button is in the same
           place as on every other page; the cards layout keeps its narrow column underneath. */}
-      <div
-        className={`px-page pb-10 pt-6${
-          wide ? "" : " mx-auto w-full max-w-frame-narrow [--cf-page-padding:20px]"
-        }`}
-      >
+      <FrameBody narrow={!wide} className="px-page pb-10 pt-6">
         {/*
           Wide: title and intro in a left column (sticky at 1024px+), timeline on the right. Only
           these two live in the grid: a sticky element can travel as far as its parent, so the
@@ -403,7 +399,7 @@ export function ExploreCollectionPage({
         </div>
 
         <div className="h-safe-bottom" />
-      </div>
+      </FrameBody>
     </PageFrame>
   );
 }

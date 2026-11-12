@@ -14,6 +14,7 @@ import { PageFrame } from "@/components/guest/primitives/page-frame";
 import { useRouter } from "next/navigation";
 import { usePreviousPage } from "@/components/guest-nav-history";
 import { Multiline } from "@/components/guest/primitives/multiline";
+import { Fact } from "@/components/guest/primitives/fact";
 import { telHref } from "@/lib/utils";
 
 function getCTALabel(category: NearbyPlace["category"]): string {
@@ -170,10 +171,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                 </div>
                 <div className="cmp:col-start-2 cmp:row-span-2 cmp:row-start-1 cmp:-mt-4 tab:mt-6 mt-6 flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
                   {place.address && mapsHref && (
-                    <div className="border-border border-b py-4">
-                      <p className="text-muted-foreground m-0 mb-1.5 text-[10px] font-semibold tracking-widest uppercase">
-                        Address
-                      </p>
+                    <Fact label="Address">
                       <a
                         href={mapsHref}
                         target="_blank"
@@ -182,36 +180,27 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                       >
                         {place.address}
                       </a>
-                    </div>
+                    </Fact>
                   )}
                   {place.hours && (
-                    <div className="border-border border-b py-4">
-                      <p className="text-muted-foreground m-0 mb-1.5 text-[10px] font-semibold tracking-widest uppercase">
-                        Hours
-                      </p>
+                    <Fact label="Hours">
                       <p className="text-body-sm text-foreground m-0">{place.hours}</p>
-                    </div>
+                    </Fact>
                   )}
                   {priceLabel && (
-                    <div className="border-border border-b py-4">
-                      <p className="text-muted-foreground m-0 mb-1.5 text-[10px] font-semibold tracking-widest uppercase">
-                        Price
-                      </p>
+                    <Fact label="Price">
                       <p className="text-body-sm text-foreground m-0">{priceLabel}</p>
-                    </div>
+                    </Fact>
                   )}
                   {place.phone && (
-                    <div className="border-border border-b py-4">
-                      <p className="text-muted-foreground m-0 mb-1.5 text-[10px] font-semibold tracking-widest uppercase">
-                        Phone
-                      </p>
+                    <Fact label="Phone">
                       <a
                         href={telHref(place.phone)}
                         className="text-body-sm text-primary flex min-h-[44px] items-center no-underline"
                       >
                         {place.phone}
                       </a>
-                    </div>
+                    </Fact>
                   )}
                 </div>
               </>

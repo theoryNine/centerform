@@ -6,7 +6,7 @@ import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/stic
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { PageHero } from "@/components/guest/primitives/page-hero";
-import { NavCard } from "@/components/guest/primitives/nav-card";
+import { NavCard, NAV_CARD_GRID } from "@/components/guest/primitives/nav-card";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
@@ -89,8 +89,6 @@ function isFeature(place: NearbyPlace, indexInSection: number): boolean {
   return place.is_featured || (indexInSection === 0 && !!place.collection_id);
 }
 
-const WIDE_GRID = "gap-card-gap cmp:grid cmp:grid-cols-2 lg:grid-cols-3";
-
 function AreaSectionView({
   section,
   index,
@@ -141,7 +139,7 @@ function AreaSectionView({
 
       {useListLayout ? (
         /* List layout for first section — capped at 4 */
-        <div className={`flex flex-col ${WIDE_GRID}`}>
+        <div className={`flex flex-col ${NAV_CARD_GRID}`}>
           {visiblePlaces.map((place, i) => (
             <NavCard
               key={place.id}
@@ -157,7 +155,7 @@ function AreaSectionView({
       ) : (
         <>
         {/* Wide (600px+): the same list cards as the first section */}
-        <div className={`hidden ${WIDE_GRID}`}>
+        <div className={`hidden ${NAV_CARD_GRID}`}>
           {widePlaces.map((place, i) => (
             <NavCard
               key={place.id}

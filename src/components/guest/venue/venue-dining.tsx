@@ -6,7 +6,7 @@ import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
-import { NavCard } from "@/components/guest/primitives/nav-card";
+import { NavCard, NAV_CARD_GRID } from "@/components/guest/primitives/nav-card";
 import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { formatPrice } from "@/lib/utils";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
@@ -98,7 +98,7 @@ export function VenueDiningPage({
             {onSite.length > 0 && (
               <div>
                 <SectionHeader number="01" title="At the Hotel" wide />
-                <div className="flex flex-col gap-card-gap cmp:grid cmp:grid-cols-2 lg:grid-cols-3">
+                <div className={`flex flex-col ${NAV_CARD_GRID}`}>
                   {onSite.map((p) => (
                     <NavCard
                       key={p.id}
@@ -123,7 +123,7 @@ export function VenueDiningPage({
                   title="Nearby Recommendations"
                   wide
                 />
-                <div className="flex flex-col gap-card-gap cmp:grid cmp:grid-cols-2 lg:grid-cols-3">
+                <div className={`flex flex-col ${NAV_CARD_GRID}`}>
                   {nearby.map((p) => (
                     <NavCard
                       key={p.id}
