@@ -164,6 +164,15 @@ export function VenueServicesPage({
         el: sectionRefs.current[s.id],
       })).filter((s) => s.el);
 
+      // The last section can be too short for its top to ever reach the threshold, so at the
+      // bottom of the page it wins regardless.
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      if (atBottom && sections.length > 0) {
+        setActiveSection(sections[sections.length - 1].id);
+        return;
+      }
+
       for (let i = sections.length - 1; i >= 0; i--) {
         const el = sections[i].el!;
         const rect = el.getBoundingClientRect();
@@ -337,6 +346,7 @@ export function VenueServicesPage({
           }
           title={<>Your Room<br />&amp; Stay</>}
           className="pt-8"
+          animated
           wide
           aside={
             <div className="space-y-2 text-body text-muted-foreground">

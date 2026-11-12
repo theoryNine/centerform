@@ -82,6 +82,7 @@ export function VenueDiningPage({
         }
         title="Dining & Drinks"
         className="pt-8"
+        animated
         wide
       />
 
