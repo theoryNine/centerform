@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { PageHero } from "@/components/guest/primitives/page-hero";
@@ -245,14 +245,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
   return (
     <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
-        venueName={venueName}
-        scrolled={scrolled}
-        backHref={`/${slug}`}
-        nameHref={`/${slug}`}
-        wide
-        phone={venue.phone}
-      />
+      <VenueHeader venue={venue} slug={slug} scrolled={scrolled} />
 
       {/* Hero section with shaped image */}
       <PageHero

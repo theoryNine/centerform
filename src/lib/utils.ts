@@ -26,7 +26,7 @@ const CUSTOM_TEXT_SIZES = [
   "section-number",
 ];
 
-const twMerge = extendTailwindMerge({
+const twMerge = extendTailwindMerge<"cf-text-size">({
   extend: {
     classGroups: { "cf-text-size": [{ text: CUSTOM_TEXT_SIZES }] },
     // A later token size replaces an earlier built-in one and vice versa.

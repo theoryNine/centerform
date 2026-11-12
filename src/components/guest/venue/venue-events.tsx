@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Calendar, MapPin, Star } from "lucide-react";
+import { Calendar, MapPin, Star } from "lucide-react";
 import type { Venue, VenueEvent } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
-import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { PageTopBar, SlideDownNav } from "@/components/guest/primitives/page-top-bar";
 import { Multiline } from "@/components/guest/primitives/multiline";
 
 function formatEventDate(startTime: string, endTime: string | null): string {
@@ -44,40 +44,23 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
   return (
     <PageFrame>
       {/* Sticky nav */}
-      <div
-        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
-        style={{
-          transform: showStickyNav ? "translateY(0)" : "translateY(-100%)",
-        }}
-      >
-        <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <FrameInner>
-            <div className="flex items-center px-5 py-3">
-              <Link href={`/${slug}`} className="-my-3 -ml-3 flex size-11 shrink-0 items-center justify-center text-primary no-underline">
-                <ArrowLeft size={20} />
-              </Link>
-              <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
-            </div>
-          </FrameInner>
-          <div className="h-px bg-border" />
-        </div>
-      </div>
+      <SlideDownNav
+        show={showStickyNav}
+        backHref={`/${slug}`}
+        backLabel={venueName}
+        title={venueName}
+        align="start"
+      />
 
       {/* Main header area */}
       <div ref={headerRef}>
-        <div
-          className="flex items-center px-5 pb-2 pt-safe"
-        >
-          <Link href={`/${slug}`} className="-my-3 -ml-3 flex size-11 shrink-0 items-center justify-center text-primary no-underline">
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            href={`/${slug}`}
-            className="font-serif text-base font-normal text-foreground no-underline"
-          >
-            {venueName}
-          </Link>
-        </div>
+        <PageTopBar
+          backHref={`/${slug}`}
+          backLabel={venueName}
+          title={venueName}
+          titleHref={`/${slug}`}
+          align="start"
+        />
 
         <PageHero
           imageUrl={heroImageUrl ?? venue.cover_image_url}

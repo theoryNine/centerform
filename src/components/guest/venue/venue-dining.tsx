@@ -7,7 +7,7 @@ import { PageHero } from "@/components/guest/primitives/page-hero";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { NavCard } from "@/components/guest/primitives/nav-card";
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { formatPrice } from "@/lib/utils";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
 import { usePageLabel } from "@/components/guest-nav-history";
@@ -61,14 +61,7 @@ export function VenueDiningPage({
   return (
     <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
-        venueName={venue.name}
-        scrolled={scrolled}
-        backHref={`/${slug}`}
-        nameHref={`/${slug}`}
-        wide
-        phone={venue.phone}
-      />
+      <VenueHeader venue={venue} slug={slug} scrolled={scrolled} />
 
       <PageHero
         imageUrl={heroImageUrl ?? venue.cover_image_url}

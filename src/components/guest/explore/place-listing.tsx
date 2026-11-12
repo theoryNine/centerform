@@ -2,7 +2,7 @@
 
 import {
   useWindowScroll,
-  ScrollRevealStickyHeader,
+  VenueHeader,
   FloatingBackButton,
 } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
@@ -74,16 +74,15 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
   return (
     <PageFrame width="wide">
       {!loaded && <LoadingSpinner />}
-      <ScrollRevealStickyHeader
-        venueName={venue.name}
+      <VenueHeader
+        venue={venue}
+        slug={slug}
         scrolled={scrolled}
+        variant="scroll-reveal"
         onBack={goBack}
-        nameHref={`/${slug}`}
-        wide
         backLabel={backLabel}
-        phone={venue.phone}
       />
-      <FloatingBackButton scrolled={scrolled} onBack={goBack} wide />
+      <FloatingBackButton scrolled={scrolled} onBack={goBack} wide label={backLabel} />
 
       {/*
         Phone: hero with the name card overlapping its bottom edge, content below.

@@ -1,17 +1,16 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { ArrowLeft, Copy, Check } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import type { Service, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
-import { CopyButton } from "@/components/guest/primitives/copy-button";
 import { AccordionItem } from "@/components/guest/primitives/accordion-item";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
-import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
-import { StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { PageTopBar, SlideDownNav } from "@/components/guest/primitives/page-top-bar";
+import { VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { Multiline } from "@/components/guest/primitives/multiline";
 
 // Section definitions — maps service categories to display sections
@@ -261,73 +260,43 @@ export function VenueServicesPage({
 
   return (
     <PageFrame width="wide">
-      {/* Sticky nav — hidden until scroll past header */}
-      <div
-        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out lg:hidden"
-        style={{
-          transform: showStickyNav ? "translateY(0)" : "translateY(-100%)",
-        }}
+      {/* Sticky nav — hidden until scroll past header. Laptop uses the side nav instead. */}
+      <SlideDownNav
+        show={showStickyNav}
+        backHref={`/${slug}`}
+        backLabel={venueName}
+        title={venueName}
+        width="wide"
+        gutter="page"
+        className="lg:hidden"
       >
-        <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <FrameInner width="wide">
-            {/* Sticky header row */}
-            <div className="relative flex items-center px-page py-3">
-              <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
-                <ArrowLeft size={20} />
-              </Link>
-              <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-                <span className="font-serif text-[20px] font-medium text-foreground">{venueName}</span>
-              </div>
-              <div className="w-5 shrink-0" />
-            </div>
-
-            {/* Section tabs */}
-            <div className="flex px-page pb-3">
-              {SECTION_CONFIG.map((section) => (
-                <SectionTab
-                  key={section.id}
-                  section={section}
-                  isActive={activeSection === section.id}
-                  onClick={() => scrollToSection(section.id)}
-                />
-              ))}
-            </div>
-          </FrameInner>
-          {/* Divider line — only visible with sticky nav */}
-          <div className="h-px bg-border" />
+        {/* Section tabs */}
+        <div className="flex px-page pb-3">
+          {SECTION_CONFIG.map((section) => (
+            <SectionTab
+              key={section.id}
+              section={section}
+              isActive={activeSection === section.id}
+              onClick={() => scrollToSection(section.id)}
+            />
+          ))}
         </div>
-      </div>
+      </SlideDownNav>
 
       {/* Main header area */}
       <div ref={headerRef}>
-        {/* Top bar with back arrow and venue name */}
-        <div
-          className="relative flex items-center px-5 pb-2 pt-safe cmp:hidden"
-        >
-          <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
-            <ArrowLeft size={20} />
-          </Link>
-          <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-            <Link
-              href={`/${slug}`}
-              className="pointer-events-auto font-serif text-[20px] font-medium text-foreground no-underline"
-            >
-              {venueName}
-            </Link>
-          </div>
-          <div className="w-5 shrink-0" />
-        </div>
+        {/* Top bar with back arrow and venue name (phone; 600px+ uses the wide header below) */}
+        <PageTopBar
+          backHref={`/${slug}`}
+          backLabel={venueName}
+          title={venueName}
+          titleHref={`/${slug}`}
+          className="cmp:hidden"
+        />
 
         {/* Wide header (600px+): replaces the phone top bar above */}
         <div className="hidden cmp:block">
-          <StickyHeader
-            venueName={venueName}
-            scrolled={false}
-            backHref={`/${slug}`}
-            nameHref={`/${slug}`}
-            wide
-            phone={venue.phone}
-          />
+          <VenueHeader venue={venue} slug={slug} scrolled={false} />
         </div>
 
         {/* Hero: image + title */}

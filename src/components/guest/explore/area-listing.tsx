@@ -1,6 +1,6 @@
 "use client";
 
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
@@ -29,14 +29,12 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
   return (
     <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
-        venueName={venue.name}
+      <VenueHeader
+        venue={venue}
+        slug={slug}
         scrolled={scrolled}
         backHref={`/${slug}/explore`}
-        nameHref={`/${slug}`}
-        wide
         backLabel="Explore"
-        phone={venue.phone}
       />
 
       {/* The header uses the wide frame so the back button matches every other page; the list

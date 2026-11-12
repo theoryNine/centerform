@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
@@ -345,14 +345,12 @@ export function ExploreCollectionPage({
   return (
     <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
-        venueName={venue.name}
+      <VenueHeader
+        venue={venue}
+        slug={slug}
         scrolled={scrolled}
         backHref={`/${slug}/explore`}
-        nameHref={`/${slug}`}
-        wide
         backLabel="Explore"
-        phone={venue.phone}
       />
 
       {/* Content. The header above always uses the wide frame so the back button is in the same

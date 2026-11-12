@@ -72,17 +72,21 @@ function BackButton({
   backHref,
   onBack,
   wide,
+  label,
 }: {
   backHref?: string;
   onBack?: () => void;
   wide?: boolean;
+  /** Name of the page it goes back to, read out as "Back to <label>". */
+  label?: string;
 }) {
   const extra = `${BACK_TARGET}${wide ? " lg:hidden" : ""}`;
+  const ariaLabel = label ? `Back to ${label}` : "Go back";
   if (backHref) {
     return (
       <Link
         href={backHref}
-        aria-label="Go back"
+        aria-label={ariaLabel}
         className={`shrink-0 text-primary no-underline ${extra}`}
       >
         <ArrowLeft size={20} />
@@ -93,7 +97,7 @@ function BackButton({
     return (
       <button
         onClick={onBack}
-        aria-label="Go back"
+        aria-label={ariaLabel}
         className={`shrink-0 cursor-pointer border-none bg-transparent p-0 text-primary ${extra}`}
       >
         <ArrowLeft size={20} />
@@ -147,7 +151,7 @@ function HeaderRow({
   const label = backLabel ?? venueName;
   return (
     <>
-      <BackButton backHref={backHref} onBack={onBack} wide={wide} />
+      <BackButton backHref={backHref} onBack={onBack} wide={wide} label={label} />
       <div
         className={`pointer-events-none absolute inset-x-0 flex items-center justify-center${
           wide ? " lg:hidden" : ""
@@ -195,9 +199,18 @@ interface FloatingBackButtonProps {
   onBack?: () => void;
   /** Wide-frame pages show the back button in the header from 600px, so this floats on phones only. */
   wide?: boolean;
+  /** Name of the page it goes back to, read out as "Back to <label>". */
+  label?: string;
 }
 
-export function FloatingBackButton({ scrolled, backHref, onBack, wide }: FloatingBackButtonProps) {
+export function FloatingBackButton({
+  scrolled,
+  backHref,
+  onBack,
+  wide,
+  label,
+}: FloatingBackButtonProps) {
+  const ariaLabel = label ? `Back to ${label}` : "Go back";
   const inner = (
     <div
       className="flex items-center justify-center rounded-default"
@@ -222,7 +235,7 @@ export function FloatingBackButton({ scrolled, backHref, onBack, wide }: Floatin
 
   if (backHref) {
     return (
-      <Link href={backHref} aria-label="Go back" className={`${base} no-underline`} style={posStyle}>
+      <Link href={backHref} aria-label={ariaLabel} className={`${base} no-underline`} style={posStyle}>
         {inner}
       </Link>
     );
@@ -231,7 +244,7 @@ export function FloatingBackButton({ scrolled, backHref, onBack, wide }: Floatin
     return (
       <button
         onClick={onBack}
-        aria-label="Go back"
+        aria-label={ariaLabel}
         className={`${base} cursor-pointer border-none bg-transparent p-0`}
         style={posStyle}
       >
@@ -328,5 +341,46 @@ export function ScrollRevealStickyHeader({
         />
       </FrameInner>
     </div>
+  );
+}
+
+// ─── Venue header ────────────────────────────────────────────────────────────
+// The header every wide-frame guest page uses: wide variant, venue phone on the right at 1024px+,
+// venue name linking home. Pages say only where "back" goes.
+
+interface VenueHeaderProps {
+  venue: { name: string; phone?: string | null };
+  slug: string;
+  scrolled: boolean;
+  /** Where back goes: a path, or a handler (e.g. history.back()). Default: the venue home. */
+  backHref?: string;
+  onBack?: () => void;
+  /** Name of the page back goes to ("Dining", a guide's title, …). Default: the venue name. */
+  backLabel?: string;
+  /** "sticky" (default): always visible. "scroll-reveal": detail pages that fade in on scroll. */
+  variant?: "sticky" | "scroll-reveal";
+}
+
+export function VenueHeader({
+  venue,
+  slug,
+  scrolled,
+  backHref,
+  onBack,
+  backLabel,
+  variant = "sticky",
+}: VenueHeaderProps) {
+  const Header = variant === "scroll-reveal" ? ScrollRevealStickyHeader : StickyHeader;
+  return (
+    <Header
+      venueName={venue.name}
+      scrolled={scrolled}
+      backHref={onBack ? undefined : (backHref ?? `/${slug}`)}
+      onBack={onBack}
+      nameHref={`/${slug}`}
+      wide
+      backLabel={backLabel}
+      phone={venue.phone}
+    />
   );
 }

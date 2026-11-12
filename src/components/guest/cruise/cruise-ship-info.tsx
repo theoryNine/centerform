@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import type { Service, ServiceDetails, ServiceDetailsBlock, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
@@ -10,7 +8,8 @@ import { CopyButton } from "@/components/guest/primitives/copy-button";
 import { AccordionItem } from "@/components/guest/primitives/accordion-item";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
-import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { PageTopBar, SlideDownNav } from "@/components/guest/primitives/page-top-bar";
 import { Multiline } from "@/components/guest/primitives/multiline";
 import { telHref } from "@/lib/utils";
 
@@ -239,54 +238,34 @@ export function CruiseShipInfoPage({
   return (
     <PageFrame>
       {/* Sticky nav */}
-      <div
-        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
-        style={{ transform: showStickyNav ? "translateY(0)" : "translateY(-100%)" }}
+      <SlideDownNav
+        show={showStickyNav}
+        backHref={`/${slug}`}
+        backLabel={shipName}
+        title={shipName}
+        weight="normal"
       >
-        <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <FrameInner>
-            <div className="relative flex items-center px-5 py-3">
-              <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
-                <ArrowLeft size={20} />
-              </Link>
-              <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-                <span className="font-serif text-[20px] font-normal text-foreground">{shipName}</span>
-              </div>
-              <div className="w-5 shrink-0" />
-            </div>
-            <div className="-mx-1 flex overflow-x-auto px-5 pb-3 scrollbar-none">
-              {SECTION_CONFIG.map((section) => (
-                <SectionTab
-                  key={section.id}
-                  section={section}
-                  isActive={activeSection === section.id}
-                  onClick={() => scrollToSection(section.id)}
-                />
-              ))}
-            </div>
-          </FrameInner>
-          <div className="h-px bg-border" />
+        <div className="-mx-1 flex overflow-x-auto px-5 pb-3 scrollbar-none">
+          {SECTION_CONFIG.map((section) => (
+            <SectionTab
+              key={section.id}
+              section={section}
+              isActive={activeSection === section.id}
+              onClick={() => scrollToSection(section.id)}
+            />
+          ))}
         </div>
-      </div>
+      </SlideDownNav>
 
       {/* Main header */}
       <div ref={headerRef}>
-        <div
-          className="relative flex items-center px-5 pb-2 pt-safe"
-        >
-          <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
-            <ArrowLeft size={20} />
-          </Link>
-          <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-            <Link
-              href={`/${slug}`}
-              className="pointer-events-auto font-serif text-[20px] font-normal text-foreground no-underline"
-            >
-              {shipName}
-            </Link>
-          </div>
-          <div className="w-5 shrink-0" />
-        </div>
+        <PageTopBar
+          backHref={`/${slug}`}
+          backLabel={shipName}
+          title={shipName}
+          titleHref={`/${slug}`}
+          weight="normal"
+        />
 
         {/* Hero */}
         <PageHero
