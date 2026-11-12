@@ -32,6 +32,8 @@ interface PageHeroProps {
    * grows to display size at 1024px. Photo height is capped at 40dvh for landscape phones.
    */
   wide?: boolean;
+  /** Wide detail only: extra content under the title from 600px (e.g. address and hours). */
+  aside?: ReactNode;
 }
 
 export function PageHero({
@@ -45,6 +47,7 @@ export function PageHero({
   className,
   textAlign = "center",
   wide,
+  aside,
 }: PageHeroProps) {
   const isHome = size === "home";
   const wideDetail = wide && !isHome;
@@ -105,6 +108,7 @@ export function PageHero({
         >
           {title}
         </h1>
+        {wideDetail && aside && <div className="mt-4 hidden w-full cmp:block">{aside}</div>}
         {isHome && (
           <>
             <div className="my-3 mb-1.5 h-px w-8 bg-[#D0CBC3]" />

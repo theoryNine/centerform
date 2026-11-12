@@ -11,6 +11,7 @@ import { AccordionItem } from "@/components/guest/primitives/accordion-item";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
 import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
+import { StickyHeader } from "@/components/guest/primitives/sticky-header";
 
 // Section definitions — maps service categories to display sections
 const SECTION_CONFIG = [
@@ -207,19 +208,60 @@ export function VenueServicesPage({
   const venueName = venue.name;
   const fullAddress = [venue.address, venue.city, venue.state].filter(Boolean).join(", ");
 
+  // Body of a service: the WiFi copy block, or its description.
+  function serviceContent(service: Service) {
+    const wifiInfo =
+      service.name.toLowerCase().includes("wifi") && service.description
+        ? parseWifiInfo(service.description)
+        : null;
+    if (wifiInfo) return <WifiContent network={wifiInfo.network} password={wifiInfo.password} />;
+    return (
+      service.description && (
+        <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
+          {service.description}
+        </p>
+      )
+    );
+  }
+
+  // Shared by the phone subheader and the wide hero (hidden at the other widths).
+  const addressLink = venue.address && (
+    <a
+      href={buildMapUrl(fullAddress)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block font-medium leading-snug text-primary no-underline"
+    >
+      {venue.address}
+      {venue.city && (
+        <>
+          <br />
+          {venue.city}
+          {venue.state ? `, ${venue.state}` : ""}
+        </>
+      )}
+    </a>
+  );
+  const hoursInfo = (
+    <>
+      <div>Front Desk: {frontDeskHours ?? "7am–10pm"}</div>
+      <div className="font-semibold text-foreground">Check out by {checkoutTime ?? "11:00 AM"}</div>
+    </>
+  );
+
   return (
-    <PageFrame>
+    <PageFrame width="wide">
       {/* Sticky nav — hidden until scroll past header */}
       <div
-        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
+        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out lg:hidden"
         style={{
           transform: showStickyNav ? "translateY(0)" : "translateY(-100%)",
         }}
       >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <FrameInner>
+          <FrameInner width="wide">
             {/* Sticky header row */}
-            <div className="relative flex items-center px-5 py-3">
+            <div className="relative flex items-center px-page py-3">
               <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
                 <ArrowLeft size={20} />
               </Link>
@@ -230,7 +272,7 @@ export function VenueServicesPage({
             </div>
 
             {/* Section tabs */}
-            <div className="flex px-5 pb-3">
+            <div className="flex px-page pb-3">
               {SECTION_CONFIG.map((section) => (
                 <SectionTab
                   key={section.id}
@@ -250,7 +292,7 @@ export function VenueServicesPage({
       <div ref={headerRef}>
         {/* Top bar with back arrow and venue name */}
         <div
-          className="relative flex items-center px-5"
+          className="relative flex items-center px-5 cmp:hidden"
           style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
         >
           <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
@@ -265,6 +307,18 @@ export function VenueServicesPage({
             </Link>
           </div>
           <div className="w-5 shrink-0" />
+        </div>
+
+        {/* Wide header (600px+): replaces the phone top bar above */}
+        <div className="hidden cmp:block">
+          <StickyHeader
+            venueName={venueName}
+            scrolled={false}
+            backHref={`/${slug}`}
+            nameHref={`/${slug}`}
+            wide
+            phone={venue.phone}
+          />
         </div>
 
         {/* Hero: image + title */}
@@ -283,98 +337,125 @@ export function VenueServicesPage({
           }
           title={<>Your Room<br />&amp; Stay</>}
           className="pt-8"
+          wide
+          aside={
+            <div className="space-y-2 text-body text-muted-foreground">
+              {addressLink}
+              <div className="leading-relaxed">{hoursInfo}</div>
+            </div>
+          }
         />
 
-        {/* Subheader: address, hours, checkout */}
-        <div className="flex justify-between gap-4 px-5 py-4 text-body text-muted-foreground">
-          <div>
-            {venue.address && (
-              <a
-                href={buildMapUrl(fullAddress)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block font-medium leading-snug text-primary no-underline"
-              >
-                {venue.address}
-                {venue.city && (
-                  <>
-                    <br />
-                    {venue.city}
-                    {venue.state ? `, ${venue.state}` : ""}
-                  </>
-                )}
-              </a>
-            )}
-          </div>
-          <div className="text-right leading-relaxed">
-            <div>Front Desk: {frontDeskHours ?? "7am–10pm"}</div>
-            <div className="font-semibold text-foreground">Check out by {checkoutTime ?? "11:00 AM"}</div>
-          </div>
+        {/* Subheader: address, hours, checkout (phone; from 600px these sit beside the title) */}
+        <div className="flex justify-between gap-4 px-5 py-4 text-body text-muted-foreground cmp:hidden">
+          <div>{addressLink}</div>
+          <div className="text-right leading-relaxed">{hoursInfo}</div>
         </div>
       </div>
 
-      {/* Accordion sections */}
-      <div className="px-page pb-10">
-        {pageDescription && (
-          <p className="mb-6 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription.split("\n").map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
-          </p>
-        )}
-        {sectionServices.map((section) => (
-          <div
-            key={section.id}
-            ref={(el) => {
-              sectionRefs.current[section.id] = el;
-            }}
-          >
-            <SectionHeader number={section.number} title={section.title} />
+      {/* Accordion sections. Laptop: a sticky section nav in a 200px left column. */}
+      <div className="px-page pb-10 lg:grid lg:grid-cols-[200px_1fr] lg:gap-x-12">
+        <nav
+          aria-label="Sections"
+          className="hidden lg:sticky lg:top-6 lg:block lg:self-start lg:pt-12"
+        >
+          <ul className="m-0 list-none p-0">
+            {SECTION_CONFIG.map((section) => {
+              const isActive = activeSection === section.id;
+              return (
+                <li key={section.id}>
+                  <a
+                    href={`#${section.id}`}
+                    aria-current={isActive ? "true" : undefined}
+                    className={`flex min-h-11 items-center border-l-2 py-2 pl-4 text-body-sm no-underline ${
+                      isActive
+                        ? "border-primary font-semibold text-foreground"
+                        : "border-transparent text-muted-foreground"
+                    }`}
+                  >
+                    {section.number} · {section.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-            {/* Accordion card */}
-            <div className="card-shadow rounded-default bg-card px-page">
-              {section.services.length === 0 ? (
-                <div className="py-6 text-center text-[13px] text-muted-foreground">
-                  No items yet.
-                </div>
-              ) : (
-                section.services.map((service) => {
-                  const itemId = `${section.id}-${service.id}`;
-                  const wifiInfo =
-                    service.name.toLowerCase().includes("wifi") && service.description
-                      ? parseWifiInfo(service.description)
-                      : null;
+        <div>
+          {pageDescription && (
+            <p className="mb-6 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
+              {pageDescription.split("\n").map((line, i) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))}
+            </p>
+          )}
+          {sectionServices.map((section) => (
+            <div
+              key={section.id}
+              id={section.id}
+              className="lg:scroll-mt-6"
+              ref={(el) => {
+                sectionRefs.current[section.id] = el;
+              }}
+            >
+              <SectionHeader number={section.number} title={section.title} wide />
 
-                  return (
-                    <AccordionItem
-                      key={service.id}
-                      title={service.name}
-                      isOpen={openItems.has(itemId)}
-                      onToggle={() => toggleItem(itemId)}
-                    >
-                      {wifiInfo ? (
-                        <WifiContent network={wifiInfo.network} password={wifiInfo.password} />
-                      ) : (
-                        service.description && (
-                          <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-muted-foreground">
-                            {service.description}
-                          </p>
-                        )
-                      )}
-                    </AccordionItem>
-                  );
-                })
-              )}
+              {/* Accordion — one grouped card on phones, separate cards in two columns from 600px */}
+              <div className="card-shadow rounded-default bg-card px-page cmp:grid cmp:grid-cols-2 cmp:items-start cmp:gap-4 cmp:bg-transparent cmp:px-0 cmp:[box-shadow:none] lg:hidden">
+                {section.services.length === 0 ? (
+                  <div className="py-6 text-center text-[13px] text-muted-foreground cmp:col-span-2">
+                    No items yet.
+                  </div>
+                ) : (
+                  section.services.map((service) => {
+                    const itemId = `${section.id}-${service.id}`;
+                    return (
+                      <AccordionItem
+                        key={service.id}
+                        title={service.name}
+                        isOpen={openItems.has(itemId)}
+                        onToggle={() => toggleItem(itemId)}
+                        wide
+                      >
+                        {serviceContent(service)}
+                      </AccordionItem>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Laptop: no accordion — every item is an open card, two across */}
+              <div className="hidden lg:grid lg:grid-cols-2 lg:items-start lg:gap-4">
+                {section.services.length === 0 ? (
+                  <div className="py-6 text-[13px] text-muted-foreground lg:col-span-2">
+                    No items yet.
+                  </div>
+                ) : (
+                  section.services.map((service) => (
+                    <div key={service.id} className="card-shadow rounded-default bg-card p-card">
+                      <h3 className="m-0 mb-3 font-serif text-card-title-md font-medium text-foreground">
+                        {service.name}
+                      </h3>
+                      {serviceContent(service)}
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      <div className="px-5">
-        <VenueFooter venueName={venueName} address={venue.address} phone={venue.phone} />
+      <div className="px-page">
+        <VenueFooter
+          venueName={venueName}
+          address={venue.address}
+          phone={venue.phone}
+          layout="responsive"
+        />
       </div>
 
       {/* Bottom safe area */}
