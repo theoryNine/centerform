@@ -27,7 +27,7 @@ interface PageFrameProps {
 /** Page root for every guest page: full-width background with the content frame inside. */
 export function PageFrame({ width = "narrow", className, inert, children }: PageFrameProps) {
   return (
-    <div className={cn("min-h-screen bg-background font-sans", className)} inert={inert}>
+    <div className={cn("bg-background min-h-screen font-sans", className)} inert={inert}>
       <div className={FRAME_CLASSES[width]}>{children}</div>
     </div>
   );
