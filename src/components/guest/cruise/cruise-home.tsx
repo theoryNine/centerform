@@ -184,7 +184,7 @@ export function CruiseHomePage({ dailyWelcomes, links, navTiles }: CruiseHomePag
             <div className="flex justify-end">
               <a
                 href={telHref(venue.phone)}
-                className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-link no-underline"
               >
                 <Phone size={15} />
                 {venue.phone_label ?? "Call the Bridge"}
@@ -228,10 +228,10 @@ export function CruiseHomePage({ dailyWelcomes, links, navTiles }: CruiseHomePag
                   href={safeHttpUrl(link.url) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-default bg-card px-4 py-3 text-cta-button font-medium text-primary no-underline card-shadow"
+                  className="flex items-center justify-between rounded-default bg-card px-4 py-3 text-cta-button font-medium text-link no-underline card-shadow"
                 >
                   {link.label}
-                  <ArrowRight size={16} className="shrink-0 text-primary" />
+                  <ArrowRight size={16} className="shrink-0 text-link" />
                 </a>
               ))}
             </div>

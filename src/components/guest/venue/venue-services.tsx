@@ -89,7 +89,7 @@ function WifiContent({ network, password }: { network: string; password: string 
           </div>
           <span className="text-base font-semibold text-foreground">{password}</span>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
+        <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-link">
           {copied ? (
             <>
               Copied <Check size={14} />
@@ -252,7 +252,7 @@ export function VenueServicesPage({
       href={buildMapUrl(fullAddress)}
       target="_blank"
       rel="noopener noreferrer"
-      className="block font-medium leading-snug text-primary no-underline"
+      className="block font-medium leading-snug text-link no-underline"
     >
       {venue.address}
       {venue.city && (

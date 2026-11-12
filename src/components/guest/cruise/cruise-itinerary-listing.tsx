@@ -97,7 +97,7 @@ export function CruiseItineraryListing({
             <div className="mt-5">
               <Link
                 href={`/${slug}/food-onboard/${item.restaurant_id}`}
-                className="flex items-center justify-center rounded-default border border-primary px-4 py-3 text-body-sm font-semibold text-primary no-underline"
+                className="flex items-center justify-center rounded-default border border-primary px-4 py-3 text-body-sm font-semibold text-link no-underline"
               >
                 {restaurantName ? `View ${restaurantName} →` : "View Restaurant →"}
               </Link>

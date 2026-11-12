@@ -196,7 +196,7 @@
   --secondary: #EDE8DE;
   --secondary-foreground: #2D2A26;
   --muted: #EDE8DE;
-  --muted-foreground: #8B8680;
+  --muted-foreground: #6B665F;
   --accent: #EDE8DE;
   --accent-foreground: #2D2A26;
   --destructive: oklch(0.577 0.245 27.325);
@@ -244,7 +244,7 @@
     --secondary: #2E2B27;
     --secondary-foreground: #EDE8DE;
     --muted: #2E2B27;
-    --muted-foreground: #8B8680;
+    --muted-foreground: #A09A90;
     --border: #3A3632;
     --input: #3A3632;
     --ring: #22A090;
@@ -270,7 +270,7 @@
   --secondary: #2E2B27;
   --secondary-foreground: #EDE8DE;
   --muted: #2E2B27;
-  --muted-foreground: #8B8680;
+  --muted-foreground: #A09A90;
   --accent: #2E2B27;
   --accent-foreground: #EDE8DE;
   --destructive: oklch(0.396 0.141 25.723);
@@ -310,11 +310,37 @@
   box-shadow: var(--cf-card-shadow);
 }
 
-/* Grows a small text link's tap target to ~28px (WCAG 2.2 target size) without moving anything
-   around it: the padding is cancelled by an equal negative margin. */
-@utility hit-area {
-  padding-block: 0.375rem;
-  margin-block: -0.375rem;
+/*
+ * Plain CSS in the utilities layer (not @utility): Turbopack's dev server doesn't reliably
+ * regenerate a custom @utility that is added or edited while it is running, which silently drops
+ * the class and leaves link text white. Plain rules are always emitted.
+ */
+@layer utilities {
+  /* Link text in the venue's brand color, nudged to be readable (>= 4.5:1) on the page and on
+     cards. VenueThemeProvider computes --link-light / --link-dark from the venue's primary color;
+     outside a venue (dashboard) it falls back to --primary. */
+  .text-link {
+    color: var(--link-light, var(--primary));
+  }
+  @media (prefers-color-scheme: dark) {
+    .text-link {
+      color: var(--link-dark, var(--primary));
+    }
+  }
+  @media (hover: hover) {
+    a.text-link:hover,
+    button.text-link:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  /* Grows a small text link's tap target to ~28px (WCAG 2.2 target size) without moving anything
+     around it: the padding is cancelled by an equal negative margin. */
+  .hit-area {
+    padding-block: 0.375rem;
+    margin-block: -0.375rem;
+  }
 }
 
 @utility pt-safe {

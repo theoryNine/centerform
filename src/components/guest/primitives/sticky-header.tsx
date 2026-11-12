@@ -87,7 +87,7 @@ function BackButton({
       <Link
         href={backHref}
         aria-label={ariaLabel}
-        className={`shrink-0 text-primary no-underline ${extra}`}
+        className={`shrink-0 text-link no-underline ${extra}`}
       >
         <ArrowLeft size={20} />
       </Link>
@@ -98,7 +98,7 @@ function BackButton({
       <button
         onClick={onBack}
         aria-label={ariaLabel}
-        className={`shrink-0 cursor-pointer border-none bg-transparent p-0 text-primary ${extra}`}
+        className={`shrink-0 cursor-pointer border-none bg-transparent p-0 text-link ${extra}`}
       >
         <ArrowLeft size={20} />
       </button>
@@ -137,7 +137,7 @@ type HeaderRowProps = Pick<
 >;
 
 const LAPTOP_LINK =
-  "min-h-11 items-center gap-2 text-body font-medium text-primary no-underline cursor-pointer border-none bg-transparent p-0";
+  "min-h-11 items-center gap-2 text-body font-medium text-link no-underline cursor-pointer border-none bg-transparent p-0";
 
 function HeaderRow({
   venueName,
@@ -178,7 +178,7 @@ function HeaderRow({
           {phone && (
             <a
               href={telHref(phone)}
-              className="text-body font-medium text-primary no-underline"
+              className="text-body font-medium text-link no-underline"
             >
               {phone}
             </a>
@@ -222,7 +222,7 @@ export function FloatingBackButton({
         WebkitBackdropFilter: "blur(4px)",
       }}
     >
-      <ArrowLeft size={20} className="text-primary" />
+      <ArrowLeft size={20} className="text-link" />
     </div>
   );
 

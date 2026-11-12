@@ -101,7 +101,7 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
         </span>
         <a
           href={telHref(block.value)}
-          className="text-body-sm font-semibold text-primary no-underline"
+          className="text-body-sm font-semibold text-link no-underline"
         >
           {block.value}
         </a>

@@ -100,7 +100,7 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
     return (
       <li className="relative pb-5 flex items-center">
         <div aria-hidden="true" className="absolute left-[24px] z-10 h-3 w-3 rounded-full bg-primary" />
-        <p className="m-0 pl-[48px] text-label font-semibold tracking-widest text-primary">
+        <p className="m-0 pl-[48px] text-label font-semibold tracking-widest text-link">
           {item.is_start ? "START" : "END"} · {place.name.toUpperCase()}
         </p>
       </li>
@@ -219,7 +219,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hit-area flex justify-end text-body-sm font-medium text-primary no-underline"
+                className="hit-area flex justify-end text-body-sm font-medium text-link no-underline"
               >
                 {ctaLabel} →
               </a>
@@ -228,7 +228,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center rounded-default border border-primary px-4 py-2.5 text-body-sm font-medium text-primary no-underline"
+                className="flex items-center justify-center rounded-default border border-primary px-4 py-2.5 text-body-sm font-medium text-link no-underline"
               >
                 {ctaLabel} →
               </a>

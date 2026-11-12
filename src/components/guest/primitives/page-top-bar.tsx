@@ -5,10 +5,10 @@ import { FrameInner, type PageFrameWidth } from "@/components/guest/primitives/p
 
 // A 44x44 target around a 20px arrow. The negative margins keep the layout box at 20x20, so the
 // arrow sits exactly where a bare icon would (see "Back buttons" in the guest CLAUDE.md).
-const BACK_LINK = "shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline";
+const BACK_LINK = "shrink-0 -m-3 flex size-11 items-center justify-center text-link no-underline";
 // Same, for a row where the title follows the arrow instead of being centered.
 const BACK_LINK_BEFORE_TITLE =
-  "-my-3 -ml-3 flex size-11 shrink-0 items-center justify-center text-primary no-underline";
+  "-my-3 -ml-3 flex size-11 shrink-0 items-center justify-center text-link no-underline";
 
 const WEIGHT = { normal: "font-normal", medium: "font-medium" } as const;
 

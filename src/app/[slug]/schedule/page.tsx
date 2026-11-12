@@ -64,7 +64,7 @@ export default async function SchedulePage({
       <div className="pt-safe px-5">
         <Link
           href={`/${slug}`}
-          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary no-underline"
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-link no-underline"
         >
           <ArrowLeft size={18} />
           Back

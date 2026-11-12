@@ -176,7 +176,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                         href={mapsHref}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hit-area text-body-sm text-primary no-underline"
+                        className="hit-area text-body-sm text-link no-underline"
                       >
                         {place.address}
                       </a>
@@ -196,7 +196,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                     <Fact label="Phone">
                       <a
                         href={telHref(place.phone)}
-                        className="text-body-sm text-primary flex min-h-[44px] items-center no-underline"
+                        className="text-body-sm text-link flex min-h-[44px] items-center no-underline"
                       >
                         {place.phone}
                       </a>
@@ -218,7 +218,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                       key={i}
                       className="text-body-sm text-foreground mb-2 flex gap-2.5 leading-snug"
                     >
-                      <span className="text-primary mt-px shrink-0 font-medium">·</span>
+                      <span className="text-link mt-px shrink-0 font-medium">·</span>
                       <span>{tip}</span>
                     </li>
                   ))}

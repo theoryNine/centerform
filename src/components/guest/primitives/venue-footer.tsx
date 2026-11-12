@@ -28,7 +28,7 @@ export function VenueFooter({ venueName, address, phone, layout = "stack" }: Ven
       {phone && (
         <a
           href={telHref(phone)}
-          className={`hit-area text-body-sm font-medium text-primary no-underline ${
+          className={`hit-area text-body-sm font-medium text-link no-underline ${
             responsive ? "cmp:inline-flex cmp:min-h-11 cmp:items-center" : ""
           }`}
         >

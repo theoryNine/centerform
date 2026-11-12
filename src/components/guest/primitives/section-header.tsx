@@ -16,7 +16,7 @@ export function SectionHeader({ number, title, wide, action }: SectionHeaderProp
   return (
     <div className={`pb-2 pt-6${wide ? " cmp:pt-8 lg:pt-12" : ""}`}>
       <div className="flex items-baseline gap-2">
-        <span className="text-section-number font-medium text-primary">{number}</span>
+        <span className="text-section-number font-medium text-link">{number}</span>
         <span className="text-section-number text-muted-foreground">·</span>
         <h2
           className={`m-0 font-serif text-section-heading font-medium text-foreground${

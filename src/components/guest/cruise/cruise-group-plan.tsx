@@ -67,7 +67,7 @@ function DayHeader({ group }: { group: DayGroup }) {
   return (
     <div className="mb-5">
       {group.header.location && (
-        <p className="m-0 text-label font-semibold uppercase tracking-[var(--cf-text-label-spacing)] text-primary">
+        <p className="m-0 text-label font-semibold uppercase tracking-[var(--cf-text-label-spacing)] text-link">
           {group.header.location}
         </p>
       )}
@@ -92,7 +92,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           {item.title}
         </p>
         {item.location && (
-          <p className="m-0 mt-0.5 text-label font-medium uppercase tracking-wide text-primary">
+          <p className="m-0 mt-0.5 text-label font-medium uppercase tracking-wide text-link">
             {item.location}
           </p>
         )}
@@ -102,7 +102,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           </p>
         )}
       </div>
-      <ArrowRight size={15} className="mr-3 shrink-0 text-primary" />
+      <ArrowRight size={15} className="mr-3 shrink-0 text-link" />
     </>
   );
 

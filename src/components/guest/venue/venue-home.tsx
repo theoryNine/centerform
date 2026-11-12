@@ -107,7 +107,7 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
   const callButton = venue?.phone && (
     <a
       href={telHref(venue.phone)}
-      className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline cmp:min-h-12"
+      className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-link no-underline cmp:min-h-12"
     >
       <Phone size={15} />
       {venue.phone_label ?? "Call the Front Desk"}

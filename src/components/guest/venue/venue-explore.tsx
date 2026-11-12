@@ -118,7 +118,7 @@ function AreaSectionView({
   const seeMoreLink = (
     <Link
       href={areaHref}
-      className="hit-area flex items-center gap-1 text-body-sm font-medium text-primary no-underline"
+      className="hit-area flex items-center gap-1 text-body-sm font-medium text-link no-underline"
     >
       {`See more in ${section.name}`}
       <ArrowRight size={14} />
