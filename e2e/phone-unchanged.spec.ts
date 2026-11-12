@@ -60,3 +60,32 @@ for (const width of WIDTHS) {
     }
   });
 }
+
+// Scrolled viewport shots cover the chrome that is hidden at scroll 0: the scroll-reveal header
+// on place pages, the Services section nav, and the sticky list-page header border.
+const SCROLLED_PAGES = ["services", "dining", "place", "dine-place", "guide"];
+
+for (const width of [390, 599]) {
+  test.describe(`${width}px scrolled`, () => {
+    test.use({ viewport: { width, height: 844 } });
+
+    for (const name of SCROLLED_PAGES) {
+      test(name, async ({ page }) => {
+        const { path } = PAGES.find((p) => p.name === name)!;
+        await page.addInitScript(
+          (key) => localStorage.setItem(key, "1"),
+          `splash-dismissed:${SLUG}`,
+        );
+        await page.clock.setFixedTime(new Date("2026-01-15T12:00:00-08:00"));
+        await page.goto(path);
+        await settle(page);
+        await page.evaluate(() => window.scrollTo(0, 700));
+        await page.waitForTimeout(300);
+        await expect(page).toHaveScreenshot(`${name}-${width}-scrolled.png`, {
+          stylePath: "e2e/hide-dev-overlay.css",
+          maxDiffPixels: 0,
+        });
+      });
+    }
+  });
+}

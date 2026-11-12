@@ -11,6 +11,7 @@ import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 function formatVenueName(slug: string) {
   return slug
@@ -161,7 +162,7 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
       {!navImagesReady && <LoadingSpinner />}
 
       {/* Main scrollable page */}
-      <div className="min-h-screen bg-background font-sans">
+      <PageFrame>
         {/* Safe-area spacer: real DOM element so Safari doesn't skip it on initial load */}
         <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
         {/* Header section with shaped image */}
@@ -269,7 +270,7 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
           {/* Bottom safe area */}
           <div className="h-safe-bottom" />
         </div>
-      </div>
+      </PageFrame>
     </>
   );
 }

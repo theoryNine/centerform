@@ -10,6 +10,7 @@ import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 import { safeHttpUrl } from "@/lib/url";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 function getCTALabel(category: NearbyPlace["category"]): string {
   switch (category) {
@@ -59,7 +60,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
   const hasMetadata = !!(place.address || place.hours || priceLabel || place.phone);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {!loaded && <LoadingSpinner />}
       <ScrollRevealStickyHeader
         venueName={venue.name}
@@ -222,6 +223,6 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
           <div className="h-safe-bottom" />
         </div>
       </div>
-    </div>
+    </PageFrame>
   );
 }

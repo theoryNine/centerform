@@ -12,6 +12,7 @@ import { useImageLoaded } from "@/hooks/use-image-loaded";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { formatPrice } from "@/lib/utils";
 import { safeHttpUrl } from "@/lib/url";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 interface CruiseRestaurantListingProps {
   venue: Venue;
@@ -31,7 +32,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
   ].filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {!loaded && <LoadingSpinner />}
       <ScrollRevealStickyHeader
         venueName={venue.name}
@@ -166,7 +167,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
           <div className="h-safe-bottom" />
         </div>
       </div>
-    </div>
+    </PageFrame>
   );
 
 }

@@ -4,6 +4,7 @@ import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sti
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 function placeHref(slug: string, place: NearbyPlace): string {
   return place.collection_id
@@ -24,7 +25,7 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
   const heading = area.toLowerCase().startsWith("beyond") ? area : `In ${area}`;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
@@ -59,6 +60,6 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
 
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

@@ -10,16 +10,28 @@ Loaded in addition to the root CLAUDE.md when working here. Layout: `primitives/
 - `corner-bracket-card.tsx` — Card with decorative corner bracket spans
 - `loading-spinner.tsx` — Fixed full-screen loading overlay
 - `nav-card.tsx` — Navigation tile card; optional `footer?: ReactNode` renders a third content row below the sublabel (used by venue-dining for category pill + price); `sublabelClassName?: string` for extra classes on the sublabel (e.g. `line-clamp-2`); `hideImage?: boolean` suppresses the image column and adds `pl-4` to the content area
+- `page-frame.tsx` — `PageFrame` (root of every guest page: full-width background + content frame) and `FrameInner` (aligns the content of a `fixed inset-x-0` bar with the frame). See Responsive layouts below.
 - `page-hero.tsx` — Full-bleed hero image with gradient
 - `section-header.tsx` — Numbered section header (e.g. "01 · Title")
-- `sticky-header.tsx` — Three sticky nav patterns: `StickyHeader` (always visible, used on Dining/Info/Explore list pages), `ScrollRevealStickyHeader` (fades in on scroll, used on hero detail pages like place-listing and cruise-restaurant-listing), `FloatingBackButton` (glass pill over hero, paired with ScrollRevealStickyHeader). Hooks: `useStickyScroll` (IntersectionObserver, for pages with in-flow headers), `useWindowScroll` (scroll event, for pages with fixed/absolute headers)
-- `venue-footer.tsx` — Venue branding footer
+- `sticky-header.tsx` — Three sticky nav patterns (pass `wide` on wide-frame pages for the responsive variant): `StickyHeader` (always visible, used on Dining/Info/Explore list pages), `ScrollRevealStickyHeader` (fades in on scroll, used on hero detail pages like place-listing and cruise-restaurant-listing), `FloatingBackButton` (glass pill over hero, paired with ScrollRevealStickyHeader). Hooks: `useStickyScroll` (IntersectionObserver, for pages with in-flow headers), `useWindowScroll` (scroll event, for pages with fixed/absolute headers)
+- `venue-footer.tsx` — Venue branding footer (`layout="responsive"` for wide-frame pages)
 - `welcome-envelope.tsx` — Animated envelope reveal
 - `welcome-splash.tsx` — Welcome card (delegates to oversized/text variants). Default is `"oversized"` for both hotel and cruise venues — full-bleed image with name card floating over lower half. `"text"` variant uses a shorter in-flow image above the card. Individual venues can override via `venues.splash_variant`.
 - `welcome-splash-oversized.tsx`
 - `welcome-splash-text.tsx`
 
 Other folders: `cruise/` (cruise venue pages), `venue/` (hotel/resort pages), `explore/` (explore hub: area-listing, explore-collection, place-listing), `event/` (standalone event home). `cruise/cruise-home.tsx` is the design-token reference implementation. Home components (`venue-home`, `cruise-home`) receive their data as props from the server page.
+
+## Responsive layouts
+
+Phone (≤599px) is the unprefixed default and **must stay pixel-identical** — `pnpm e2e` checks it. Layout changes only ever add `cmp:` / `tab:` / `lg:` classes (min-width, mobile-first).
+
+- **Breakpoints:** `cmp:` 600px (compact tablet), `tab:` 700px (tablet), `lg:` 1024px (laptop). These are namespaced on purpose — `sm:`/`md:` are left at Tailwind's defaults because the dashboard and shadcn components use them.
+- **CSS only.** No `useMediaQuery` / `window.innerWidth` in guest components: pages are ISR and a JS-driven layout flashes or mismatches on hydration.
+- **Gutters:** `--cf-page-padding` is 20px, 32px from 600px, 40px from 700px, so `px-page` / `-ml-page` follow the viewport.
+- **Frames:** every guest page root is `<PageFrame width="narrow" | "wide">`. `narrow` (default) is the phone layout centered in a 600px column with phone gutters at every width — use it until a page has a wide design. `wide` is fluid up to a centered 1200px frame (1120px of content + 40px gutters). Switch a page to `wide` in the same change that builds its tablet/laptop layout, and pass `wide` to its header and `layout="responsive"` to its footer.
+- **Fixed bars** (`fixed inset-x-0` navs) keep the full-width background and put their content in `<FrameInner>` so it lines up with the frame. `FloatingBackButton` positions itself against the narrow frame.
+- Event pages (`event-home`, `schedule`, `info`) and the concierge chat are not framed.
 
 ## Accessibility
 

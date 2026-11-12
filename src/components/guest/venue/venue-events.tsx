@@ -6,6 +6,7 @@ import type { Venue, VenueEvent } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
+import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
 
 function formatEventDate(startTime: string, endTime: string | null): string {
   const start = new Date(startTime);
@@ -40,7 +41,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
   const venueName = venue.name;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {/* Sticky nav */}
       <div
         className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
@@ -49,12 +50,14 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
         }}
       >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <div className="flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
-              <ArrowLeft size={20} />
-            </Link>
-            <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
-          </div>
+          <FrameInner>
+            <div className="flex items-center px-5 py-3">
+              <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
+                <ArrowLeft size={20} />
+              </Link>
+              <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
+            </div>
+          </FrameInner>
           <div className="h-px bg-border" />
         </div>
       </div>
@@ -179,6 +182,6 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
 
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

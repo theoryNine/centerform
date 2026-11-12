@@ -9,6 +9,7 @@ import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
 import { formatPrice } from "@/lib/utils";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 const CATEGORY_LABELS: Record<string, string> = {
   restaurant: "Restaurant",
@@ -55,7 +56,7 @@ export function VenueDiningPage({
   const hasBoth = onSite.length > 0 && nearby.length > 0;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
@@ -150,6 +151,6 @@ export function VenueDiningPage({
       </div>
 
       {!allLoaded && <LoadingSpinner />}
-    </div>
+    </PageFrame>
   );
 }

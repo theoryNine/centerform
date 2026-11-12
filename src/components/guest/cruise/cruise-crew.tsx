@@ -9,6 +9,7 @@ import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { CREW } from "@/lib/cruise-crew-data";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 function CrewTile({
   name,
@@ -73,7 +74,7 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
   );
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
@@ -140,6 +141,6 @@ export function CruiseCrewPage({ venue, slug, pageDescription, heroImageUrl }: C
       </div>
 
       {!allLoaded && <LoadingSpinner />}
-    </div>
+    </PageFrame>
   );
 }

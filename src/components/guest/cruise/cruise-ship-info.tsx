@@ -10,6 +10,7 @@ import { CopyButton } from "@/components/guest/primitives/copy-button";
 import { AccordionItem } from "@/components/guest/primitives/accordion-item";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
+import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
 
 // Cruise-specific section config
 const SECTION_CONFIG = [
@@ -234,32 +235,34 @@ export function CruiseShipInfoPage({
   const shipName = venue.name;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {/* Sticky nav */}
       <div
         className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
         style={{ transform: showStickyNav ? "translateY(0)" : "translateY(-100%)" }}
       >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <div className="relative flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
-              <ArrowLeft size={20} />
-            </Link>
-            <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-              <span className="font-serif text-[20px] font-normal text-foreground">{shipName}</span>
+          <FrameInner>
+            <div className="relative flex items-center px-5 py-3">
+              <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
+                <ArrowLeft size={20} />
+              </Link>
+              <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+                <span className="font-serif text-[20px] font-normal text-foreground">{shipName}</span>
+              </div>
+              <div className="w-5 shrink-0" />
             </div>
-            <div className="w-5 shrink-0" />
-          </div>
-          <div className="-mx-1 flex overflow-x-auto px-5 pb-3 scrollbar-none">
-            {SECTION_CONFIG.map((section) => (
-              <SectionTab
-                key={section.id}
-                section={section}
-                isActive={activeSection === section.id}
-                onClick={() => scrollToSection(section.id)}
-              />
-            ))}
-          </div>
+            <div className="-mx-1 flex overflow-x-auto px-5 pb-3 scrollbar-none">
+              {SECTION_CONFIG.map((section) => (
+                <SectionTab
+                  key={section.id}
+                  section={section}
+                  isActive={activeSection === section.id}
+                  onClick={() => scrollToSection(section.id)}
+                />
+              ))}
+            </div>
+          </FrameInner>
           <div className="h-px bg-border" />
         </div>
       </div>
@@ -366,6 +369,6 @@ export function CruiseShipInfoPage({
       </div>
 
       <div className="h-safe-bottom" />
-    </div>
+    </PageFrame>
   );
 }

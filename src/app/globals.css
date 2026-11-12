@@ -70,6 +70,15 @@
   --text-cta-button: var(--cf-text-cta-button);
   --text-cta-link: var(--cf-text-cta-link);
   --text-section-number: var(--cf-text-section-number);
+
+  /* Guest-page breakpoints (min-width). Namespaced instead of overriding sm/md, which the
+     dashboard and shadcn components use. Phone is the unprefixed default; lg (1024px) is Tailwind's. */
+  --breakpoint-cmp: 600px; /* compact tablet: iPhone Duo inner screen, small tablets */
+  --breakpoint-tab: 700px; /* tablet: iPad portrait */
+
+  /* Page frame widths → max-w-frame / max-w-frame-narrow */
+  --container-frame: var(--cf-frame-max);
+  --container-frame-narrow: var(--cf-frame-narrow-max);
 }
 
 :root {
@@ -105,7 +114,9 @@
   --cf-body-line-height: 1.5;       /* 1.6–1.7  body line height */
 
   /* Spacing */
-  --cf-page-padding: 20px;           /* side padding on all pages */
+  --cf-page-padding: 20px;           /* side padding on all pages (grows at cmp/tab, see below) */
+  --cf-frame-max: 1200px;            /* wide page frame: 1120px content + 2 × 40px gutters */
+  --cf-frame-narrow-max: 600px;      /* narrow frame: phone layout, centered, for pages without a wide design */
   --cf-section-gap: 40px;            /* between major sections */
   --cf-heading-to-content: 16px;     /* section heading to first item */
   --cf-card-gap: 14px;               /* 12–16px  between cards in a list */
@@ -162,6 +173,19 @@
   --sidebar-accent-foreground: #2D2A26;
   --sidebar-border: #DDD8CE;
   --sidebar-ring: #1A7A6D;
+}
+
+/* Side gutters grow with the viewport (phone 20px). Same values as the cmp/tab breakpoints above;
+   custom properties can't use Tailwind's variants, so the widths are repeated here. */
+@media (min-width: 600px) {
+  :root {
+    --cf-page-padding: 32px;
+  }
+}
+@media (min-width: 700px) {
+  :root {
+    --cf-page-padding: 40px;
+  }
 }
 
 /* Applied via CSS before any JS runs — eliminates dark mode flash on first render. */

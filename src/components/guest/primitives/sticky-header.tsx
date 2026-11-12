@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { FrameInner } from "@/components/guest/primitives/page-frame";
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
@@ -49,12 +50,38 @@ interface BaseHeaderProps {
   onBack?: () => void;
   /** If set, the venue name is rendered as a link */
   nameHref?: string;
+  /**
+   * For pages in the wide frame. Phone is unchanged; from 600px the header is static (not sticky)
+   * with a 44px back button and 64px height, and from 1024px it becomes a text back link on the
+   * left with the phone number on the right (80px).
+   */
+  wide?: boolean;
+  /** Wide only, 1024px+: back link text (defaults to the venue name, e.g. "Explore" on place pages). */
+  backLabel?: string;
+  /** Wide only, 1024px+: front desk number shown on the right. */
+  phone?: string | null;
 }
 
-function BackButton({ backHref, onBack }: { backHref?: string; onBack?: () => void }) {
+// Wide headers get a 44px hit area from 600px and hand over to the text link at 1024px.
+const WIDE_BACK_BUTTON = "cmp:-ml-3 cmp:flex cmp:size-11 cmp:items-center cmp:justify-center lg:hidden";
+
+function BackButton({
+  backHref,
+  onBack,
+  wide,
+}: {
+  backHref?: string;
+  onBack?: () => void;
+  wide?: boolean;
+}) {
+  const extra = wide ? ` ${WIDE_BACK_BUTTON}` : "";
   if (backHref) {
     return (
-      <Link href={backHref} aria-label="Go back" className="shrink-0 text-primary no-underline">
+      <Link
+        href={backHref}
+        aria-label="Go back"
+        className={`shrink-0 text-primary no-underline${extra}`}
+      >
         <ArrowLeft size={20} />
       </Link>
     );
@@ -64,13 +91,13 @@ function BackButton({ backHref, onBack }: { backHref?: string; onBack?: () => vo
       <button
         onClick={onBack}
         aria-label="Go back"
-        className="shrink-0 cursor-pointer border-none bg-transparent p-0 text-primary"
+        className={`shrink-0 cursor-pointer border-none bg-transparent p-0 text-primary${extra}`}
       >
         <ArrowLeft size={20} />
       </button>
     );
   }
-  return <div className="w-5 shrink-0" />;
+  return <div className={`w-5 shrink-0${wide ? " lg:hidden" : ""}`} />;
 }
 
 function NameContent({
@@ -95,6 +122,66 @@ function NameContent({
   );
 }
 
+// ─── Shared header row ───────────────────────────────────────────────────────
+
+type HeaderRowProps = Pick<
+  BaseHeaderProps,
+  "venueName" | "backHref" | "onBack" | "nameHref" | "wide" | "backLabel" | "phone"
+>;
+
+const LAPTOP_LINK =
+  "items-center gap-2 text-body font-medium text-primary no-underline cursor-pointer border-none bg-transparent p-0";
+
+function HeaderRow({
+  venueName,
+  backHref,
+  onBack,
+  nameHref,
+  wide,
+  backLabel,
+  phone,
+}: HeaderRowProps) {
+  const label = backLabel ?? venueName;
+  return (
+    <>
+      <BackButton backHref={backHref} onBack={onBack} wide={wide} />
+      <div
+        className={`pointer-events-none absolute inset-x-0 flex items-center justify-center${
+          wide ? " lg:hidden" : ""
+        }`}
+      >
+        <NameContent venueName={venueName} nameHref={nameHref} />
+      </div>
+      <div className={wide ? "w-5 shrink-0 cmp:w-11 lg:hidden" : "w-5 shrink-0"} />
+      {wide && (
+        <div className="hidden flex-1 items-center justify-between lg:flex">
+          {backHref ? (
+            <Link href={backHref} className={`inline-flex ${LAPTOP_LINK}`}>
+              <ArrowLeft size={20} aria-hidden="true" />
+              {label}
+            </Link>
+          ) : onBack ? (
+            <button onClick={onBack} className={`inline-flex ${LAPTOP_LINK}`}>
+              <ArrowLeft size={20} aria-hidden="true" />
+              {label}
+            </button>
+          ) : (
+            <span />
+          )}
+          {phone && (
+            <a
+              href={`tel:${phone.replace(/\D/g, "")}`}
+              className="text-body font-medium text-primary no-underline"
+            >
+              {phone}
+            </a>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
 // ─── Floating Back Button ────────────────────────────────────────────────────
 // Overlays a large hero image. Hides when the sticky header scrolls into view.
 // Used on: venue/poster detail variant, cruise restaurant detail.
@@ -103,9 +190,11 @@ interface FloatingBackButtonProps {
   scrolled: boolean;
   backHref?: string;
   onBack?: () => void;
+  /** Wide-frame pages show the back button in the header from 600px, so this floats on phones only. */
+  wide?: boolean;
 }
 
-export function FloatingBackButton({ scrolled, backHref, onBack }: FloatingBackButtonProps) {
+export function FloatingBackButton({ scrolled, backHref, onBack, wide }: FloatingBackButtonProps) {
   const inner = (
     <div
       className="flex items-center justify-center rounded-default"
@@ -121,8 +210,12 @@ export function FloatingBackButton({ scrolled, backHref, onBack }: FloatingBackB
     </div>
   );
 
-  const base = `fixed z-40 transition-opacity duration-200 ${scrolled ? "pointer-events-none opacity-0" : "opacity-100"}`;
-  const posStyle = { top: 48, left: 20 };
+  const base = `fixed z-40 transition-opacity duration-200 ${scrolled ? "pointer-events-none opacity-0" : "opacity-100"}${wide ? " cmp:hidden" : ""}`;
+  // Fixed to the viewport, so on wide screens line it up with the narrow frame's left gutter.
+  const posStyle = {
+    top: 48,
+    left: "max(20px, calc((100% - var(--cf-frame-narrow-max)) / 2 + 20px))",
+  };
 
   if (backHref) {
     return (
@@ -150,19 +243,34 @@ export function FloatingBackButton({ scrolled, backHref, onBack }: FloatingBackB
 // Always visible. Used on: Info page, Explore landing, Explore results,
 // Timeline (name row), Dining, The Crew.
 
-export function StickyHeader({ venueName, scrolled, backHref, onBack, nameHref }: BaseHeaderProps) {
+export function StickyHeader({
+  venueName,
+  scrolled,
+  backHref,
+  onBack,
+  nameHref,
+  wide,
+  backLabel,
+  phone,
+}: BaseHeaderProps) {
   return (
     <div
-      className={`sticky top-0 z-30 pt-safe relative flex items-center px-5 pb-2 transition-[border-color] duration-200 ${
+      className={`sticky top-0 z-30 pt-safe relative flex items-center ${
+        wide ? "px-page cmp:relative cmp:min-h-16 cmp:border-transparent cmp:pb-0 lg:min-h-20" : "px-5"
+      } pb-2 transition-[border-color] duration-200 ${
         scrolled ? "border-b border-border" : "border-b border-transparent"
       }`}
       style={{ backgroundColor: "var(--background)" }}
     >
-      <BackButton backHref={backHref} onBack={onBack} />
-      <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-        <NameContent venueName={venueName} nameHref={nameHref} />
-      </div>
-      <div className="w-5 shrink-0" />
+      <HeaderRow
+        venueName={venueName}
+        backHref={backHref}
+        onBack={onBack}
+        nameHref={nameHref}
+        wide={wide}
+        backLabel={backLabel}
+        phone={phone}
+      />
     </div>
   );
 }
@@ -178,19 +286,37 @@ export function ScrollRevealStickyHeader({
   backHref,
   onBack,
   nameHref,
+  wide,
+  backLabel,
+  phone,
 }: BaseHeaderProps) {
   return (
     <div
-      className={`fixed inset-x-0 top-0 z-30 pt-safe flex items-center px-5 pb-2 transition-[border-color,opacity] duration-200 ${
+      className={`fixed inset-x-0 top-0 z-30 pt-safe pb-2 transition-[border-color,opacity] duration-200 ${
         scrolled ? "border-b border-border opacity-100" : "border-b border-transparent opacity-0 pointer-events-none"
+      }${
+        wide
+          ? " cmp:static cmp:border-transparent cmp:pb-0 cmp:opacity-100 cmp:pointer-events-auto"
+          : ""
       }`}
       style={{ backgroundColor: "var(--background)" }}
     >
-      <BackButton backHref={backHref} onBack={onBack} />
-      <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-        <NameContent venueName={venueName} nameHref={nameHref} />
-      </div>
-      <div className="w-5 shrink-0" />
+      <FrameInner
+        width={wide ? "wide" : "narrow"}
+        className={`relative flex items-center ${
+          wide ? "px-page cmp:min-h-16 lg:min-h-20" : "px-5"
+        }`}
+      >
+        <HeaderRow
+          venueName={venueName}
+          backHref={backHref}
+          onBack={onBack}
+          nameHref={nameHref}
+          wide={wide}
+          backLabel={backLabel}
+          phone={phone}
+        />
+      </FrameInner>
     </div>
   );
 }

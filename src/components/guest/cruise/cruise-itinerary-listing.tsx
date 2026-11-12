@@ -11,6 +11,7 @@ import type { CruiseItineraryItem, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 interface CruiseItineraryListingProps {
   venue: Venue;
@@ -30,7 +31,7 @@ export function CruiseItineraryListing({
   const { loaded, imgRef, settle } = useImageLoaded(item.image_url);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {!loaded && <LoadingSpinner />}
       <ScrollRevealStickyHeader
         venueName={venue.name}
@@ -110,6 +111,6 @@ export function CruiseItineraryListing({
           <div className="h-safe-bottom" />
         </div>
       </div>
-    </div>
+    </PageFrame>
   );
 }

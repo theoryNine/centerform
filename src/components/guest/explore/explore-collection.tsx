@@ -16,6 +16,7 @@ import type {
   PlaceCategory,
   VenueWithTheme,
 } from "@/types";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -304,7 +305,7 @@ export function ExploreCollectionPage({
   const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
@@ -337,6 +338,6 @@ export function ExploreCollectionPage({
 
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

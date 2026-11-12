@@ -10,6 +10,7 @@ import { CopyButton } from "@/components/guest/primitives/copy-button";
 import { AccordionItem } from "@/components/guest/primitives/accordion-item";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
+import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
 
 // Section definitions — maps service categories to display sections
 const SECTION_CONFIG = [
@@ -207,7 +208,7 @@ export function VenueServicesPage({
   const fullAddress = [venue.address, venue.city, venue.state].filter(Boolean).join(", ");
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {/* Sticky nav — hidden until scroll past header */}
       <div
         className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
@@ -216,29 +217,30 @@ export function VenueServicesPage({
         }}
       >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          {/* Sticky header row */}
-          <div className="relative flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
-              <ArrowLeft size={20} />
-            </Link>
-            <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-              <span className="font-serif text-[20px] font-medium text-foreground">{venueName}</span>
+          <FrameInner>
+            {/* Sticky header row */}
+            <div className="relative flex items-center px-5 py-3">
+              <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
+                <ArrowLeft size={20} />
+              </Link>
+              <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+                <span className="font-serif text-[20px] font-medium text-foreground">{venueName}</span>
+              </div>
+              <div className="w-5 shrink-0" />
             </div>
-            <div className="w-5 shrink-0" />
-          </div>
 
-          {/* Section tabs */}
-          <div className="flex px-5 pb-3">
-            {SECTION_CONFIG.map((section) => (
-              <SectionTab
-                key={section.id}
-                section={section}
-                isActive={activeSection === section.id}
-                onClick={() => scrollToSection(section.id)}
-              />
-            ))}
-          </div>
-
+            {/* Section tabs */}
+            <div className="flex px-5 pb-3">
+              {SECTION_CONFIG.map((section) => (
+                <SectionTab
+                  key={section.id}
+                  section={section}
+                  isActive={activeSection === section.id}
+                  onClick={() => scrollToSection(section.id)}
+                />
+              ))}
+            </div>
+          </FrameInner>
           {/* Divider line — only visible with sticky nav */}
           <div className="h-px bg-border" />
         </div>
@@ -377,6 +379,6 @@ export function VenueServicesPage({
 
       {/* Bottom safe area */}
       <div className="h-safe-bottom" />
-    </div>
+    </PageFrame>
   );
 }

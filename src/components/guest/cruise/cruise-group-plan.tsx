@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { CruiseItineraryItem, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
+import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
 
 // ─── Day grouping ────────────────────────────────────────────────────────────
 
@@ -249,7 +250,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
     ) : null;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {/* Sticky nav — slides in when main header scrolls out of view */}
       <div
         ref={stickyNavRef}
@@ -257,16 +258,18 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
         style={{ transform: showStickyNav ? "translateY(0)" : "translateY(-100%)" }}
       >
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <div className="relative flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
-              <ArrowLeft size={20} />
-            </Link>
-            <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-              <span className="font-serif text-[20px] font-medium text-foreground">{venue.name}</span>
+          <FrameInner>
+            <div className="relative flex items-center px-5 py-3">
+              <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
+                <ArrowLeft size={20} />
+              </Link>
+              <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
+                <span className="font-serif text-[20px] font-medium text-foreground">{venue.name}</span>
+              </div>
+              <div className="w-5 shrink-0" />
             </div>
-            <div className="w-5 shrink-0" />
-          </div>
-          {pillRow(stickyPillContainerRef, stickyPillRefs)}
+            {pillRow(stickyPillContainerRef, stickyPillRefs)}
+          </FrameInner>
           <div className="h-px bg-border" />
         </div>
       </div>
@@ -389,6 +392,6 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
         </div>
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

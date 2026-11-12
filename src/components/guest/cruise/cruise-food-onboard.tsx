@@ -9,6 +9,7 @@ import { PageHero } from "@/components/guest/primitives/page-hero";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { formatPrice } from "@/lib/utils";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 function restaurantSubLabel(r: CruiseRestaurant): string {
   return [
@@ -43,7 +44,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
   const walkUp = restaurants.filter((r) => r.restaurant_type === "walk_up");
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
@@ -133,6 +134,6 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
       </div>
 
       {!allLoaded && <LoadingSpinner />}
-    </div>
+    </PageFrame>
   );
 }

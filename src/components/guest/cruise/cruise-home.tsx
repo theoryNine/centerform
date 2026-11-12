@@ -11,6 +11,7 @@ import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card"
 import type { CruiseDailyWelcome, CruiseLink } from "@/types";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { safeHttpUrl } from "@/lib/url";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 function formatVenueName(slug: string) {
   return slug
@@ -134,7 +135,7 @@ export function CruiseHomePage({ dailyWelcomes, links, navTiles }: CruiseHomePag
         </div>
       )}
 
-      <div className="min-h-screen bg-background font-sans">
+      <PageFrame>
         {/* Safe-area spacer: real DOM element so Safari doesn't skip it on initial load */}
         <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
         {/* Header */}
@@ -239,7 +240,7 @@ export function CruiseHomePage({ dailyWelcomes, links, navTiles }: CruiseHomePag
         <VenueFooter venueName={shipName} address={venue?.ship_name} phone={venue?.phone} />
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
 
       {!allLoaded && <LoadingSpinner />}
     </>

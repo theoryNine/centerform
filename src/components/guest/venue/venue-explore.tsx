@@ -9,6 +9,7 @@ import { PageHero } from "@/components/guest/primitives/page-hero";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 interface AreaSection {
   name: string;
@@ -203,7 +204,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
   const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venueName}
@@ -272,6 +273,6 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
         {/* Bottom safe area */}
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }
