@@ -2,6 +2,17 @@ import { resolveSlug } from "@/lib/slug-resolver";
 import { getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseCrewPage } from "@/components/guest/cruise/cruise-crew";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug, "The Crew");
+}
 
 export default async function TheCrewPage({
   params,

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createPublicClient as createClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { NearbyPlace, ExploreCollectionWithItems, CruiseRestaurant, CruiseItineraryItem, CruiseDailyWelcome, CruiseLink, MemberRole, Venue } from "@/types";
@@ -34,7 +35,7 @@ export async function getVenueServices(venueId: string) {
   return data ?? [];
 }
 
-export async function getNearbyPlaceById(placeId: string) {
+export const getNearbyPlaceById = cache(async function getNearbyPlaceById(placeId: string) {
   const supabase = createClient();
   const { data } = await supabase
     .from("nearby_places")
@@ -42,7 +43,7 @@ export async function getNearbyPlaceById(placeId: string) {
     .eq("id", placeId)
     .single();
   return data;
-}
+});
 
 const DINING_CATEGORIES = '("restaurant","bar","cafe")';
 
@@ -214,7 +215,7 @@ export async function getExploreCollections(venueId: string) {
   return data ?? [];
 }
 
-export async function getExploreCollectionWithItems(
+export const getExploreCollectionWithItems = cache(async function getExploreCollectionWithItems(
   collectionId: string,
 ): Promise<ExploreCollectionWithItems | null> {
   const supabase = createClient();
@@ -242,7 +243,7 @@ export async function getExploreCollectionWithItems(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { explore_collection_items: _, ...collection } = data as Record<string, unknown>;
   return { ...(collection as object), items } as unknown as ExploreCollectionWithItems;
-}
+});
 
 export async function getAllStandaloneEvents() {
   const supabase = createClient();
@@ -288,7 +289,7 @@ export async function getCruiseItineraryItems(venueId: string): Promise<CruiseIt
 }
 
 
-export async function getCruiseRestaurantById(restaurantId: string): Promise<CruiseRestaurant | null> {
+export const getCruiseRestaurantById = cache(async function getCruiseRestaurantById(restaurantId: string): Promise<CruiseRestaurant | null> {
   const supabase = createClient();
   const { data } = await supabase
     .from("cruise_restaurants")
@@ -297,9 +298,9 @@ export async function getCruiseRestaurantById(restaurantId: string): Promise<Cru
     .eq("is_active", true)
     .single();
   return data as CruiseRestaurant | null;
-}
+});
 
-export async function getCruiseItineraryItemById(
+export const getCruiseItineraryItemById = cache(async function getCruiseItineraryItemById(
   itemId: string,
 ): Promise<CruiseItineraryItem | null> {
   const supabase = createClient();
@@ -310,7 +311,7 @@ export async function getCruiseItineraryItemById(
     .eq("is_active", true)
     .single();
   return data as CruiseItineraryItem | null;
-}
+});
 
 export async function getVenuePageDescription(
   venueId: string,

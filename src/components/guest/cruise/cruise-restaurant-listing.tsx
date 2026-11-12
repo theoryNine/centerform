@@ -10,8 +10,10 @@ import type { CruiseRestaurant, Venue } from "@/types";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, telHref } from "@/lib/utils";
 import { safeHttpUrl } from "@/lib/url";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 interface CruiseRestaurantListingProps {
   venue: Venue;
@@ -31,7 +33,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
   ].filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {!loaded && <LoadingSpinner />}
       <ScrollRevealStickyHeader
         venueName={venue.name}
@@ -84,12 +86,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
           {/* Description */}
           {restaurant.description && (
             <p className="mt-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
-              {restaurant.description.split("\n").map((line, i) => (
-                <span key={i}>
-                  {i > 0 && <br />}
-                  {line}
-                </span>
-              ))}
+              <Multiline text={restaurant.description} />
             </p>
           )}
 
@@ -101,7 +98,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                   href={safeHttpUrl(restaurant.website) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-[44px] items-center justify-center rounded-default border border-primary px-4 text-body-sm font-semibold text-primary no-underline"
+                  className="flex min-h-[44px] items-center justify-center rounded-default border border-primary px-4 text-body-sm font-semibold text-link no-underline"
                 >
                   Reserve a Table →
                 </a>
@@ -112,7 +109,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                   href={safeHttpUrl(link.url) ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-[44px] items-center justify-end text-body-sm text-primary no-underline"
+                  className="flex min-h-[44px] items-center justify-end text-body-sm text-link no-underline"
                 >
                   {link.label} →
                 </a>
@@ -148,8 +145,8 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                       Phone
                     </p>
                     <a
-                      href={`tel:${restaurant.phone.replace(/\D/g, "")}`}
-                      className="flex min-h-[44px] items-center text-body-sm text-primary no-underline"
+                      href={telHref(restaurant.phone)}
+                      className="flex min-h-[44px] items-center text-body-sm text-link no-underline"
                     >
                       {restaurant.phone}
                     </a>
@@ -166,7 +163,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
           <div className="h-safe-bottom" />
         </div>
       </div>
-    </div>
+    </PageFrame>
   );
 
 }

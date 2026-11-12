@@ -11,6 +11,7 @@ import type { CruiseItineraryItem, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 interface CruiseItineraryListingProps {
   venue: Venue;
@@ -30,7 +31,7 @@ export function CruiseItineraryListing({
   const { loaded, imgRef, settle } = useImageLoaded(item.image_url);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {!loaded && <LoadingSpinner />}
       <ScrollRevealStickyHeader
         venueName={venue.name}
@@ -96,7 +97,7 @@ export function CruiseItineraryListing({
             <div className="mt-5">
               <Link
                 href={`/${slug}/food-onboard/${item.restaurant_id}`}
-                className="flex items-center justify-center rounded-default border border-primary px-4 py-3 text-body-sm font-semibold text-primary no-underline"
+                className="flex items-center justify-center rounded-default border border-primary px-4 py-3 text-body-sm font-semibold text-link no-underline"
               >
                 {restaurantName ? `View ${restaurantName} →` : "View Restaurant →"}
               </Link>
@@ -110,6 +111,6 @@ export function CruiseItineraryListing({
           <div className="h-safe-bottom" />
         </div>
       </div>
-    </div>
+    </PageFrame>
   );
 }

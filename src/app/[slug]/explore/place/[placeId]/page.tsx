@@ -2,9 +2,21 @@ import { resolveSlug } from "@/lib/slug-resolver";
 import { getNearbyPlaceById } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { PlaceListing } from "@/components/guest/explore/place-listing";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
 
 export function generateStaticParams() {
   return [];
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string; placeId: string }>;
+}): Promise<Metadata> {
+  const { slug, placeId } = await params;
+  const place = await getNearbyPlaceById(placeId);
+  return pageMetadata(slug, place?.name);
 }
 
 export default async function PlacePage({

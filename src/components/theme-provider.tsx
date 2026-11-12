@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { ThemeColors } from "@/types";
+import { readableOn } from "@/lib/contrast";
 
 function hexToOklch(hex: string): string {
   // For now, pass through the hex value directly as CSS color
@@ -85,7 +86,28 @@ export function VenueThemeProvider({ theme, darkMode, lightMode, children }: The
     if (theme.heading_font_family) inject(theme.heading_font_family, "300;400;500;600;700");
   }, [theme.font_family, theme.heading_font_family]);
 
+  // Brand colors are chosen per venue, so the raw primary can't be trusted for link *text*: the
+  // default teal is only 3:1 on the dark page. Compute a readable variant for each mode; the
+  // `text-link` utility (globals.css) picks one by color scheme. A forced scheme gets one value
+  // for both. Buttons keep using --primary itself, with --primary-foreground on top.
+  const surfaces = (mode: React.CSSProperties | undefined, fallback: [string, string]) => {
+    const m = (mode ?? {}) as Record<string, string>;
+    return [m["--background"] ?? fallback[0], m["--card"] ?? fallback[1]];
+  };
+  const linkLight = readableOn(
+    theme.primary_color,
+    surfaces(lightMode, ["#F5F0E8", "#FFFFFF"]),
+    "darker",
+  );
+  const linkDark = readableOn(
+    theme.primary_color,
+    surfaces(darkMode, ["#1C1A17", "#252220"]),
+    "lighter",
+  );
+
   const brandStyle = {
+    "--link-light": colorScheme === "dark" ? linkDark : linkLight,
+    "--link-dark": colorScheme === "light" ? linkLight : linkDark,
     "--primary": hexToOklch(theme.primary_color),
     "--secondary": hexToOklch(theme.secondary_color),
     "--accent": hexToOklch(theme.accent_color),

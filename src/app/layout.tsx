@@ -53,7 +53,13 @@ export default function RootLayout({
         <AuthSessionProvider>{children}</AuthSessionProvider>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");`,
+            // The worker caches /_next/static/ cache-first, which serves stale chunks against a dev
+            // server (Turbopack reuses chunk names) and breaks HMR. Only register it in production,
+            // and clean up one left over from an earlier dev session.
+            __html:
+              process.env.NODE_ENV === "production"
+                ? `if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");`
+                : `if ("serviceWorker" in navigator) { navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }); if (window.caches) caches.delete("centerform-static-v1"); }`,
           }}
         />
       </body>

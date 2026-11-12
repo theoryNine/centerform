@@ -9,17 +9,39 @@ Loaded in addition to the root CLAUDE.md when working here. Layout: `primitives/
 - `copy-button.tsx` — Inline copy-to-clipboard with check feedback
 - `corner-bracket-card.tsx` — Card with decorative corner bracket spans
 - `loading-spinner.tsx` — Fixed full-screen loading overlay
-- `nav-card.tsx` — Navigation tile card; optional `footer?: ReactNode` renders a third content row below the sublabel (used by venue-dining for category pill + price); `sublabelClassName?: string` for extra classes on the sublabel (e.g. `line-clamp-2`); `hideImage?: boolean` suppresses the image column and adds `pl-4` to the content area
-- `page-hero.tsx` — Full-bleed hero image with gradient
-- `section-header.tsx` — Numbered section header (e.g. "01 · Title")
-- `sticky-header.tsx` — Three sticky nav patterns: `StickyHeader` (always visible, used on Dining/Info/Explore list pages), `ScrollRevealStickyHeader` (fades in on scroll, used on hero detail pages like place-listing and cruise-restaurant-listing), `FloatingBackButton` (glass pill over hero, paired with ScrollRevealStickyHeader). Hooks: `useStickyScroll` (IntersectionObserver, for pages with in-flow headers), `useWindowScroll` (scroll event, for pages with fixed/absolute headers)
-- `venue-footer.tsx` — Venue branding footer
+- `nav-card.tsx` — Navigation tile card (a `<Link>`; `responsive` + `featured` give the wide-frame list layout, used inside a `cmp:grid cmp:grid-cols-2 lg:grid-cols-3`); optional `footer?: ReactNode` renders a third content row below the sublabel (used by venue-dining for category pill + price); `sublabelClassName?: string` for extra classes on the sublabel (e.g. `line-clamp-2`); `hideImage?: boolean` suppresses the image column and adds `pl-4` to the content area
+- `page-frame.tsx` — `PageFrame` (root of every guest page: full-width background + a `<main>` content frame), `FrameInner` (aligns the content of a `fixed inset-x-0` bar with the frame) and `FrameBody` (narrow column under a wide header). See Responsive layouts below.
+- `page-top-bar.tsx` — `PageTopBar` (in-flow header with back arrow + title), `SlideDownNav` (bar that slides in after the page header scrolls away; `inert` while hidden) and `BackLink`. Used by Services, Events and the cruise pages instead of hand-rolled copies.
+- `fact.tsx` — one labelled fact row (place page)
+- `multiline.tsx` — renders `\n` as line breaks
+- `page-hero.tsx` — Full-bleed hero image with gradient (`wide` for the two-column wide-frame hero, detail size only)
+- `section-header.tsx` — Numbered section header (e.g. "01 · Title"; `wide` for the wide-frame rule and 36px laptop heading)
+- `sticky-header.tsx` — Three sticky nav patterns (wide-frame pages use `VenueHeader`, which wraps them with the wide variant, home link and venue phone): `StickyHeader` (always visible, used on Dining/Info/Explore list pages), `ScrollRevealStickyHeader` (fades in on scroll, used on hero detail pages like place-listing and cruise-restaurant-listing), `FloatingBackButton` (glass pill over hero, paired with ScrollRevealStickyHeader). Hooks: `useStickyScroll` (IntersectionObserver, for pages with in-flow headers), `useWindowScroll` (scroll event, for pages with fixed/absolute headers)
+- `venue-footer.tsx` — Venue branding footer (`layout="responsive"` for wide-frame pages)
 - `welcome-envelope.tsx` — Animated envelope reveal
 - `welcome-splash.tsx` — Welcome card (delegates to oversized/text variants). Default is `"oversized"` for both hotel and cruise venues — full-bleed image with name card floating over lower half. `"text"` variant uses a shorter in-flow image above the card. Individual venues can override via `venues.splash_variant`.
-- `welcome-splash-oversized.tsx`
+- `welcome-splash-oversized.tsx` — Has two compositions, switched by the `splash-port` / `splash-land` custom variants in `globals.css` (orientation + width, not just width): portrait is the original tall oval; landscape (and any window ≥1024px) is a half-oval photo with the card centered in the dark panel. `splash-short` / `splash-mid` / `splash-lap` size the landscape one. The `text` variant is not responsive yet.
 - `welcome-splash-text.tsx`
 
 Other folders: `cruise/` (cruise venue pages), `venue/` (hotel/resort pages), `explore/` (explore hub: area-listing, explore-collection, place-listing), `event/` (standalone event home). `cruise/cruise-home.tsx` is the design-token reference implementation. Home components (`venue-home`, `cruise-home`) receive their data as props from the server page.
+
+## Responsive layouts
+
+Phone (≤599px) is the unprefixed default and **must stay pixel-identical** — `pnpm e2e` checks it. Layout changes only ever add `cmp:` / `tab:` / `lg:` classes (min-width, mobile-first).
+
+- **Breakpoints:** `cmp:` 600px (compact tablet), `tab:` 700px (tablet), `lg:` 1024px (laptop). These are namespaced on purpose — `sm:`/`md:` are left at Tailwind's defaults because the dashboard and shadcn components use them.
+- **CSS only.** No `useMediaQuery` / `window.innerWidth` in guest components: pages are ISR and a JS-driven layout flashes or mismatches on hydration.
+- **Gutters:** `--cf-page-padding` is 20px, 32px from 600px, 40px from 700px, so `px-page` / `-ml-page` follow the viewport.
+- **Frames:** every guest page root is `<PageFrame width="narrow" | "wide">`. `narrow` (default) is the phone layout centered in a 600px column with phone gutters at every width — use it until a page has a wide design. `wide` is fluid up to a centered 1200px frame (1120px of content + 40px gutters). Switch a page to `wide` in the same change that builds its tablet/laptop layout, and pass `wide` to its header and `layout="responsive"` to its footer.
+- **Fixed bars** (`fixed inset-x-0` navs) keep the full-width background and put their content in `<FrameInner>` so it lines up with the frame. `FloatingBackButton` positions itself against the narrow frame.
+- **Back buttons** are one size everywhere: a 44×44 target around a 20px arrow, using `-m-3 flex size-11 items-center justify-center` so the layout box stays 20×20 and the arrow doesn't move. `BackButton` in `sticky-header.tsx` does this; custom headers (services, events, cruise ship-info/group-plan) use the same classes. `FloatingBackButton` is a 44×44 square. Wide-frame headers swap to a 44px-tall text link at 1024px.
+- **Back labels** come from `GuestNavHistory` (`src/components/guest-nav-history.tsx`): pages call `usePageLabel("Dining")`, and a detail page calls `usePreviousPage()` to label its back link with the page the guest came from (a direct visit goes back to Explore). Client-only state, so ISR is unaffected.
+- **Document titles**: every route exports `generateMetadata` using `pageMetadata(slug, pageName)` from `src/lib/page-metadata.ts`. Detail-page queries in `queries.ts` are `cache()`d so the title and the page share one fetch.
+- **Contrast**: link text uses `text-link`, not `text-primary`. `VenueThemeProvider` computes a readable variant of the venue's brand color for light and dark (`readableOn` in `src/lib/contrast.ts`) into `--link-light` / `--link-dark`; `bg-primary` + `text-primary-foreground` (buttons) still use the raw brand color. The neutral `--muted-foreground` tokens are checked against every surface by `src/lib/contrast.test.ts`, and `layout-invariants.spec.ts` measures rendered text contrast on every page in both color schemes.
+- **Small links** (See more, footer phone, address) get `hit-area`: ~28px tap target with no layout change (WCAG 2.2 target size). Never leave an interactive element under 24×24.
+- **Adding CSS utilities:** put new helpers in `globals.css` as plain rules inside `@layer utilities { … }`, not `@utility`. Turbopack's dev server doesn't reliably regenerate a *new or edited* `@utility` while it is running, so the class silently disappears until a restart (this made all link text white once). If styles look missing in dev, `rm -rf .next` and restart before debugging.
+- **`cn()` knows the custom text-size tokens** (`text-hotel-name`, `text-card-title-*`, …; see `CUSTOM_TEXT_SIZES` in `src/lib/utils.ts`). Add a new `--text-*` token there too, or tailwind-merge will read it as a color and drop a sibling class.
+- Event pages (`event-home`, `schedule`, `info`) and the concierge chat are not framed.
 
 ## Accessibility
 

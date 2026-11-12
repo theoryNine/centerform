@@ -6,9 +6,12 @@ import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
-import { NavCard } from "@/components/guest/primitives/nav-card";
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { NavCard, NAV_CARD_GRID } from "@/components/guest/primitives/nav-card";
+import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { formatPrice } from "@/lib/utils";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 const CATEGORY_LABELS: Record<string, string> = {
   restaurant: "Restaurant",
@@ -44,6 +47,7 @@ export function VenueDiningPage({
   heroImageUrl,
 }: VenueDiningPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
+  usePageLabel("Dining");
 
   const totalWithImages = places.filter((p) => p.image_url).length;
   const [loadedCount, setLoadedCount] = useState(0);
@@ -55,14 +59,9 @@ export function VenueDiningPage({
   const hasBoth = onSite.length > 0 && nearby.length > 0;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
-        venueName={venue.name}
-        scrolled={scrolled}
-        backHref={`/${slug}`}
-        nameHref={`/${slug}`}
-      />
+      <VenueHeader venue={venue} slug={slug} scrolled={scrolled} />
 
       <PageHero
         imageUrl={heroImageUrl ?? venue.cover_image_url}
@@ -79,17 +78,14 @@ export function VenueDiningPage({
         }
         title="Dining & Drinks"
         className="pt-8"
+        animated
+        wide
       />
 
       <div className="px-page pb-10 pt-2">
         {pageDescription && (
           <p className="mb-6 mt-2 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription.split("\n").map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
+            <Multiline text={pageDescription} />
           </p>
         )}
 
@@ -101,8 +97,8 @@ export function VenueDiningPage({
           <>
             {onSite.length > 0 && (
               <div>
-                <SectionHeader number="01" title="At the Hotel" />
-                <div className="flex flex-col gap-card-gap">
+                <SectionHeader number="01" title="At the Hotel" wide />
+                <div className={`flex flex-col ${NAV_CARD_GRID}`}>
                   {onSite.map((p) => (
                     <NavCard
                       key={p.id}
@@ -112,6 +108,8 @@ export function VenueDiningPage({
                       imageUrl={p.image_url ?? undefined}
                       onSettle={p.image_url ? handleImageSettle : undefined}
                       footer={diningFooter(p)}
+                      responsive
+                      featured={onSite.length === 1}
                     />
                   ))}
                 </div>
@@ -123,8 +121,9 @@ export function VenueDiningPage({
                 <SectionHeader
                   number={hasBoth ? "02" : "01"}
                   title="Nearby Recommendations"
+                  wide
                 />
-                <div className="flex flex-col gap-card-gap">
+                <div className={`flex flex-col ${NAV_CARD_GRID}`}>
                   {nearby.map((p) => (
                     <NavCard
                       key={p.id}
@@ -134,6 +133,8 @@ export function VenueDiningPage({
                       imageUrl={p.image_url ?? undefined}
                       onSettle={p.image_url ? handleImageSettle : undefined}
                       footer={diningFooter(p)}
+                      responsive
+                      featured={nearby.length === 1}
                     />
                   ))}
                 </div>
@@ -143,13 +144,18 @@ export function VenueDiningPage({
         )}
 
         <div className="mt-section">
-          <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />
+          <VenueFooter
+            venueName={venue.name}
+            address={venue.address}
+            phone={venue.phone}
+            layout="responsive"
+          />
         </div>
 
         <div className="h-safe-bottom" />
       </div>
 
       {!allLoaded && <LoadingSpinner />}
-    </div>
+    </PageFrame>
   );
 }

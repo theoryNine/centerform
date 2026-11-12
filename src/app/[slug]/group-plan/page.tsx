@@ -2,6 +2,17 @@ import { resolveSlug } from "@/lib/slug-resolver";
 import { getCruiseItineraryItems, getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseGroupPlanPage } from "@/components/guest/cruise/cruise-group-plan";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug, "Group Plan");
+}
 
 export default async function GroupPlanPage({
   params,

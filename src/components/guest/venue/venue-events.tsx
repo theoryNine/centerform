@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Calendar, MapPin, Star } from "lucide-react";
+import { Calendar, MapPin, Star } from "lucide-react";
 import type { Venue, VenueEvent } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { PageTopBar, SlideDownNav } from "@/components/guest/primitives/page-top-bar";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 function formatEventDate(startTime: string, endTime: string | null): string {
   const start = new Date(startTime);
@@ -40,41 +42,25 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
   const venueName = venue.name;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {/* Sticky nav */}
-      <div
-        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
-        style={{
-          transform: showStickyNav ? "translateY(0)" : "translateY(-100%)",
-        }}
-      >
-        <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <div className="flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
-              <ArrowLeft size={20} />
-            </Link>
-            <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
-          </div>
-          <div className="h-px bg-border" />
-        </div>
-      </div>
+      <SlideDownNav
+        show={showStickyNav}
+        backHref={`/${slug}`}
+        backLabel={venueName}
+        title={venueName}
+        align="start"
+      />
 
       {/* Main header area */}
       <div ref={headerRef}>
-        <div
-          className="flex items-center px-5"
-          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
-        >
-          <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            href={`/${slug}`}
-            className="font-serif text-base font-normal text-foreground no-underline"
-          >
-            {venueName}
-          </Link>
-        </div>
+        <PageTopBar
+          backHref={`/${slug}`}
+          backLabel={venueName}
+          title={venueName}
+          titleHref={`/${slug}`}
+          align="start"
+        />
 
         <PageHero
           imageUrl={heroImageUrl ?? venue.cover_image_url}
@@ -98,12 +84,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
       <div className="px-page pb-10 pt-6">
         {pageDescription && (
           <p className="mb-6 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription.split("\n").map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
+            <Multiline text={pageDescription} />
           </p>
         )}
 
@@ -179,6 +160,6 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
 
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }
