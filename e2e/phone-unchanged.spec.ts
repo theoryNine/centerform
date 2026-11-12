@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { CRUISE_SLUG, PAGES, SLUG } from "./pages";
 
 /**
  * Guards the "phone layout must not change" rule for the responsive work.
@@ -7,30 +8,6 @@ import { expect, test, type Page } from "@playwright/test";
  * then on the feature branch run `pnpm e2e` — any pixel difference at or below 599px fails.
  * Baselines live in e2e/__screenshots__ (gitignored; they depend on the remote Supabase data).
  */
-
-const SLUG = "the-ballard-inn";
-const MARKET_ID = "b1a2c3d4-0000-4000-a000-000000000101";
-const CAFE_ID = "b1a2c3d4-0000-4000-a000-000000000103";
-const WALK_COLLECTION_ID = "b1a2c3d4-0000-4000-a000-000000000201";
-const DATE_NIGHT_ID = "b1a2c3d4-0000-4000-a000-000000000202";
-const CRUISE_SLUG = "adam-ansel";
-
-const PAGES = [
-  { name: "home", path: `/${SLUG}` },
-  { name: "services", path: `/${SLUG}/services` },
-  { name: "dining", path: `/${SLUG}/dining` },
-  { name: "explore", path: `/${SLUG}/explore` },
-  { name: "place", path: `/${SLUG}/explore/place/${MARKET_ID}` },
-  { name: "dine-place", path: `/${SLUG}/explore/place/${CAFE_ID}` },
-  { name: "guide", path: `/${SLUG}/explore/${WALK_COLLECTION_ID}` },
-  { name: "date-night", path: `/${SLUG}/explore/${DATE_NIGHT_ID}` },
-  { name: "area", path: `/${SLUG}/explore/area/Ballard` },
-  { name: "events", path: `/${SLUG}/events` },
-  { name: "cruise-ship-info", path: `/${CRUISE_SLUG}/ship-info` },
-  { name: "cruise-group-plan", path: `/${CRUISE_SLUG}/group-plan` },
-  { name: "cruise-food", path: `/${CRUISE_SLUG}/food-onboard` },
-  { name: "cruise-crew", path: `/${CRUISE_SLUG}/the-crew` },
-];
 
 const WIDTHS = [360, 390, 430, 599];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,6 +48,16 @@ export function NavCard({
   tile,
   lazyImage,
 }: NavCardProps) {
+  // Report the image as settled exactly once. A cached image can finish loading before React
+  // attaches onLoad (it never fires then), so also check `complete` when the element mounts;
+  // otherwise pages waiting on every card image (Home, Dining) would show their spinner forever.
+  const settled = useRef(false);
+  const settle = () => {
+    if (settled.current) return;
+    settled.current = true;
+    onSettle?.();
+  };
+
   return (
     <Link
       href={href}
@@ -85,8 +95,11 @@ export function NavCard({
               alt=""
               loading={lazyImage ? "lazy" : undefined}
               decoding={lazyImage ? "async" : undefined}
-              onLoad={onSettle}
-              onError={onSettle}
+              ref={(el) => {
+                if (el?.complete) settle();
+              }}
+              onLoad={settle}
+              onError={settle}
               className="absolute inset-0 size-full object-cover"
             />
           )}

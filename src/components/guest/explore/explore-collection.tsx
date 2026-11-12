@@ -171,10 +171,17 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
   return (
     <div className="card-shadow overflow-hidden rounded-default bg-card">
       {/* Image */}
-      <Link href={`/${slug}/explore/place/${place.id}`} className="block no-underline">
+      {/* Decorative duplicate of the title link below, so it's out of the tab order and hidden from
+          screen readers (a keyboard user would otherwise land on the same card twice). */}
+      <Link
+        href={`/${slug}/explore/place/${place.id}`}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="block no-underline"
+      >
         <div className="aspect-[16/7] w-full overflow-hidden">
           {place.image_url ? (
-            <img loading="lazy" decoding="async" src={place.image_url} alt={place.name} className="size-full object-cover" />
+            <img loading="lazy" decoding="async" src={place.image_url} alt="" className="size-full object-cover" />
           ) : (
             <div
               className="size-full"
@@ -186,7 +193,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
 
       {/* Content */}
       <div className="px-4 pb-4 pt-3">
-        <Link href={`/${slug}/explore/place/${place.id}`} className="no-underline">
+        <Link href={`/${slug}/explore/place/${place.id}`} className="hit-area block no-underline">
           <h2 className="m-0 font-serif text-card-title-md font-medium leading-tight text-foreground">
             {place.name}
           </h2>
@@ -212,7 +219,7 @@ function PlaceCard({ place, slug }: { place: NearbyPlace; slug: string }) {
                 href={ctaHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex justify-end text-body-sm font-medium text-primary no-underline"
+                className="hit-area flex justify-end text-body-sm font-medium text-primary no-underline"
               >
                 {ctaLabel} →
               </a>
