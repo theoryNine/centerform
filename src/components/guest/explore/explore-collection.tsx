@@ -65,13 +65,19 @@ function getCTAHref(place: NearbyPlace): string | null {
 function CollectionHeader({
   title,
   subtitle,
+  wide,
 }: {
   title: string;
   subtitle: string | null;
+  wide?: boolean;
 }) {
   return (
     <CornerBracketCard className="mb-5">
-      <h1 className="m-0 font-serif text-page-title font-semibold leading-tight text-foreground">
+      <h1
+        className={`m-0 font-serif text-page-title font-semibold leading-tight text-foreground${
+          wide ? " cmp:text-[32px] lg:text-[36px]" : ""
+        }`}
+      >
         {title}
       </h1>
       {subtitle && (
@@ -91,35 +97,35 @@ function TimelineCard({ item, slug }: { item: CollectionItemWithPlace; slug: str
 
   if (item.is_start || item.is_end) {
     return (
-      <div className="relative pb-5 flex items-center">
-        <div className="absolute left-[24px] z-10 h-3 w-3 rounded-full bg-primary" />
+      <li className="relative pb-5 flex items-center">
+        <div aria-hidden="true" className="absolute left-[24px] z-10 h-3 w-3 rounded-full bg-primary" />
         <p className="m-0 pl-[48px] text-label font-semibold tracking-widest text-primary">
           {item.is_start ? "START" : "END"} · {place.name.toUpperCase()}
         </p>
-      </div>
+      </li>
     );
   }
 
   return (
-    <div className="pb-3">
+    <li className="pb-3">
       {item.time_label && (
         <p className="relative z-10 m-0 mb-2 bg-background text-body-sm font-semibold text-foreground">
           {item.time_label}
         </p>
       )}
       <div className="relative pl-[60px]">
-        <div className="absolute left-[26px] top-[10px] z-10 h-2 w-2 rounded-full bg-muted-foreground/60" />
-        <div className="absolute left-[34px] top-[13px] h-px w-[26px] bg-muted-foreground/25" />
+        <div aria-hidden="true" className="absolute left-[26px] top-[10px] z-10 h-2 w-2 rounded-full bg-muted-foreground/60" />
+        <div aria-hidden="true" className="absolute left-[34px] top-[13px] h-px w-[26px] bg-muted-foreground/25" />
         <NavCard
           label={place.name}
           sublabel={place.description ?? ""}
           href={`/${slug}/explore/place/${place.id}`}
 
-          sublabelClassName="line-clamp-2"
+          sublabelClassName="line-clamp-2 cmp:line-clamp-none"
           hideImage
         />
       </div>
-    </div>
+    </li>
   );
 }
 
@@ -134,14 +140,15 @@ function TimelineLayout({
     <div className="relative">
       {/* Vertical line */}
       <div
+        aria-hidden="true"
         className="absolute top-3 bottom-3 w-px bg-muted-foreground/25"
         style={{ left: "30px" }}
       />
-      <div className="flex flex-col">
+      <ol className="m-0 flex list-none flex-col p-0">
         {items.map((item) => (
           <TimelineCard key={item.id} item={item} slug={slug} />
         ))}
-      </div>
+      </ol>
     </div>
   );
 }
@@ -246,18 +253,36 @@ function CardsLayout({
 function SomethingElse({
   slug,
   otherCollections,
+  wide,
 }: {
   slug: string;
   otherCollections: ExploreCollection[];
+  wide?: boolean;
 }) {
+  // Wide: from 700px a two-column band (heading left, prompt right); the link to other guides sits
+  // under the band, and moves into the right column at 1024px.
   return (
-    <div className="mt-10">
-      <h2 className="m-0 mb-1 text-center font-serif text-card-title-lg font-medium text-foreground">
-        Something else?
-      </h2>
-      <p className="m-0 mb-4 text-center text-body-sm text-muted-foreground">
-        Tell us what you&apos;re in the mood for.
-      </p>
+    <div
+      className={`mt-10${
+        wide ? " tab:grid tab:grid-cols-2 tab:items-start tab:gap-x-10 tab:gap-y-6" : ""
+      }`}
+    >
+      <div className={wide ? "tab:text-left lg:row-span-2" : undefined}>
+        <h2
+          className={`m-0 mb-1 text-center font-serif text-card-title-lg font-medium text-foreground${
+            wide ? " tab:text-left tab:text-[28px]" : ""
+          }`}
+        >
+          Something else?
+        </h2>
+        <p
+          className={`m-0 mb-4 text-center text-body-sm text-muted-foreground${
+            wide ? " tab:mb-0 tab:text-left" : ""
+          }`}
+        >
+          Tell us what you&apos;re in the mood for.
+        </p>
+      </div>
 
       <ConciergePrompt
         slug={slug}
@@ -266,16 +291,24 @@ function SomethingElse({
       />
 
       {otherCollections.length > 0 && (
-        <div className="mt-6">
-          <p className="m-0 mb-3 text-center text-body-sm text-muted-foreground">
+        <div className={`mt-6${wide ? " tab:col-span-2 tab:mt-0 lg:col-span-1 lg:col-start-2" : ""}`}>
+          <p
+            className={`m-0 mb-3 text-center text-body-sm text-muted-foreground${
+              wide ? " tab:text-left" : ""
+            }`}
+          >
             Or explore something else.
           </p>
-          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none">
+          <div
+            className={`-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none${
+              wide ? " cmp:mx-0 cmp:flex-wrap cmp:overflow-visible cmp:px-0" : ""
+            }`}
+          >
             {otherCollections.map((c) => (
               <Link
                 key={c.id}
                 href={`/${slug}/explore/${c.id}`}
-                className="shrink-0 whitespace-nowrap rounded-chip border border-border px-4 py-2 text-body-sm text-foreground no-underline"
+                className="shrink-0 whitespace-nowrap rounded-chip border border-border px-4 py-2 text-body-sm text-foreground no-underline cmp:min-h-11"
               >
                 {c.title}
               </Link>
@@ -304,39 +337,60 @@ export function ExploreCollectionPage({
 }: ExploreCollectionPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
 
+  // Only the timeline guide has a wide design so far; the cards layout keeps the phone column.
+  const wide = collection.layout === "timeline";
+
   return (
-    <PageFrame>
+    <PageFrame width={wide ? "wide" : "narrow"}>
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
         scrolled={scrolled}
         backHref={`/${slug}/explore`}
         nameHref={`/${slug}`}
+        wide={wide}
+        backLabel="Explore"
+        phone={venue.phone}
       />
 
-      {/* Content */}
-      <div className="px-page pb-10 pt-6">
-        <CollectionHeader title={collection.title} subtitle={collection.subtitle} />
+      {/* Content. Wide: title and intro in a left column (sticky at 1024px+), timeline on the right. */}
+      <div
+        className={`px-page pb-10 pt-6${
+          wide ? " tab:grid tab:grid-cols-[280px_1fr] tab:gap-x-12 lg:grid-cols-[400px_1fr] lg:gap-x-16" : ""
+        }`}
+      >
+        <div className={wide ? "lg:sticky lg:top-6 lg:self-start" : undefined}>
+          <CollectionHeader title={collection.title} subtitle={collection.subtitle} wide={wide} />
 
-        {collection.description && (
-          <p className="mb-6 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
-            {collection.description}
-          </p>
-        )}
-
-        {collection.layout === "timeline" ? (
-          <TimelineLayout items={collection.items} slug={slug} />
-        ) : (
-          <CardsLayout items={collection.items} slug={slug} />
-        )}
-
-        <SomethingElse slug={slug} otherCollections={otherCollections} />
-
-        <div className="mt-8">
-          <VenueFooter venueName={venue.name} address={venue.address} phone={venue.phone} />
+          {collection.description && (
+            <p className="mb-6 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
+              {collection.description}
+            </p>
+          )}
         </div>
 
-        <div className="h-safe-bottom" />
+        <div>
+          {collection.layout === "timeline" ? (
+            <TimelineLayout items={collection.items} slug={slug} />
+          ) : (
+            <CardsLayout items={collection.items} slug={slug} />
+          )}
+        </div>
+
+        <div className={wide ? "tab:col-span-2" : undefined}>
+          <SomethingElse slug={slug} otherCollections={otherCollections} wide={wide} />
+
+          <div className="mt-8">
+            <VenueFooter
+              venueName={venue.name}
+              address={venue.address}
+              phone={venue.phone}
+              layout={wide ? "responsive" : "stack"}
+            />
+          </div>
+
+          <div className="h-safe-bottom" />
+        </div>
       </div>
     </PageFrame>
   );
