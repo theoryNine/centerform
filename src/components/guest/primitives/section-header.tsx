@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 interface SectionHeaderProps {
   number: string;
   title: string;
@@ -6,9 +8,11 @@ interface SectionHeaderProps {
    * from 700px; at 1024px the heading grows to 36px over a full-width hairline.
    */
   wide?: boolean;
+  /** Wide only: shown on the right of the heading from 1024px (hidden below, where the page shows its own link). */
+  action?: ReactNode;
 }
 
-export function SectionHeader({ number, title, wide }: SectionHeaderProps) {
+export function SectionHeader({ number, title, wide, action }: SectionHeaderProps) {
   return (
     <div className={`pb-2 pt-6${wide ? " cmp:pt-8 lg:pt-12" : ""}`}>
       <div className="flex items-baseline gap-2">
@@ -23,6 +27,7 @@ export function SectionHeader({ number, title, wide }: SectionHeaderProps) {
         >
           {title}
         </h2>
+        {wide && action && <div className="ml-auto hidden lg:block">{action}</div>}
       </div>
       <div
         className={`-ml-page mt-2 h-px w-[calc(60%+var(--cf-page-padding))] bg-primary${

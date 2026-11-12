@@ -81,6 +81,14 @@ function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
   );
 }
 
+// Wide layouts render a place as a feature card when it is flagged (is_featured, editable in the
+// dashboard) or when it is the guide leading its section. Driven by data, not list position alone.
+function isFeature(place: NearbyPlace, indexInSection: number): boolean {
+  return place.is_featured || (indexInSection === 0 && !!place.collection_id);
+}
+
+const WIDE_GRID = "gap-card-gap cmp:grid cmp:grid-cols-2 lg:grid-cols-3";
+
 function AreaSectionView({
   section,
   index,
@@ -106,27 +114,64 @@ function AreaSectionView({
   const regularPlaces = places.filter((p) => !p.is_featured);
 
   const areaHref = `/${slug}/explore/area/${encodeURIComponent(section.name)}`;
+  const showSeeMore = hasMore || !useListLayout;
+  const seeMoreLink = (
+    <Link
+      href={areaHref}
+      className="flex items-center gap-1 text-body-sm font-medium text-primary no-underline"
+    >
+      {`See more in ${section.name}`}
+      <ArrowRight size={14} />
+    </Link>
+  );
+
+  // Featured places first, same as the phone grid.
+  const widePlaces = [...places].sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
 
   return (
     <div className="mb-section">
-      <SectionHeader number={sectionNumber} title={section.name} />
+      <SectionHeader
+        number={sectionNumber}
+        title={section.name}
+        wide
+        action={showSeeMore ? seeMoreLink : undefined}
+      />
 
       {useListLayout ? (
         /* List layout for first section — capped at 4 */
-        <div className="flex flex-col gap-card-gap">
-          {visiblePlaces.map((place) => (
+        <div className={`flex flex-col ${WIDE_GRID}`}>
+          {visiblePlaces.map((place, i) => (
             <NavCard
               key={place.id}
               href={placeHref(slug, place)}
               label={place.name}
               sublabel={place.description ?? ""}
               imageUrl={place.image_url ?? undefined}
+              responsive
+              featured={isFeature(place, i)}
             />
           ))}
         </div>
       ) : (
-        /* Grid layout for other sections */
-        <div>
+        <>
+        {/* Wide (600px+): the same list cards as the first section */}
+        <div className={`hidden ${WIDE_GRID}`}>
+          {widePlaces.map((place, i) => (
+            <NavCard
+              key={place.id}
+              href={placeHref(slug, place)}
+              label={place.name}
+              sublabel={place.description ?? ""}
+              imageUrl={place.image_url ?? undefined}
+              responsive
+              lazyImage
+              featured={isFeature(place, i)}
+            />
+          ))}
+        </div>
+
+        {/* Grid layout for other sections (phone) */}
+        <div className="cmp:hidden">
           {/* Featured card — full width */}
           {featuredPlace && (
             <Link
@@ -170,20 +215,11 @@ function AreaSectionView({
             ))}
           </div>
         </div>
+        </>
       )}
 
-      {/* See more link — right aligned */}
-      {(hasMore || !useListLayout) && (
-        <div className="mt-3 flex justify-end">
-          <Link
-            href={areaHref}
-            className="flex items-center gap-1 text-body-sm font-medium text-primary no-underline"
-          >
-            {`See more in ${section.name}`}
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-      )}
+      {/* See more link — right aligned; from 1024px it sits beside the section title instead */}
+      {showSeeMore && <div className="mt-3 flex justify-end lg:hidden">{seeMoreLink}</div>}
     </div>
   );
 }
@@ -204,13 +240,15 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
   const { scrolled, sentinelRef } = useStickyScroll();
 
   return (
-    <PageFrame>
+    <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venueName}
         scrolled={scrolled}
         backHref={`/${slug}`}
         nameHref={`/${slug}`}
+        wide
+        phone={venue.phone}
       />
 
       {/* Hero section with shaped image */}
@@ -227,6 +265,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
         animated
         textAlign="left"
         className="min-h-[200px] pt-8"
+        wide
       />
 
       {/* Content */}
@@ -256,8 +295,8 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
         )}
 
         {/* "Or just ask" section */}
-        <div className="mb-8 mt-4">
-          <h2 className="mb-4 font-serif text-card-title-md font-medium text-foreground">
+        <div className="mb-8 mt-4 tab:mt-8 tab:grid tab:grid-cols-2 tab:items-start tab:gap-10">
+          <h2 className="mb-4 font-serif text-card-title-md font-medium text-foreground tab:mb-0 tab:text-[28px]">
             Or just ask.
           </h2>
 
@@ -268,7 +307,12 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
           />
         </div>
 
-        <VenueFooter venueName={venueName} address={venue.address} phone={venue.phone} />
+        <VenueFooter
+          venueName={venueName}
+          address={venue.address}
+          phone={venue.phone}
+          layout="responsive"
+        />
 
         {/* Bottom safe area */}
         <div className="h-safe-bottom" />

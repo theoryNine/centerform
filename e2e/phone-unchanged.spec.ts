@@ -30,9 +30,10 @@ async function settle(page: Page) {
   await page.waitForFunction(() => !document.querySelector("svg.animate-spin"));
   await page.evaluate(() =>
     Promise.all(
-      Array.from(document.images).map((img) =>
-        img.complete ? null : new Promise((r) => (img.onload = img.onerror = r)),
-      ),
+      // Skip images in display:none subtrees (e.g. lazy cards hidden at this width) — they never load.
+      Array.from(document.images)
+        .filter((img) => img.offsetParent !== null)
+        .map((img) => (img.complete ? null : new Promise((r) => (img.onload = img.onerror = r)))),
     ),
   );
 }

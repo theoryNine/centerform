@@ -22,6 +22,8 @@ interface NavCardProps {
   responsive?: boolean;
   /** With `responsive`: at 1024px+ span the whole grid row as a horizontal card with a 260px photo. */
   featured?: boolean;
+  /** Lazy-load the image. Use for cards that are hidden on some widths so they cost nothing there. */
+  lazyImage?: boolean;
 }
 
 export function NavCard({
@@ -35,6 +37,7 @@ export function NavCard({
   hideImage,
   responsive,
   featured,
+  lazyImage,
 }: NavCardProps) {
   return (
     <Link
@@ -66,6 +69,8 @@ export function NavCard({
             <img
               src={imageUrl}
               alt=""
+              loading={lazyImage ? "lazy" : undefined}
+              decoding={lazyImage ? "async" : undefined}
               onLoad={onSettle}
               onError={onSettle}
               className="absolute inset-0 size-full object-cover"
