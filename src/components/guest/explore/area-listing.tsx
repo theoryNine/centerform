@@ -5,6 +5,7 @@ import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
 
 function placeHref(slug: string, place: NearbyPlace): string {
   return place.collection_id
@@ -21,6 +22,7 @@ interface AreaListingPageProps {
 
 export function AreaListingPage({ slug, venue, area, places }: AreaListingPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
+  usePageLabel(area);
 
   const heading = area.toLowerCase().startsWith("beyond") ? area : `In ${area}`;
 

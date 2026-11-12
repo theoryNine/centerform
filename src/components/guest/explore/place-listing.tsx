@@ -11,6 +11,8 @@ import { useImageLoaded } from "@/hooks/use-image-loaded";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 import { safeHttpUrl } from "@/lib/url";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { useRouter } from "next/navigation";
+import { usePreviousPage } from "@/components/guest-nav-history";
 
 function getCTALabel(category: NearbyPlace["category"]): string {
   switch (category) {
@@ -48,6 +50,12 @@ interface PlaceListingProps {
 
 export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
   const scrolled = useWindowScroll();
+  const router = useRouter();
+  // Back goes to wherever the guest came from, labelled with that page's name. A direct visit
+  // (shared link) has no previous page, so back goes to Explore instead of leaving the site.
+  const previous = usePreviousPage();
+  const backLabel = previous ? (previous.label ?? "Back") : "Explore";
+  const goBack = () => (previous ? history.back() : router.push(`/${slug}/explore`));
   const { loaded, imgRef, settle } = useImageLoaded(place.image_url);
 
   const priceLabel = place.price_level ? "$".repeat(place.price_level) : null;
@@ -67,13 +75,13 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
       <ScrollRevealStickyHeader
         venueName={venue.name}
         scrolled={scrolled}
-        onBack={() => history.back()}
+        onBack={goBack}
         nameHref={`/${slug}`}
         wide
-        backLabel="Explore"
+        backLabel={backLabel}
         phone={venue.phone}
       />
-      <FloatingBackButton scrolled={scrolled} onBack={() => history.back()} wide />
+      <FloatingBackButton scrolled={scrolled} onBack={goBack} wide />
 
       {/*
         Phone: hero with the name card overlapping its bottom edge, content below.

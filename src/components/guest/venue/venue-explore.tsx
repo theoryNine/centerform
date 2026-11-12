@@ -10,6 +10,7 @@ import { NavCard } from "@/components/guest/primitives/nav-card";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
 
 interface AreaSection {
   name: string;
@@ -238,6 +239,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
   const sections = groupByArea(places);
 
   const { scrolled, sentinelRef } = useStickyScroll();
+  usePageLabel("Explore");
 
   return (
     <PageFrame width="wide">

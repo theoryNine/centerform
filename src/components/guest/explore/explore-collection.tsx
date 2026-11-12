@@ -17,6 +17,7 @@ import type {
   VenueWithTheme,
 } from "@/types";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -336,6 +337,7 @@ export function ExploreCollectionPage({
   otherCollections,
 }: ExploreCollectionPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
+  usePageLabel(collection.title);
 
   // Only the timeline guide has a wide design so far; the cards layout keeps the phone column.
   const wide = collection.layout === "timeline";
@@ -353,44 +355,51 @@ export function ExploreCollectionPage({
         phone={venue.phone}
       />
 
-      {/* Content. Wide: title and intro in a left column (sticky at 1024px+), timeline on the right. */}
-      <div
-        className={`px-page pb-10 pt-6${
-          wide ? " tab:grid tab:grid-cols-[280px_1fr] tab:gap-x-12 lg:grid-cols-[400px_1fr] lg:gap-x-16" : ""
-        }`}
-      >
-        <div className={wide ? "lg:sticky lg:top-6 lg:self-start" : undefined}>
-          <CollectionHeader title={collection.title} subtitle={collection.subtitle} wide={wide} />
+      {/* Content */}
+      <div className="px-page pb-10 pt-6">
+        {/*
+          Wide: title and intro in a left column (sticky at 1024px+), timeline on the right. Only
+          these two live in the grid: a sticky element can travel as far as its parent, so the
+          "Something else?" band below must sit outside it or the pinned column rides over it.
+        */}
+        <div
+          className={
+            wide
+              ? "tab:grid tab:grid-cols-[280px_1fr] tab:gap-x-12 lg:grid-cols-[400px_1fr] lg:gap-x-16"
+              : undefined
+          }
+        >
+          <div className={wide ? "lg:sticky lg:top-6 lg:self-start" : undefined}>
+            <CollectionHeader title={collection.title} subtitle={collection.subtitle} wide={wide} />
 
-          {collection.description && (
-            <p className="mb-6 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
-              {collection.description}
-            </p>
-          )}
-        </div>
-
-        <div>
-          {collection.layout === "timeline" ? (
-            <TimelineLayout items={collection.items} slug={slug} />
-          ) : (
-            <CardsLayout items={collection.items} slug={slug} />
-          )}
-        </div>
-
-        <div className={wide ? "tab:col-span-2" : undefined}>
-          <SomethingElse slug={slug} otherCollections={otherCollections} wide={wide} />
-
-          <div className="mt-8">
-            <VenueFooter
-              venueName={venue.name}
-              address={venue.address}
-              phone={venue.phone}
-              layout={wide ? "responsive" : "stack"}
-            />
+            {collection.description && (
+              <p className="mb-6 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
+                {collection.description}
+              </p>
+            )}
           </div>
 
-          <div className="h-safe-bottom" />
+          <div>
+            {collection.layout === "timeline" ? (
+              <TimelineLayout items={collection.items} slug={slug} />
+            ) : (
+              <CardsLayout items={collection.items} slug={slug} />
+            )}
+          </div>
         </div>
+
+        <SomethingElse slug={slug} otherCollections={otherCollections} wide={wide} />
+
+        <div className="mt-8">
+          <VenueFooter
+            venueName={venue.name}
+            address={venue.address}
+            phone={venue.phone}
+            layout={wide ? "responsive" : "stack"}
+          />
+        </div>
+
+        <div className="h-safe-bottom" />
       </div>
     </PageFrame>
   );

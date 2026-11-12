@@ -10,6 +10,7 @@ import { NavCard } from "@/components/guest/primitives/nav-card";
 import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
 import { formatPrice } from "@/lib/utils";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
 
 const CATEGORY_LABELS: Record<string, string> = {
   restaurant: "Restaurant",
@@ -45,6 +46,7 @@ export function VenueDiningPage({
   heroImageUrl,
 }: VenueDiningPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
+  usePageLabel("Dining");
 
   const totalWithImages = places.filter((p) => p.image_url).length;
   const [loadedCount, setLoadedCount] = useState(0);

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { VenueThemeProvider } from "@/components/theme-provider";
 import { SlugProvider } from "@/components/slug-context";
+import { NavHistoryProvider } from "@/components/guest-nav-history";
 import { resolveSlug } from "@/lib/slug-resolver";
 import type { ColorScheme, ThemeColors } from "@/types";
 
@@ -145,7 +146,7 @@ export default async function SlugLayout({
         }}
       />
       <VenueThemeProvider theme={theme} darkMode={DARK_MODE} lightMode={LIGHT_MODE}>
-        {children}
+        <NavHistoryProvider>{children}</NavHistoryProvider>
       </VenueThemeProvider>
     </SlugProvider>
   );

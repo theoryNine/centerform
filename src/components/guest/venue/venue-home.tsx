@@ -12,6 +12,7 @@ import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt"
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
 
 function formatVenueName(slug: string) {
   return slug
@@ -47,6 +48,7 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
   const resolved = useSlug();
   const venue = resolved.type === "venue" ? resolved.data : null;
   const venueName = venue?.name ?? formatVenueName(slug);
+  usePageLabel(venueName);
 
   // Extract location parts
   const locationParts = [venue?.city, venue?.state].filter(Boolean);
