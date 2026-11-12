@@ -301,8 +301,7 @@ export function VenueServicesPage({
       <div ref={headerRef}>
         {/* Top bar with back arrow and venue name */}
         <div
-          className="relative flex items-center px-5 cmp:hidden"
-          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
+          className="relative flex items-center px-5 pb-2 pt-safe cmp:hidden"
         >
           <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
             <ArrowLeft size={20} />
@@ -437,8 +436,9 @@ export function VenueServicesPage({
                 )}
               </div>
 
-              {/* Laptop: no accordion — every item is an open card, two across */}
-              <div className="hidden lg:grid lg:grid-cols-2 lg:items-start lg:gap-4">
+              {/* Laptop: no accordion — every item is an open card, two across. Cards in a row stretch to
+                  the same height (no items-start) so a short card doesn't leave a hole under it. */}
+              <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
                 {section.services.length === 0 ? (
                   <div className="py-6 text-[13px] text-muted-foreground lg:col-span-2">
                     No items yet.

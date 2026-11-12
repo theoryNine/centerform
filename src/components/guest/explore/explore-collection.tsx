@@ -343,20 +343,25 @@ export function ExploreCollectionPage({
   const wide = collection.layout === "timeline";
 
   return (
-    <PageFrame width={wide ? "wide" : "narrow"}>
+    <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
         scrolled={scrolled}
         backHref={`/${slug}/explore`}
         nameHref={`/${slug}`}
-        wide={wide}
+        wide
         backLabel="Explore"
         phone={venue.phone}
       />
 
-      {/* Content */}
-      <div className="px-page pb-10 pt-6">
+      {/* Content. The header above always uses the wide frame so the back button is in the same
+          place as on every other page; the cards layout keeps its narrow column underneath. */}
+      <div
+        className={`px-page pb-10 pt-6${
+          wide ? "" : " mx-auto w-full max-w-frame-narrow [--cf-page-padding:20px]"
+        }`}
+      >
         {/*
           Wide: title and intro in a left column (sticky at 1024px+), timeline on the right. Only
           these two live in the grid: a sticky element can travel as far as its parent, so the

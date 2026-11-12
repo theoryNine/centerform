@@ -65,8 +65,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
       {/* Main header area */}
       <div ref={headerRef}>
         <div
-          className="flex items-center px-5"
-          style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
+          className="flex items-center px-5 pb-2 pt-safe"
         >
           <Link href={`/${slug}`} className="-my-3 -ml-3 flex size-11 shrink-0 items-center justify-center text-primary no-underline">
             <ArrowLeft size={20} />

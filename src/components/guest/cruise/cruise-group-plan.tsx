@@ -277,11 +277,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
       {/* Main header (scrolls with page) */}
       <div ref={mainHeaderRef}>
         <div
-          className="relative flex items-center px-5"
-          style={{
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
-            paddingBottom: 12,
-          }}
+          className="relative flex items-center px-5 pb-2 pt-safe"
         >
           <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
             <ArrowLeft size={20} />

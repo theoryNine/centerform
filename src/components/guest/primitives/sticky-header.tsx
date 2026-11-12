@@ -255,24 +255,31 @@ export function StickyHeader({
   backLabel,
   phone,
 }: BaseHeaderProps) {
+  // Same geometry as ScrollRevealStickyHeader: the safe-area padding is on the outer element and
+  // the row (with its minimum height) is inside it, so the back arrow sits at the same spot on
+  // every page.
   return (
     <div
-      className={`sticky top-0 z-30 pt-safe relative flex items-center ${
-        wide ? "px-page cmp:relative cmp:min-h-16 cmp:border-transparent cmp:pb-0 lg:min-h-20" : "px-5"
-      } pb-2 transition-[border-color] duration-200 ${
-        scrolled ? "border-b border-border" : "border-b border-transparent"
-      }`}
+      className={`sticky top-0 z-30 pt-safe pb-2 transition-[border-color] duration-200 ${
+        wide ? "cmp:relative cmp:border-transparent cmp:pb-0 " : ""
+      }${scrolled ? "border-b border-border" : "border-b border-transparent"}`}
       style={{ backgroundColor: "var(--background)" }}
     >
-      <HeaderRow
-        venueName={venueName}
-        backHref={backHref}
-        onBack={onBack}
-        nameHref={nameHref}
-        wide={wide}
-        backLabel={backLabel}
-        phone={phone}
-      />
+      <div
+        className={`relative flex items-center ${
+          wide ? "px-page cmp:min-h-16 lg:min-h-20" : "px-5"
+        }`}
+      >
+        <HeaderRow
+          venueName={venueName}
+          backHref={backHref}
+          onBack={onBack}
+          nameHref={nameHref}
+          wide={wide}
+          backLabel={backLabel}
+          phone={phone}
+        />
+      </div>
     </div>
   );
 }

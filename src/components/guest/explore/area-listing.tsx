@@ -27,16 +27,21 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
   const heading = area.toLowerCase().startsWith("beyond") ? area : `In ${area}`;
 
   return (
-    <PageFrame>
+    <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
       <StickyHeader
         venueName={venue.name}
         scrolled={scrolled}
         backHref={`/${slug}/explore`}
         nameHref={`/${slug}`}
+        wide
+        backLabel="Explore"
+        phone={venue.phone}
       />
 
-      <div className="px-page pb-10 pt-6">
+      {/* The header uses the wide frame so the back button matches every other page; the list
+          keeps its narrow column underneath. */}
+      <div className="mx-auto w-full max-w-frame-narrow px-page pb-10 pt-6 [--cf-page-padding:20px]">
         {/* Section heading */}
         <div className="mb-6">
           <h1 className="m-0 font-serif text-page-title font-semibold text-foreground">{heading}</h1>
