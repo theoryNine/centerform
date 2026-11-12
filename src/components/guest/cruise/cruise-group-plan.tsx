@@ -260,7 +260,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
           <FrameInner>
             <div className="relative flex items-center px-5 py-3">
-              <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
+              <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
                 <ArrowLeft size={20} />
               </Link>
               <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
@@ -283,7 +283,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
             paddingBottom: 12,
           }}
         >
-          <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
+          <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
             <ArrowLeft size={20} />
           </Link>
           <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">

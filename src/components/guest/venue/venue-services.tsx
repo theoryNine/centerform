@@ -271,7 +271,7 @@ export function VenueServicesPage({
           <FrameInner width="wide">
             {/* Sticky header row */}
             <div className="relative flex items-center px-page py-3">
-              <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
+              <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
                 <ArrowLeft size={20} />
               </Link>
               <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
@@ -304,7 +304,7 @@ export function VenueServicesPage({
           className="relative flex items-center px-5 cmp:hidden"
           style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
         >
-          <Link href={`/${slug}`} className="shrink-0 flex items-center text-primary no-underline">
+          <Link href={`/${slug}`} className="shrink-0 -m-3 flex size-11 items-center justify-center text-primary no-underline">
             <ArrowLeft size={20} />
           </Link>
           <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">

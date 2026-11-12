@@ -52,7 +52,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
         <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
           <FrameInner>
             <div className="flex items-center px-5 py-3">
-              <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
+              <Link href={`/${slug}`} className="-my-3 -ml-3 flex size-11 shrink-0 items-center justify-center text-primary no-underline">
                 <ArrowLeft size={20} />
               </Link>
               <span className="font-serif text-base font-normal text-foreground">{venueName}</span>
@@ -68,7 +68,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
           className="flex items-center px-5"
           style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)", paddingBottom: 12 }}
         >
-          <Link href={`/${slug}`} className="mr-3 flex items-center text-primary no-underline">
+          <Link href={`/${slug}`} className="-my-3 -ml-3 flex size-11 shrink-0 items-center justify-center text-primary no-underline">
             <ArrowLeft size={20} />
           </Link>
           <Link

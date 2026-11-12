@@ -62,8 +62,10 @@ interface BaseHeaderProps {
   phone?: string | null;
 }
 
-// Wide headers get a 44px hit area from 600px and hand over to the text link at 1024px.
-const WIDE_BACK_BUTTON = "cmp:-ml-3 cmp:flex cmp:size-11 cmp:items-center cmp:justify-center lg:hidden";
+// Every icon back button is a 44x44 target around a 20px arrow. The negative margins keep its
+// layout box at 20x20, so the arrow sits exactly where a bare icon would. Wide headers hand over
+// to the text link at 1024px.
+const BACK_TARGET = "-m-3 flex size-11 items-center justify-center";
 
 function BackButton({
   backHref,
@@ -74,13 +76,13 @@ function BackButton({
   onBack?: () => void;
   wide?: boolean;
 }) {
-  const extra = wide ? ` ${WIDE_BACK_BUTTON}` : "";
+  const extra = `${BACK_TARGET}${wide ? " lg:hidden" : ""}`;
   if (backHref) {
     return (
       <Link
         href={backHref}
         aria-label="Go back"
-        className={`shrink-0 text-primary no-underline${extra}`}
+        className={`shrink-0 text-primary no-underline ${extra}`}
       >
         <ArrowLeft size={20} />
       </Link>
@@ -91,7 +93,7 @@ function BackButton({
       <button
         onClick={onBack}
         aria-label="Go back"
-        className={`shrink-0 cursor-pointer border-none bg-transparent p-0 text-primary${extra}`}
+        className={`shrink-0 cursor-pointer border-none bg-transparent p-0 text-primary ${extra}`}
       >
         <ArrowLeft size={20} />
       </button>
@@ -130,7 +132,7 @@ type HeaderRowProps = Pick<
 >;
 
 const LAPTOP_LINK =
-  "items-center gap-2 text-body font-medium text-primary no-underline cursor-pointer border-none bg-transparent p-0";
+  "min-h-11 items-center gap-2 text-body font-medium text-primary no-underline cursor-pointer border-none bg-transparent p-0";
 
 function HeaderRow({
   venueName,
@@ -200,13 +202,13 @@ export function FloatingBackButton({ scrolled, backHref, onBack, wide }: Floatin
       className="flex items-center justify-center rounded-default"
       style={{
         width: 44,
-        height: 36,
+        height: 44,
         backgroundColor: "var(--cf-glass-bg)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
       }}
     >
-      <ArrowLeft size={18} className="text-primary" />
+      <ArrowLeft size={20} className="text-primary" />
     </div>
   );
 
