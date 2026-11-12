@@ -11,6 +11,17 @@ import {
 import { VenueHomePage } from "@/components/guest/venue/venue-home";
 import { EventHomePage } from "@/components/guest/event/event-home";
 import { CruiseHomePage } from "@/components/guest/cruise/cruise-home";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug);
+}
 
 export default async function SlugHomePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

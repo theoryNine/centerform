@@ -1,9 +1,11 @@
 "use client";
 
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { NavCard } from "@/components/guest/primitives/nav-card";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
+import { PageFrame, FrameBody } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
 
 function placeHref(slug: string, place: NearbyPlace): string {
   return place.collection_id
@@ -20,20 +22,24 @@ interface AreaListingPageProps {
 
 export function AreaListingPage({ slug, venue, area, places }: AreaListingPageProps) {
   const { scrolled, sentinelRef } = useStickyScroll();
+  usePageLabel(area);
 
   const heading = area.toLowerCase().startsWith("beyond") ? area : `In ${area}`;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
-        venueName={venue.name}
+      <VenueHeader
+        venue={venue}
+        slug={slug}
         scrolled={scrolled}
         backHref={`/${slug}/explore`}
-        nameHref={`/${slug}`}
+        backLabel="Explore"
       />
 
-      <div className="px-page pb-10 pt-6">
+      {/* The header uses the wide frame so the back button matches every other page; the list
+          keeps its narrow column underneath. */}
+      <FrameBody narrow className="px-page pb-10 pt-6">
         {/* Section heading */}
         <div className="mb-6">
           <h1 className="m-0 font-serif text-page-title font-semibold text-foreground">{heading}</h1>
@@ -58,7 +64,7 @@ export function AreaListingPage({ slug, venue, area, places }: AreaListingPagePr
         </div>
 
         <div className="h-safe-bottom" />
-      </div>
-    </div>
+      </FrameBody>
+    </PageFrame>
   );
 }

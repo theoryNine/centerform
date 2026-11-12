@@ -2,10 +2,13 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { CruiseItineraryItem, Venue } from "@/types";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { PageTopBar, SlideDownNav } from "@/components/guest/primitives/page-top-bar";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 // ─── Day grouping ────────────────────────────────────────────────────────────
 
@@ -64,7 +67,7 @@ function DayHeader({ group }: { group: DayGroup }) {
   return (
     <div className="mb-5">
       {group.header.location && (
-        <p className="m-0 text-label font-semibold uppercase tracking-[var(--cf-text-label-spacing)] text-primary">
+        <p className="m-0 text-label font-semibold uppercase tracking-[var(--cf-text-label-spacing)] text-link">
           {group.header.location}
         </p>
       )}
@@ -89,7 +92,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           {item.title}
         </p>
         {item.location && (
-          <p className="m-0 mt-0.5 text-label font-medium uppercase tracking-wide text-primary">
+          <p className="m-0 mt-0.5 text-label font-medium uppercase tracking-wide text-link">
             {item.location}
           </p>
         )}
@@ -99,7 +102,7 @@ function TimelineItem({ item, slug }: { item: CruiseItineraryItem; slug: string 
           </p>
         )}
       </div>
-      <ArrowRight size={15} className="mr-3 shrink-0 text-primary" />
+      <ArrowRight size={15} className="mr-3 shrink-0 text-link" />
     </>
   );
 
@@ -249,50 +252,26 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
     ) : null;
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       {/* Sticky nav — slides in when main header scrolls out of view */}
-      <div
-        ref={stickyNavRef}
-        className="fixed inset-x-0 top-0 z-50 bg-background transition-transform duration-300 ease-out"
-        style={{ transform: showStickyNav ? "translateY(0)" : "translateY(-100%)" }}
+      <SlideDownNav
+        navRef={stickyNavRef}
+        show={showStickyNav}
+        backHref={`/${slug}`}
+        backLabel={venue.name}
+        title={venue.name}
       >
-        <div style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
-          <div className="relative flex items-center px-5 py-3">
-            <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
-              <ArrowLeft size={20} />
-            </Link>
-            <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-              <span className="font-serif text-[20px] font-medium text-foreground">{venue.name}</span>
-            </div>
-            <div className="w-5 shrink-0" />
-          </div>
-          {pillRow(stickyPillContainerRef, stickyPillRefs)}
-          <div className="h-px bg-border" />
-        </div>
-      </div>
+        {pillRow(stickyPillContainerRef, stickyPillRefs)}
+      </SlideDownNav>
 
       {/* Main header (scrolls with page) */}
       <div ref={mainHeaderRef}>
-        <div
-          className="relative flex items-center px-5"
-          style={{
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
-            paddingBottom: 12,
-          }}
-        >
-          <Link href={`/${slug}`} className="shrink-0 text-primary no-underline">
-            <ArrowLeft size={20} />
-          </Link>
-          <div className="pointer-events-none absolute inset-x-0 flex items-center justify-center">
-            <Link
-              href={`/${slug}`}
-              className="pointer-events-auto font-serif text-[20px] font-medium text-foreground no-underline"
-            >
-              {venue.name}
-            </Link>
-          </div>
-          <div className="w-5 shrink-0" />
-        </div>
+        <PageTopBar
+          backHref={`/${slug}`}
+          backLabel={venue.name}
+          title={venue.name}
+          titleHref={`/${slug}`}
+        />
 
         {/* Hero */}
         <PageHero
@@ -317,12 +296,7 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
 
         {pageDescription && (
           <p className="mb-0 px-page pt-5 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription.split("\n").map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
+            <Multiline text={pageDescription} />
           </p>
         )}
 
@@ -389,6 +363,6 @@ export function CruiseGroupPlanPage({ venue, items, slug, pageDescription, heroI
         </div>
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

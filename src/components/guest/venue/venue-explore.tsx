@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useStickyScroll, StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { useStickyScroll, VenueHeader } from "@/components/guest/primitives/sticky-header";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { ConciergePrompt } from "@/components/guest/primitives/concierge-prompt";
 import { PageHero } from "@/components/guest/primitives/page-hero";
-import { NavCard } from "@/components/guest/primitives/nav-card";
+import { NavCard, NAV_CARD_GRID } from "@/components/guest/primitives/nav-card";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { usePageLabel } from "@/components/guest-nav-history";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 interface AreaSection {
   name: string;
@@ -80,6 +83,12 @@ function PlaceCardGrid({ place, slug }: { place: NearbyPlace; slug: string }) {
   );
 }
 
+// Wide layouts render a place as a feature card when it is flagged (is_featured, editable in the
+// dashboard) or when it is the guide leading its section. Driven by data, not list position alone.
+function isFeature(place: NearbyPlace, indexInSection: number): boolean {
+  return place.is_featured || (indexInSection === 0 && !!place.collection_id);
+}
+
 function AreaSectionView({
   section,
   index,
@@ -105,27 +114,64 @@ function AreaSectionView({
   const regularPlaces = places.filter((p) => !p.is_featured);
 
   const areaHref = `/${slug}/explore/area/${encodeURIComponent(section.name)}`;
+  const showSeeMore = hasMore || !useListLayout;
+  const seeMoreLink = (
+    <Link
+      href={areaHref}
+      className="hit-area flex items-center gap-1 text-body-sm font-medium text-link no-underline"
+    >
+      {`See more in ${section.name}`}
+      <ArrowRight size={14} />
+    </Link>
+  );
+
+  // Featured places first, same as the phone grid.
+  const widePlaces = [...places].sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
 
   return (
     <div className="mb-section">
-      <SectionHeader number={sectionNumber} title={section.name} />
+      <SectionHeader
+        number={sectionNumber}
+        title={section.name}
+        wide
+        action={showSeeMore ? seeMoreLink : undefined}
+      />
 
       {useListLayout ? (
         /* List layout for first section — capped at 4 */
-        <div className="flex flex-col gap-card-gap">
-          {visiblePlaces.map((place) => (
+        <div className={`flex flex-col ${NAV_CARD_GRID}`}>
+          {visiblePlaces.map((place, i) => (
             <NavCard
               key={place.id}
               href={placeHref(slug, place)}
               label={place.name}
               sublabel={place.description ?? ""}
               imageUrl={place.image_url ?? undefined}
+              responsive
+              featured={isFeature(place, i)}
             />
           ))}
         </div>
       ) : (
-        /* Grid layout for other sections */
-        <div>
+        <>
+        {/* Wide (600px+): the same list cards as the first section */}
+        <div className={`hidden ${NAV_CARD_GRID}`}>
+          {widePlaces.map((place, i) => (
+            <NavCard
+              key={place.id}
+              href={placeHref(slug, place)}
+              label={place.name}
+              sublabel={place.description ?? ""}
+              imageUrl={place.image_url ?? undefined}
+              responsive
+              lazyImage
+              featured={isFeature(place, i)}
+            />
+          ))}
+        </div>
+
+        {/* Grid layout for other sections (phone) */}
+        <div className="cmp:hidden">
           {/* Featured card — full width */}
           {featuredPlace && (
             <Link
@@ -169,20 +215,11 @@ function AreaSectionView({
             ))}
           </div>
         </div>
+        </>
       )}
 
-      {/* See more link — right aligned */}
-      {(hasMore || !useListLayout) && (
-        <div className="mt-3 flex justify-end">
-          <Link
-            href={areaHref}
-            className="flex items-center gap-1 text-body-sm font-medium text-primary no-underline"
-          >
-            {`See more in ${section.name}`}
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-      )}
+      {/* See more link — right aligned; from 1024px it sits beside the section title instead */}
+      {showSeeMore && <div className="mt-3 flex justify-end lg:hidden">{seeMoreLink}</div>}
     </div>
   );
 }
@@ -201,16 +238,12 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
   const sections = groupByArea(places);
 
   const { scrolled, sentinelRef } = useStickyScroll();
+  usePageLabel("Explore");
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame width="wide">
       <div ref={sentinelRef} className="h-0" />
-      <StickyHeader
-        venueName={venueName}
-        scrolled={scrolled}
-        backHref={`/${slug}`}
-        nameHref={`/${slug}`}
-      />
+      <VenueHeader venue={venue} slug={slug} scrolled={scrolled} />
 
       {/* Hero section with shaped image */}
       <PageHero
@@ -226,6 +259,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
         animated
         textAlign="left"
         className="min-h-[200px] pt-8"
+        wide
       />
 
       {/* Content */}
@@ -233,12 +267,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
         {pageDescription && (
           <div className="card-shadow mb-section rounded-default bg-card px-card py-5">
             <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
-              {pageDescription.split("\n").map((line, i) => (
-                <span key={i}>
-                  {i > 0 && <br />}
-                  {line}
-                </span>
-              ))}
+              <Multiline text={pageDescription} />
             </p>
           </div>
         )}
@@ -255,8 +284,8 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
         )}
 
         {/* "Or just ask" section */}
-        <div className="mb-8 mt-4">
-          <h2 className="mb-4 font-serif text-card-title-md font-medium text-foreground">
+        <div className="mb-8 mt-4 tab:mt-8 tab:grid tab:grid-cols-2 tab:items-start tab:gap-10">
+          <h2 className="mb-4 font-serif text-card-title-md font-medium text-foreground tab:mb-0 tab:text-[28px]">
             Or just ask.
           </h2>
 
@@ -267,11 +296,16 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
           />
         </div>
 
-        <VenueFooter venueName={venueName} address={venue.address} phone={venue.phone} />
+        <VenueFooter
+          venueName={venueName}
+          address={venue.address}
+          phone={venue.phone}
+          layout="responsive"
+        />
 
         {/* Bottom safe area */}
         <div className="h-safe-bottom" />
       </div>
-    </div>
+    </PageFrame>
   );
 }

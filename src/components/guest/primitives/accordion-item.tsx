@@ -8,9 +8,14 @@ interface AccordionItemProps {
   children: React.ReactNode;
   isOpen: boolean;
   onToggle: () => void;
+  /**
+   * For wide-frame pages: from 600px each item is its own rounded card (put them in a grid with
+   * `items-start` so an open card doesn't stretch its neighbour) with a 56px-high summary.
+   */
+  wide?: boolean;
 }
 
-export function AccordionItem({ title, children, isOpen, onToggle }: AccordionItemProps) {
+export function AccordionItem({ title, children, isOpen, onToggle, wide }: AccordionItemProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
   const panelId = useId();
@@ -22,12 +27,18 @@ export function AccordionItem({ title, children, isOpen, onToggle }: AccordionIt
   }, [isOpen, children]);
 
   return (
-    <div className="-mx-5 border-b border-border px-5">
+    <div
+      className={`-mx-5 border-b border-border px-5${
+        wide ? " cmp:card-shadow cmp:mx-0 cmp:rounded-default cmp:border-b-0 cmp:bg-card" : ""
+      }`}
+    >
       <button
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        className="flex w-full cursor-pointer items-center justify-between border-none bg-none py-4 text-left"
+        className={`flex w-full cursor-pointer items-center justify-between border-none bg-none py-4 text-left${
+          wide ? " cmp:min-h-14" : ""
+        }`}
       >
         <span className="text-cta-button font-medium text-foreground">{title}</span>
         <ChevronDown

@@ -9,6 +9,7 @@ import type { Venue } from "@/types";
 import type { CrewMember } from "@/lib/cruise-crew-data";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { CornerBracketCard } from "@/components/guest/primitives/corner-bracket-card";
+import { PageFrame } from "@/components/guest/primitives/page-frame";
 
 interface CruiseCrewListingProps {
   venue: Venue;
@@ -94,7 +95,7 @@ export function CruiseCrewListing({ venue, member }: CruiseCrewListingProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <PageFrame>
       <FloatingBackButton scrolled={false} onBack={() => router.back()} />
 
       {/* Photo carousel */}
@@ -116,6 +117,6 @@ export function CruiseCrewListing({ venue, member }: CruiseCrewListingProps) {
       </div>
 
       <div className="h-safe-bottom" />
-    </div>
+    </PageFrame>
   );
 }

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { VenueThemeProvider } from "@/components/theme-provider";
 import { SlugProvider } from "@/components/slug-context";
+import { NavHistoryProvider } from "@/components/guest-nav-history";
 import { resolveSlug } from "@/lib/slug-resolver";
 import type { ColorScheme, ThemeColors } from "@/types";
 
@@ -26,10 +27,11 @@ const DARK_MODE: React.CSSProperties = {
   "--secondary": "#2E2B27",
   "--secondary-foreground": "#EDE8DE",
   "--muted": "#2E2B27",
-  "--muted-foreground": "#8B8680",
+  "--muted-foreground": "#A09A90",
   "--border": "#3A3632",
   "--input": "#3A3632",
   "--cf-card-shadow": "0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.4)",
+  "--cf-card-shadow-hover": "0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.5)",
   "--cf-glass-bg": "rgba(28, 26, 23, 0.9)",
 } as React.CSSProperties;
 
@@ -45,10 +47,11 @@ const LIGHT_MODE: React.CSSProperties = {
   "--secondary": "#EDE8DE",
   "--secondary-foreground": "#2D2A26",
   "--muted": "#EDE8DE",
-  "--muted-foreground": "#8B8680",
+  "--muted-foreground": "#6B665F",
   "--border": "#DDD8CE",
   "--input": "#DDD8CE",
   "--cf-card-shadow": "0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03)",
+  "--cf-card-shadow-hover": "0 2px 6px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.07)",
   "--cf-glass-bg": "rgba(250, 247, 242, 0.9)",
 } as React.CSSProperties;
 
@@ -145,7 +148,7 @@ export default async function SlugLayout({
         }}
       />
       <VenueThemeProvider theme={theme} darkMode={DARK_MODE} lightMode={LIGHT_MODE}>
-        {children}
+        <NavHistoryProvider>{children}</NavHistoryProvider>
       </VenueThemeProvider>
     </SlugProvider>
   );

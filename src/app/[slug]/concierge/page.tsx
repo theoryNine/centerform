@@ -73,7 +73,7 @@ export default function ConciergePage() {
             <div
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                 msg.role === "assistant"
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary/10 text-link"
                   : "bg-accent text-accent-foreground"
               }`}
             >
