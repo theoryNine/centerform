@@ -1,3 +1,5 @@
+import { telHref } from "@/lib/utils";
+
 interface VenueFooterProps {
   venueName: string;
   address?: string | null;
@@ -25,7 +27,7 @@ export function VenueFooter({ venueName, address, phone, layout = "stack" }: Ven
       </div>
       {phone && (
         <a
-          href={`tel:${phone.replace(/\D/g, "")}`}
+          href={telHref(phone)}
           className={`text-body-sm font-medium text-primary no-underline ${
             responsive ? "cmp:inline-flex cmp:min-h-11 cmp:items-center" : ""
           }`}

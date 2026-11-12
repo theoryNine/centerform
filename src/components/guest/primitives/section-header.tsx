@@ -18,8 +18,6 @@ export function SectionHeader({ number, title, wide, action }: SectionHeaderProp
       <div className="flex items-baseline gap-2">
         <span className="text-section-number font-medium text-primary">{number}</span>
         <span className="text-section-number text-muted-foreground">·</span>
-        {/* Plain strings, not cn(): tailwind-merge drops the custom text-section-heading size
-            when text-foreground is present. */}
         <h2
           className={`m-0 font-serif text-section-heading font-medium text-foreground${
             wide ? " lg:text-[36px]" : ""

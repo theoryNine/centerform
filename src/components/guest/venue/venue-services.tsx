@@ -12,6 +12,7 @@ import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
 import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
 import { StickyHeader } from "@/components/guest/primitives/sticky-header";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 // Section definitions — maps service categories to display sections
 const SECTION_CONFIG = [
@@ -393,12 +394,7 @@ export function VenueServicesPage({
         <div>
           {pageDescription && (
             <p className="mb-6 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
-              {pageDescription.split("\n").map((line, i) => (
-                <span key={i}>
-                  {i > 0 && <br />}
-                  {line}
-                </span>
-              ))}
+              <Multiline text={pageDescription} />
             </p>
           )}
           {sectionServices.map((section) => (

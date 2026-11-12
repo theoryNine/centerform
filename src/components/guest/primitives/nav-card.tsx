@@ -121,7 +121,6 @@ interface SectionDividerProps {
   wide?: boolean;
 }
 
-// Plain strings, not cn(): tailwind-merge drops the custom text-card-title-lg size next to text-foreground.
 export function SectionDivider({ title, wide }: SectionDividerProps) {
   return (
     <div className="mb-heading-gap">

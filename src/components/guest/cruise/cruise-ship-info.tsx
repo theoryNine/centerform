@@ -11,6 +11,8 @@ import { AccordionItem } from "@/components/guest/primitives/accordion-item";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
 import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
+import { Multiline } from "@/components/guest/primitives/multiline";
+import { telHref } from "@/lib/utils";
 
 // Cruise-specific section config
 const SECTION_CONFIG = [
@@ -99,7 +101,7 @@ function ServiceDetailsBlock({ block }: { block: ServiceDetailsBlock }) {
           <InlineBold text={block.label} />
         </span>
         <a
-          href={`tel:${block.value.replace(/\D/g, "")}`}
+          href={telHref(block.value)}
           className="text-body-sm font-semibold text-primary no-underline"
         >
           {block.value}
@@ -312,12 +314,7 @@ export function CruiseShipInfoPage({
       <div className="px-page pb-10">
         {pageDescription && (
           <p className="mb-6 pt-4 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription.split("\n").map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
+            <Multiline text={pageDescription} />
           </p>
         )}
         {sectionServices.map((section) => (

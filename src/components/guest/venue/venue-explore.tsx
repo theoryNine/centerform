@@ -11,6 +11,7 @@ import { SectionHeader } from "@/components/guest/primitives/section-header";
 import type { NearbyPlace, VenueWithTheme } from "@/types";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
 import { usePageLabel } from "@/components/guest-nav-history";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 interface AreaSection {
   name: string;
@@ -275,12 +276,7 @@ export function VenueExplorePage({ slug, venue, places, pageDescription, heroIma
         {pageDescription && (
           <div className="card-shadow mb-section rounded-default bg-card px-card py-5">
             <p className="m-0 text-body-sm leading-[var(--cf-body-line-height)] text-foreground">
-              {pageDescription.split("\n").map((line, i) => (
-                <span key={i}>
-                  {i > 0 && <br />}
-                  {line}
-                </span>
-              ))}
+              <Multiline text={pageDescription} />
             </p>
           </div>
         )}

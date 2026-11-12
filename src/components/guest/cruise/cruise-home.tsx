@@ -12,6 +12,7 @@ import type { CruiseDailyWelcome, CruiseLink } from "@/types";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { safeHttpUrl } from "@/lib/url";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { telHref } from "@/lib/utils";
 
 function formatVenueName(slug: string) {
   return slug
@@ -182,7 +183,7 @@ export function CruiseHomePage({ dailyWelcomes, links, navTiles }: CruiseHomePag
           {venue?.phone && (
             <div className="flex justify-end">
               <a
-                href={`tel:${venue.phone.replace(/\D/g, "")}`}
+                href={telHref(venue.phone)}
                 className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline"
               >
                 <Phone size={15} />

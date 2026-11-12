@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { FrameInner } from "@/components/guest/primitives/page-frame";
+import { telHref } from "@/lib/utils";
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
@@ -172,7 +173,7 @@ function HeaderRow({
           )}
           {phone && (
             <a
-              href={`tel:${phone.replace(/\D/g, "")}`}
+              href={telHref(phone)}
               className="text-body font-medium text-primary no-underline"
             >
               {phone}

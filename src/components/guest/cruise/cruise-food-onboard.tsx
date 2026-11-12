@@ -10,6 +10,7 @@ import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { SectionHeader } from "@/components/guest/primitives/section-header";
 import { formatPrice } from "@/lib/utils";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 function restaurantSubLabel(r: CruiseRestaurant): string {
   return [
@@ -71,12 +72,7 @@ export function CruiseFoodOnboardPage({ venue, restaurants, slug, pageDescriptio
       <div className="px-page pb-10 pt-2">
         {pageDescription && (
           <p className="mb-6 mt-2 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription.split("\n").map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
+            <Multiline text={pageDescription} />
           </p>
         )}
         {restaurants.length === 0 ? (

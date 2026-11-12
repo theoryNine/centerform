@@ -12,6 +12,8 @@ const SLUG = "the-ballard-inn";
 const MARKET_ID = "b1a2c3d4-0000-4000-a000-000000000101";
 const CAFE_ID = "b1a2c3d4-0000-4000-a000-000000000103";
 const WALK_COLLECTION_ID = "b1a2c3d4-0000-4000-a000-000000000201";
+const DATE_NIGHT_ID = "b1a2c3d4-0000-4000-a000-000000000202";
+const CRUISE_SLUG = "adam-ansel";
 
 const PAGES = [
   { name: "home", path: `/${SLUG}` },
@@ -21,6 +23,13 @@ const PAGES = [
   { name: "place", path: `/${SLUG}/explore/place/${MARKET_ID}` },
   { name: "dine-place", path: `/${SLUG}/explore/place/${CAFE_ID}` },
   { name: "guide", path: `/${SLUG}/explore/${WALK_COLLECTION_ID}` },
+  { name: "date-night", path: `/${SLUG}/explore/${DATE_NIGHT_ID}` },
+  { name: "area", path: `/${SLUG}/explore/area/Ballard` },
+  { name: "events", path: `/${SLUG}/events` },
+  { name: "cruise-ship-info", path: `/${CRUISE_SLUG}/ship-info` },
+  { name: "cruise-group-plan", path: `/${CRUISE_SLUG}/group-plan` },
+  { name: "cruise-food", path: `/${CRUISE_SLUG}/food-onboard` },
+  { name: "cruise-crew", path: `/${CRUISE_SLUG}/the-crew` },
 ];
 
 const WIDTHS = [360, 390, 430, 599];
@@ -64,7 +73,16 @@ for (const width of WIDTHS) {
 
 // Scrolled viewport shots cover the chrome that is hidden at scroll 0: the scroll-reveal header
 // on place pages, the Services section nav, and the sticky list-page header border.
-const SCROLLED_PAGES = ["services", "dining", "place", "dine-place", "guide"];
+const SCROLLED_PAGES = [
+  "services",
+  "dining",
+  "place",
+  "dine-place",
+  "guide",
+  "events",
+  "cruise-ship-info",
+  "cruise-group-plan",
+];
 
 for (const width of [390, 599]) {
   test.describe(`${width}px scrolled`, () => {

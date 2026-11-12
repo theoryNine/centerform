@@ -10,9 +10,10 @@ import type { CruiseRestaurant, Venue } from "@/types";
 import { LoadingSpinner } from "@/components/guest/primitives/loading-spinner";
 import { useImageLoaded } from "@/hooks/use-image-loaded";
 import { VenueFooter } from "@/components/guest/primitives/venue-footer";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, telHref } from "@/lib/utils";
 import { safeHttpUrl } from "@/lib/url";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 interface CruiseRestaurantListingProps {
   venue: Venue;
@@ -85,12 +86,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
           {/* Description */}
           {restaurant.description && (
             <p className="mt-0 text-body leading-[var(--cf-body-line-height)] text-foreground">
-              {restaurant.description.split("\n").map((line, i) => (
-                <span key={i}>
-                  {i > 0 && <br />}
-                  {line}
-                </span>
-              ))}
+              <Multiline text={restaurant.description} />
             </p>
           )}
 
@@ -149,7 +145,7 @@ export function CruiseRestaurantListing({ venue, restaurant, slug }: CruiseResta
                       Phone
                     </p>
                     <a
-                      href={`tel:${restaurant.phone.replace(/\D/g, "")}`}
+                      href={telHref(restaurant.phone)}
                       className="flex min-h-[44px] items-center text-body-sm text-primary no-underline"
                     >
                       {restaurant.phone}

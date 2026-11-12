@@ -13,6 +13,8 @@ import { safeHttpUrl } from "@/lib/url";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
 import { useRouter } from "next/navigation";
 import { usePreviousPage } from "@/components/guest-nav-history";
+import { Multiline } from "@/components/guest/primitives/multiline";
+import { telHref } from "@/lib/utils";
 
 function getCTALabel(category: NearbyPlace["category"]): string {
   switch (category) {
@@ -133,12 +135,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
             {/* Description */}
             {place.description && (
               <p className="text-body text-foreground cmp:col-start-1 m-0 leading-[var(--cf-body-line-height)]">
-                {place.description.split("\n").map((line, i) => (
-                  <span key={i}>
-                    {i > 0 && <br />}
-                    {line}
-                  </span>
-                ))}
+                <Multiline text={place.description} />
               </p>
             )}
 
@@ -210,7 +207,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                         Phone
                       </p>
                       <a
-                        href={`tel:${place.phone.replace(/\D/g, "")}`}
+                        href={telHref(place.phone)}
                         className="text-body-sm text-primary flex min-h-[44px] items-center no-underline"
                       >
                         {place.phone}

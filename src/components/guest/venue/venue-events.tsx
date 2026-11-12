@@ -7,6 +7,7 @@ import { VenueFooter } from "@/components/guest/primitives/venue-footer";
 import { PageHero } from "@/components/guest/primitives/page-hero";
 import { useStickyNav } from "@/hooks/use-sticky-nav";
 import { PageFrame, FrameInner } from "@/components/guest/primitives/page-frame";
+import { Multiline } from "@/components/guest/primitives/multiline";
 
 function formatEventDate(startTime: string, endTime: string | null): string {
   const start = new Date(startTime);
@@ -100,12 +101,7 @@ export function VenueEventsPage({ venue, events, slug, pageDescription, heroImag
       <div className="px-page pb-10 pt-6">
         {pageDescription && (
           <p className="mb-6 text-body leading-[var(--cf-body-line-height)] text-foreground">
-            {pageDescription.split("\n").map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
+            <Multiline text={pageDescription} />
           </p>
         )}
 

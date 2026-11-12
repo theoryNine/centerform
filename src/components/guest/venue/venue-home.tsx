@@ -13,6 +13,7 @@ import { PageHero } from "@/components/guest/primitives/page-hero";
 import { NavCard, SectionDivider } from "@/components/guest/primitives/nav-card";
 import { PageFrame } from "@/components/guest/primitives/page-frame";
 import { usePageLabel } from "@/components/guest-nav-history";
+import { telHref } from "@/lib/utils";
 
 function formatVenueName(slug: string) {
   return slug
@@ -105,7 +106,7 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
   // Used in the phone welcome card and, from 600px, in the hero.
   const callButton = venue?.phone && (
     <a
-      href={`tel:${venue.phone.replace(/\D/g, "")}`}
+      href={telHref(venue.phone)}
       className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline cmp:min-h-12"
     >
       <Phone size={15} />
