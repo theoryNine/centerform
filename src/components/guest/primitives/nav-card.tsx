@@ -22,6 +22,11 @@ interface NavCardProps {
   responsive?: boolean;
   /** With `responsive`: at 1024px+ span the whole grid row as a horizontal card with a 260px photo. */
   featured?: boolean;
+  /**
+   * Home tile: from 600px an image-top card (photo 120px, 160px from 700px, 200px from 1024px) for
+   * a three-across grid. Phone stays the horizontal row.
+   */
+  tile?: boolean;
   /** Lazy-load the image. Use for cards that are hidden on some widths so they cost nothing there. */
   lazyImage?: boolean;
 }
@@ -37,6 +42,7 @@ export function NavCard({
   hideImage,
   responsive,
   featured,
+  tile,
   lazyImage,
 }: NavCardProps) {
   return (
@@ -47,6 +53,7 @@ export function NavCard({
         responsive &&
           "relative cmp:min-h-0 cmp:flex-col cmp:items-stretch cmp:gap-0 tab:min-h-[116px] tab:flex-row tab:items-center tab:gap-4 lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0",
         responsive && featured && "lg:col-span-3 lg:min-h-[116px] lg:flex-row lg:items-center lg:gap-6",
+        tile && "relative cmp:min-h-0 cmp:flex-col cmp:items-stretch cmp:gap-0",
       )}
       style={{ transitionDuration: "var(--cf-press-duration)" }}
       onMouseDown={(e) => (e.currentTarget.style.transform = `scale(var(--cf-press-scale))`)}
@@ -62,6 +69,7 @@ export function NavCard({
             responsive &&
               "cmp:h-[110px] cmp:w-full cmp:self-auto tab:h-auto tab:w-[120px] tab:self-stretch lg:h-[176px] lg:w-full lg:self-auto",
             responsive && featured && "lg:h-auto lg:w-[260px] lg:self-stretch",
+            tile && "cmp:h-[120px] cmp:w-full cmp:self-auto tab:h-[160px] lg:h-[200px]",
           )}
           style={{ background: "linear-gradient(135deg, #D4C4A8 0%, #B8A88C 100%)" }}
         >
@@ -85,6 +93,7 @@ export function NavCard({
           responsive &&
             "cmp:px-4 cmp:pb-4 cmp:pr-12 cmp:pt-3 tab:px-0 tab:py-4 tab:pr-0 lg:px-4 lg:pb-4 lg:pr-12 lg:pt-3",
           responsive && featured && "lg:px-0 lg:py-4 lg:pr-0",
+          tile && "cmp:px-4 cmp:pb-4 cmp:pr-12 cmp:pt-3",
         )}
       >
         <div className="mb-0.5 font-serif text-card-title-lg font-normal text-foreground">{label}</div>
@@ -99,6 +108,7 @@ export function NavCard({
           responsive &&
             "cmp:absolute cmp:bottom-4 cmp:right-4 cmp:mr-0 tab:static tab:mr-3 lg:absolute lg:bottom-4 lg:right-4 lg:mr-0",
           responsive && featured && "lg:static lg:mr-3",
+          tile && "cmp:absolute cmp:bottom-4 cmp:right-4 cmp:mr-0",
         )}
       />
     </Link>
@@ -107,13 +117,26 @@ export function NavCard({
 
 interface SectionDividerProps {
   title: string;
+  /** Wide-frame pages: the rule starts at the content edge from 600px and is a hairline at 1024px. */
+  wide?: boolean;
 }
 
-export function SectionDivider({ title }: SectionDividerProps) {
+// Plain strings, not cn(): tailwind-merge drops the custom text-card-title-lg size next to text-foreground.
+export function SectionDivider({ title, wide }: SectionDividerProps) {
   return (
     <div className="mb-heading-gap">
-      <h3 className="mb-2 font-serif text-card-title-lg font-normal text-foreground">{title}</h3>
-      <div className="-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary" />
+      <h3
+        className={`mb-2 font-serif text-card-title-lg font-normal text-foreground${
+          wide ? " lg:text-[28px]" : ""
+        }`}
+      >
+        {title}
+      </h3>
+      <div
+        className={`-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary${
+          wide ? " cmp:ml-0 cmp:w-[70%] tab:w-1/2 lg:h-px lg:w-full lg:bg-border" : ""
+        }`}
+      />
     </div>
   );
 }

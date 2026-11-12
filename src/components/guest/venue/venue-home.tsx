@@ -98,6 +98,19 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
     setTimeout(() => setSplashVisible(false), 500);
   }
 
+  const welcomeBody =
+    venue?.welcome_body ?? "We\u2019re glad you\u2019re here. Everything you need for your stay is right below.";
+  // Used in the phone welcome card and, from 600px, in the hero.
+  const callButton = venue?.phone && (
+    <a
+      href={`tel:${venue.phone.replace(/\D/g, "")}`}
+      className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline cmp:min-h-12"
+    >
+      <Phone size={15} />
+      {venue.phone_label ?? "Call the Front Desk"}
+    </a>
+  );
+
   const cityName = venue?.city ?? "the Area";
   const navItems = [
     {
@@ -162,7 +175,7 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
       {!navImagesReady && <LoadingSpinner />}
 
       {/* Main scrollable page */}
-      <PageFrame>
+      <PageFrame width="wide">
         {/* Safe-area spacer: real DOM element so Safari doesn't skip it on initial load */}
         <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
         {/* Header section with shaped image */}
@@ -191,40 +204,38 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
           subtitle={locationString || undefined}
           size="home"
           animated={splashDismissed}
+          wide
+          aside={
+            <div className="max-w-[44ch] text-left">
+              <p className="m-0 mb-5 text-body leading-[var(--cf-body-line-height)] text-muted-foreground">
+                {welcomeBody}
+              </p>
+              {callButton}
+            </div>
+          }
         />
         {/* Content area */}
-        <div className="px-page pb-10 pt-6">
-          {/* Welcome card */}
-          <div className="card-shadow mb-section rounded-default bg-card p-card">
+        <div className="px-page pb-10 pt-6 cmp:pt-10 lg:pt-14">
+          {/* Welcome card (phone; from 600px the welcome copy and call button sit in the hero) */}
+          <div className="card-shadow mb-section rounded-default bg-card p-card cmp:hidden">
             <h2 className="mb-2 font-serif text-card-title-lg font-medium text-foreground">
               {venue?.welcome_heading ?? "Welcome."}
             </h2>
             <p
               className={`text-body leading-[var(--cf-body-line-height)] text-muted-foreground ${venue?.phone ? "mb-5" : "mb-0"}`}
             >
-              {venue?.welcome_body ??
-                "We\u2019re glad you\u2019re here. Everything you need for your stay is right below."}
+              {welcomeBody}
             </p>
-            {venue?.phone && (
-              <div className="flex justify-end">
-                <a
-                  href={`tel:${venue.phone.replace(/\D/g, "")}`}
-                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-default border border-primary bg-transparent px-5 py-2.5 text-cta-button font-semibold text-primary no-underline"
-                >
-                  <Phone size={15} />
-                  {venue.phone_label ?? "Call the Front Desk"}
-                </a>
-              </div>
-            )}
+            {venue?.phone && <div className="flex justify-end">{callButton}</div>}
           </div>
 
           {/* Your Stay section */}
           <div className="mb-section">
-            <SectionDivider title="Your Stay" />
+            <SectionDivider title="Your Stay" wide />
 
-            <div className="flex flex-col gap-card-gap">
+            <div className="flex flex-col gap-card-gap cmp:grid cmp:grid-cols-3">
               {navItems.map((item) => (
-                <NavCard key={item.label} {...item} />
+                <NavCard key={item.label} {...item} tile />
               ))}
             </div>
           </div>
@@ -232,9 +243,9 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
           {/* Tonight section */}
           {todayEvents.length > 0 && (
             <div className="mb-section">
-              <SectionDivider title="Tonight" />
+              <SectionDivider title="Tonight" wide />
 
-              <div className="flex flex-col gap-card-gap">
+              <div className="flex flex-col gap-card-gap tab:grid tab:grid-cols-2 lg:grid-cols-3">
                 {todayEvents.map((event) => (
                   <div
                     key={event.id}
@@ -255,17 +266,24 @@ export function VenueHomePage({ events, navSublabels, navImages }: VenueHomePage
           )}
 
           {/* Your Concierge section */}
-          <div className="mb-section">
-            <SectionDivider title="Concierge" />
+          <div className="mb-section tab:grid tab:grid-cols-2 tab:items-start tab:gap-x-10">
+            <div>
+              <SectionDivider title="Concierge" wide />
 
-            <p className="mb-4 text-body leading-[var(--cf-body-line-height)] text-muted-foreground">
-              Ask us anything about your stay or the neighborhood.
-            </p>
+              <p className="mb-4 text-body leading-[var(--cf-body-line-height)] text-muted-foreground">
+                Ask us anything about your stay or the neighborhood.
+              </p>
+            </div>
 
             <ConciergePrompt slug={slug} />
           </div>
 
-          <VenueFooter venueName={venueName} address={venue?.address} phone={venue?.phone} />
+          <VenueFooter
+            venueName={venueName}
+            address={venue?.address}
+            phone={venue?.phone}
+            layout="responsive"
+          />
 
           {/* Bottom safe area */}
           <div className="h-safe-bottom" />
