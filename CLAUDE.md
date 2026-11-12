@@ -17,6 +17,7 @@ Digital concierge platform (PWA) for venues, standalone events, and cruise ships
 - `pnpm build` — Production build (also the way to check which routes are static `●` vs dynamic `ƒ`)
 - `pnpm typecheck` — `tsc --noEmit`
 - `pnpm test` — Vitest unit tests
+- `pnpm e2e` — Playwright screenshot check that phone widths (≤599px) are pixel-identical to the baselines in `e2e/__screenshots__` (gitignored; regenerate from a clean `develop` with `pnpm e2e:baseline`). Needs the remote Supabase data.
 - `pnpm format` / `pnpm format:check` — Prettier (many older files are not yet formatted; only format files you change)
 - `pnpm lint` — **Broken**: `next lint` was removed in Next.js 16 and no ESLint config exists. Use `pnpm typecheck`.
 
