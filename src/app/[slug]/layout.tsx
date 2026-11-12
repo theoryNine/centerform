@@ -31,6 +31,7 @@ const DARK_MODE: React.CSSProperties = {
   "--border": "#3A3632",
   "--input": "#3A3632",
   "--cf-card-shadow": "0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.4)",
+  "--cf-card-shadow-hover": "0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.5)",
   "--cf-glass-bg": "rgba(28, 26, 23, 0.9)",
 } as React.CSSProperties;
 
@@ -50,6 +51,7 @@ const LIGHT_MODE: React.CSSProperties = {
   "--border": "#DDD8CE",
   "--input": "#DDD8CE",
   "--cf-card-shadow": "0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03)",
+  "--cf-card-shadow-hover": "0 2px 6px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.07)",
   "--cf-glass-bg": "rgba(250, 247, 242, 0.9)",
 } as React.CSSProperties;
 

@@ -2,6 +2,17 @@ import { resolveSlug } from "@/lib/slug-resolver";
 import { getNearbyPlaces, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { VenueExplorePage } from "@/components/guest/venue/venue-explore";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug, "Explore");
+}
 
 export default async function ExplorePage({
   params,

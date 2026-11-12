@@ -3,6 +3,8 @@ import { getEventScheduleItems } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Star, Clock, MapPin, User } from "lucide-react";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
 
 function formatTime(dateStr: string) {
   return new Date(dateStr).toLocaleTimeString("en-US", {
@@ -17,6 +19,15 @@ function formatDayLabel(dateStr: string) {
     month: "long",
     day: "numeric",
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug, "Schedule");
 }
 
 export default async function SchedulePage({

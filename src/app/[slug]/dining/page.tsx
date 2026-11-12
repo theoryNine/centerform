@@ -2,6 +2,17 @@ import { resolveSlug } from "@/lib/slug-resolver";
 import { getDiningPlaces, getVenuePageDescription } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { VenueDiningPage } from "@/components/guest/venue/venue-dining";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug, "Dining & Drinks");
+}
 
 export default async function DiningPage({
   params,

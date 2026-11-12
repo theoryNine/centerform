@@ -2,6 +2,17 @@ import { resolveSlug } from "@/lib/slug-resolver";
 import { getCruiseRestaurants, getVenuePageDescription, getCruiseNavImage } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { CruiseFoodOnboardPage } from "@/components/guest/cruise/cruise-food-onboard";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug, "Food Onboard");
+}
 
 export default async function FoodOnboardPage({
   params,

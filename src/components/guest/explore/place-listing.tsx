@@ -178,7 +178,7 @@ export function PlaceListing({ slug, venue, place }: PlaceListingProps) {
                         href={mapsHref}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-body-sm text-primary no-underline"
+                        className="hit-area text-body-sm text-primary no-underline"
                       >
                         {place.address}
                       </a>

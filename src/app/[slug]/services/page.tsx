@@ -2,6 +2,17 @@ import { resolveSlug } from "@/lib/slug-resolver";
 import { getVenueServices, getVenuePageDescription, getVenueInfoValues } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import { VenueServicesPage } from "@/components/guest/venue/venue-services";
+import { pageMetadata } from "@/lib/page-metadata";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return pageMetadata(slug, "Your Room & Stay");
+}
 
 export default async function ServicesPage({
   params,

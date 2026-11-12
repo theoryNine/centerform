@@ -48,8 +48,11 @@ export function NavCard({
   return (
     <Link
       href={href}
+      // Cards are ISR pages backed by Supabase; prefetching a screenful of them on a cold cache
+      // would render every one of them, so navigate on tap like the old router.push did.
+      prefetch={false}
       className={cn(
-        "card-shadow flex min-h-[116px] w-full cursor-pointer items-center gap-4 overflow-hidden rounded-default bg-card p-0 text-left no-underline transition-transform ease-out active:scale-[var(--cf-press-scale)]",
+        "card-shadow hover:[box-shadow:var(--cf-card-shadow-hover,var(--cf-card-shadow))] flex min-h-[116px] w-full cursor-pointer items-center gap-4 overflow-hidden rounded-default bg-card p-0 text-left no-underline transition-transform ease-out active:scale-[var(--cf-press-scale)]",
         responsive &&
           "relative cmp:min-h-0 cmp:flex-col cmp:items-stretch cmp:gap-0 tab:min-h-[116px] tab:flex-row tab:items-center tab:gap-4 lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0",
         responsive && featured && "lg:col-span-3 lg:min-h-[116px] lg:flex-row lg:items-center lg:gap-6",
@@ -124,13 +127,13 @@ interface SectionDividerProps {
 export function SectionDivider({ title, wide }: SectionDividerProps) {
   return (
     <div className="mb-heading-gap">
-      <h3
+      <h2
         className={`mb-2 font-serif text-card-title-lg font-normal text-foreground${
           wide ? " lg:text-[28px]" : ""
         }`}
       >
         {title}
-      </h3>
+      </h2>
       <div
         className={`-ml-page h-0.5 w-[calc(60%+var(--cf-page-padding))] bg-primary${
           wide ? " cmp:ml-0 cmp:w-[70%] tab:w-1/2 lg:h-px lg:w-full lg:bg-border" : ""
