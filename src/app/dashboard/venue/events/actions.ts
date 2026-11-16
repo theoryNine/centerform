@@ -1,5 +1,6 @@
 "use server";
 
+import { validateEventTimes } from "@/lib/datetime";
 import { parseOptionalHttpUrl } from "@/lib/url";
 import { authorizeVenue, finishVenueWrite } from "@/lib/venue-action";
 
@@ -9,9 +10,17 @@ export async function upsertVenueEventAction(formData: FormData): Promise<void> 
 
   const id = formData.get("id") as string | null;
 
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) throw new Error("Title is required.");
+  const timeError = validateEventTimes(
+    formData.get("start_time") as string | null,
+    formData.get("end_time") as string | null,
+  );
+  if (timeError) throw new Error(timeError);
+
   const payload = {
     venue_id: venueId,
-    title: formData.get("title") as string,
+    title,
     description: (formData.get("description") as string) || null,
     location: (formData.get("location") as string) || null,
     start_time: formData.get("start_time") as string,

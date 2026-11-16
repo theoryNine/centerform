@@ -18,8 +18,8 @@ Every dashboard page calls this once at the top. The `VenueSwitcher` component i
 ### Dashboard Routes
 
 ```
-/dashboard                                    Overview (real counts: events, services, places, collections)
-/dashboard/venue                              Hotel Info & Branding: general info (incl. cover image) + page images + welcome card + theme
+/dashboard                                    Overview: linked stat cards (events, services, places, collections), "Finish setting up" checklist (hidden when 5/5), guest page URL card
+/dashboard/venue?tab=general|images|branding  Hotel Info & Branding: tabs (General incl. cover image + welcome card + live guest preview; Page images; Branding and theme), one form + action per tab, sticky save bar
 /dashboard/venue/info                         Hotel Details: key-value metadata (check-in, policies, etc.)
 /dashboard/venue/amenities                    Amenity toggles + CRUD (grouped by category)
 /dashboard/venue/services                     Services CRUD
@@ -85,11 +85,12 @@ export async function upsertXAction(formData: FormData): Promise<void> {
 
 ### Forms Strategy
 
-All list pages use a right-side shadcn `Sheet` (`side="right"`) for create/edit. One exception: Venue Settings stays as an inline full-page form.
+All list pages use a right-side shadcn `Sheet` (`side="right"`) for create/edit, built on `SheetShell`/`SheetSection` (see `src/components/dashboard/CLAUDE.md`). One exception: Venue Settings stays as an inline full-page form, now split into tabs with dirty tracking (`DirtyForm`).
 
 - List pages are split into a Server Component (`page.tsx`) that fetches data, and a `"use client"` sibling (`*-client.tsx`) that holds sheet open state
 - Sheet components live in `src/components/dashboard/` (e.g. `ServiceSheet`, `PlaceSheet`)
 - On action success: close sheet + `router.refresh()`
 - Delete confirmation: inline toggle in sheet footer (no separate Dialog)
 - Delete requires `"admin"` role minimum; upsert requires `"staff"`
-- One exception: Hotel Info & Branding (`/dashboard/venue`) stays as an inline full-page form (no Sheet)
+- One exception: Hotel Info & Branding (`/dashboard/venue`) stays as an inline full-page form (no Sheet). Its three tabs each own one `<DirtyForm>`; the page reads `searchParams` (fine here: the dashboard is not ISR) only to pick the initial tab.
+- The Overview builds the guest URL from the request host (falling back to `AUTH_URL`), so previews and localhost link to themselves.

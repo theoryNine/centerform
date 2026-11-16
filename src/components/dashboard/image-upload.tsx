@@ -4,17 +4,34 @@ import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { listVenueMediaAction, deleteVenueMediaAction } from "@/app/dashboard/venue/media/actions";
+import { useNotifyForm } from "@/components/dashboard/notify-form";
 import type { VenueMedia } from "@/types";
 
 interface ImageUploadProps {
   name: string;
   defaultValue?: string | null;
   venueId: string;
+  /** 72px thumbnail beside the buttons instead of a large preview above them. */
+  compact?: boolean;
+  /** What the image is for ("Services page image"). Makes the buttons' names unique when a page has
+   * several of these ("Replace Services page image"). */
+  label?: string;
 }
 
-export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
+export function ImageUpload({
+  name,
+  defaultValue,
+  venueId,
+  compact = false,
+  label,
+}: ImageUploadProps) {
+  // An accessible name must contain the visible text (WCAG 2.5.3); the label makes it unique.
+  const named = (visible: string) => (label ? `${visible}, ${label}` : undefined);
   const [value, setValue] = useState(defaultValue ?? "");
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const hiddenRef = useRef<HTMLInputElement>(null);
+  useNotifyForm(hiddenRef, value);
   const [showLibrary, setShowLibrary] = useState(false);
   const [media, setMedia] = useState<VenueMedia[]>([]);
   const [loadingLibrary, setLoadingLibrary] = useState(false);
@@ -32,6 +49,7 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setError(null);
     try {
       const fd = new FormData();
       fd.set("file", file);
@@ -42,9 +60,20 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
       setValue(url);
       // Prepend to library so it appears immediately if opened
       setMedia((prev) => [
-        { id: crypto.randomUUID(), venue_id: venueId, url, filename: file.name, size: file.size, created_at: new Date().toISOString() },
+        {
+          id: crypto.randomUUID(),
+          venue_id: venueId,
+          url,
+          filename: file.name,
+          size: file.size,
+          created_at: new Date().toISOString(),
+        },
         ...prev,
       ]);
+    } catch {
+      setError(
+        "Upload failed. Use a JPG, PNG, WebP, GIF, AVIF or HEIC image under 10 MB (SVG isn't supported).",
+      );
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -63,8 +92,8 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
   }
 
   return (
-    <div className="space-y-2">
-      <input type="hidden" name={name} value={value} />
+    <div className="space-y-2" role={label ? "group" : undefined} aria-label={label}>
+      <input ref={hiddenRef} type="hidden" name={name} value={value} />
       <input
         type="file"
         ref={fileInputRef}
@@ -73,75 +102,118 @@ export function ImageUpload({ name, defaultValue, venueId }: ImageUploadProps) {
         onChange={handleFileChange}
       />
 
-      {value && (
-        <div className="relative rounded-default overflow-hidden border border-border">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img loading="lazy" decoding="async" src={value} alt="Selected image preview" className="w-full max-h-48 object-contain bg-muted" />
-        </div>
-      )}
+      <div className={compact ? "flex items-center gap-3" : "space-y-2"}>
+        {compact ? (
+          <div className="border-border bg-muted size-[72px] shrink-0 overflow-hidden rounded-md border">
+            {value && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                loading="lazy"
+                decoding="async"
+                src={value}
+                alt={label ? `${label} preview` : "Selected image preview"}
+                className="size-full object-cover"
+              />
+            )}
+          </div>
+        ) : (
+          value && (
+            <div className="rounded-default border-border relative overflow-hidden border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                loading="lazy"
+                decoding="async"
+                src={value}
+                alt={label ? `${label} preview` : "Selected image preview"}
+                className="bg-muted max-h-48 w-full object-contain"
+              />
+            </div>
+          )
+        )}
 
-      <div className="flex gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="flex-1 hover:bg-muted hover:text-foreground"
-          disabled={uploading}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {uploading ? "Uploading…" : value ? "Replace" : "Upload Image"}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="flex-1 hover:bg-muted hover:text-foreground"
-          onClick={() => setShowLibrary((v) => !v)}
-        >
-          {showLibrary ? "Hide Library" : "Library"}
-        </Button>
-        {value && (
+        <div className={compact ? "flex min-w-0 flex-1 flex-wrap gap-2" : "flex gap-2"}>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="text-destructive hover:text-destructive px-2"
-            onClick={() => setValue("")}
+            className="hover:bg-muted hover:text-foreground flex-1"
+            disabled={uploading}
+            aria-label={named(uploading ? "Uploading…" : value ? "Replace" : "Upload Image")}
+            onClick={() => fileInputRef.current?.click()}
           >
-            Remove
+            {uploading ? "Uploading…" : value ? "Replace" : "Upload Image"}
           </Button>
-        )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="hover:bg-muted hover:text-foreground flex-1"
+            aria-label={named(showLibrary ? "Hide Library" : "Library")}
+            aria-expanded={showLibrary}
+            onClick={() => setShowLibrary((v) => !v)}
+          >
+            {showLibrary ? "Hide Library" : "Library"}
+          </Button>
+          {value && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive px-2"
+              aria-label={named("Remove")}
+              onClick={() => setValue("")}
+            >
+              Remove
+            </Button>
+          )}
+        </div>
       </div>
 
+      {error && (
+        <p role="alert" className="text-xs text-red-700">
+          {error}
+        </p>
+      )}
+
       {showLibrary && (
-        <div className="border border-border rounded-default p-2">
+        <div className="border-border rounded-default border p-2">
           {loadingLibrary ? (
-            <p className="text-xs text-muted-foreground py-4 text-center">Loading…</p>
+            <p className="text-muted-foreground py-4 text-center text-xs">Loading…</p>
           ) : media.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-4 text-center">
+            <p className="text-muted-foreground py-4 text-center text-xs">
               No images uploaded yet. Upload one above.
             </p>
           ) : (
-            <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+            <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto">
               {media.map((item) => (
                 <div
                   key={item.id}
-                  className={`group relative aspect-square rounded-default overflow-hidden border-2 transition-colors ${
-                    value === item.url ? "border-primary" : "border-transparent hover:border-border"
+                  className={`group rounded-default relative aspect-square overflow-hidden border-2 transition-colors ${
+                    value === item.url ? "border-primary" : "hover:border-border border-transparent"
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => handleSelect(item.url)}
-                    className="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="focus-visible:ring-ring absolute inset-0 focus-visible:ring-2 focus-visible:outline-none"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img loading="lazy" decoding="async" src={item.url} alt={item.filename} className="w-full h-full object-cover" />
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={item.url}
+                      alt={item.filename}
+                      className="h-full w-full object-cover"
+                    />
                   </button>
                   <button
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); handleDeleteMedia(item.id, item.url); }}
-                    className="absolute right-1 top-1 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 bg-black/60 text-white hover:bg-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteMedia(item.id, item.url);
+                    }}
+                    aria-label={`Delete ${item.filename} from the library`}
+                    className="absolute top-1 right-1 rounded bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600 focus-visible:opacity-100"
                   >
                     <Trash2 size={12} />
                   </button>
