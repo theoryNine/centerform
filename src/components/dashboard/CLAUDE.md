@@ -21,8 +21,16 @@ Loaded in addition to the root and `src/app/dashboard/CLAUDE.md`. These are clie
 - `date-field.tsx`, `calendar-panel.tsx` — Date button + calendar (react-day-picker, which provides the ARIA grid keyboard behavior; styled with tokens in `classNames`). Popover on desktop, bottom sheet when `(max-width: 767px), (pointer: coarse)`: we kept the custom design on touch devices rather than native pickers.
 - `time-field.tsx` — Time combobox: type ("7pm", "19:30", "730p") or pick from 30-minute slots; bad input reverts with "Enter a time like 7:30 PM". Bottom sheet with the same list on touch devices. Slots can be filtered and annotated (the end-time list shows durations).
 - Date/time maths and parsing live in `src/lib/datetime.ts` (tested). It works on wall-clock strings with no time zone — see the known time zone issue below.
+- `list-parts.tsx` — The shared list pattern: `ListToolbar` (search, single-select filter chips with `aria-pressed`, a polite result count), `ListGroup` + `ListRow` (the whole row is one `<button>` that opens the edit sheet; delete lives in the sheet), `Chip` (exceptions only: Draft, Featured, Collection, Today, Hidden, never "Active"), `Thumb` / `DateTile`, `EmptyState`, `NoResults`, `ListSkeleton`, and `SafeImage` (falls back to a placeholder if the file is missing or fails). Search/grouping/event-phase logic is in `src/lib/dashboard-lists.ts`.
+- `edit-sheet.tsx` — `useEditSheet` (pending, inline error, delete confirm, close + refresh) and `EditSheetFooter` (Cancel / Save, Delete with inline confirm). All the standard sheets use these with `SheetShell`.
+- `segmented-control.tsx` — Mutually exclusive options built on real radio inputs in a `radiogroup` (price level, Middle/Start/End, layout, location). Submits under `name`.
+- `combobox.tsx` — Searchable single select (ARIA combobox + listbox, focus stays in the input). Used by the Add place sheet.
+- `sortable.tsx` — `SortableList`: drag and drop (mouse, touch, keyboard on the handle) on `@dnd-kit`, with screen-reader announcements. Always pair it with up/down buttons for the simple keyboard route (see the collection detail page and the service block editor).
+- `service-details-editor.tsx` — Block editor for a service's `details` (text, bullets, key/value, phone), serialized as a JSON array in the `details` field. Stored data that isn't made of valid blocks is shown as raw JSON and left untouched (`details_keep`). Parsing and validation are in `src/lib/service-details.ts` and are checked again on the server.
+- `toaster.tsx` — `toast(message, "error")` from any client component; `<Toaster />` is mounted in the dashboard layout.
+- `src/components/ui/alert-dialog.tsx` — Confirm dialog for destructive actions that aren't in a sheet (deleting a collection, removing a stop, bulk-deleting images). Name what will be deleted and say what happens to related data.
 - `service-sheet.tsx` — Sheet form for Service create/edit/delete
-- `event-sheet.tsx` — Sheet form for VenueEvent create/edit/delete
+- `event-sheet.tsx` — Sheet form for VenueEvent create/edit/delete (own submit logic because of the date/time validation)
 - `place-sheet.tsx` — Sheet form for NearbyPlace create/edit/delete; dining categories (restaurant/bar/cafe) show a "Location" select (Nearby recommendation / On-site at the hotel) instead of the free-text Area field; selecting "On-site" writes area = "on-site"
 - `collection-sheet.tsx` — Sheet form for ExploreCollection create/edit/delete
 - `amenity-sheet.tsx` — Sheet form for VenueAmenity create/edit/delete
@@ -30,11 +38,18 @@ Loaded in addition to the root and `src/app/dashboard/CLAUDE.md`. These are clie
 
 ## Sheet form conventions
 
-- New or restructured sheets use `SheetShell` + `SheetSection`; a boolean setting is a `SwitchRow` (shadcn `Switch`, `src/components/ui/switch.tsx`), not a two-option `<select>`. Mark required fields with "(required)" in the label text. Show action errors inline (`role="alert"`).
+- All sheets use `SheetShell` + `SheetSection` + `useEditSheet`/`EditSheetFooter`; a boolean setting is a `SwitchRow` (shadcn `Switch`, `src/components/ui/switch.tsx`), not a two-option `<select>`. Mark required fields with "(required)" in the label text. Show action errors inline (`role="alert"`).
 - Each sheet submits a `FormData` to a server action in the matching `actions.ts` (the form always includes a hidden `venueId`, plus `id` when editing).
 - On success: close the sheet and `router.refresh()`. Delete uses an inline confirm toggle in the sheet footer (no separate dialog); delete needs `admin`, upsert needs `staff`.
 - Image fields use `ImageUpload` (hidden input holding the URL). URL fields (website, booking URL) are validated server-side by `parseOptionalHttpUrl`, so surface the thrown message to the user.
 - Colors must be `#rrggbb` and font names alphanumeric — the server action validates both (see `updateVenueThemeAction`).
+
+## Dark mode
+
+The dashboard follows the OS color scheme, so check every change in **both** light and dark. Things that have bitten us:
+- Fixed colors don't adapt: write `text-red-700 dark:text-red-400`, `text-amber-900 dark:text-amber-300`, and `text-primary dark:text-ring` (the teal primary is too dim on dark surfaces). Never darken text toward black with `color-mix`.
+- The OS-dark token block in `globals.css` must define every token the `.dark` block does that components rely on (`--accent` / `--accent-foreground` were missing, which made outline and ghost buttons unreadable on hover).
+- Hover and focus states are not covered by axe: hover each control kind and measure the contrast (4.5:1).
 
 ## Known issue: event time zones
 

@@ -53,7 +53,7 @@ export function ChecklistRow({ item }: { item: ChecklistItem }) {
       <Link
         href={item.href}
         className={cn(
-          "text-primary inline-flex min-h-11 shrink-0 items-center rounded-md px-2 text-sm font-medium outline-none",
+          "text-primary dark:text-ring inline-flex min-h-11 shrink-0 items-center rounded-md px-2 text-sm font-medium outline-none",
           "focus-visible:ring-ring/50 hover:underline focus-visible:ring-[3px]",
           "after:absolute after:inset-0 md:after:hidden",
         )}

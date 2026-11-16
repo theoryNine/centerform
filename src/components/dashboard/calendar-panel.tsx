@@ -159,7 +159,7 @@ export function CalendarPanel({
           <Button
             type="button"
             variant="ghost"
-            className="text-primary h-9 px-3"
+            className="text-primary dark:text-ring h-9 px-3"
             disabled={!todayAllowed}
             onClick={goToday}
           >

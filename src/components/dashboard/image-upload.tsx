@@ -16,6 +16,10 @@ interface ImageUploadProps {
   /** What the image is for ("Services page image"). Makes the buttons' names unique when a page has
    * several of these ("Replace Services page image"). */
   label?: string;
+  /** For a page image that falls back to another image (the cover): pass that image (or null if
+   * there is none). The row then shows it as "Using default" until the owner picks their own, with
+   * Change / Choose image / Use default wording. Use with `compact`. */
+  fallbackUrl?: string | null;
 }
 
 export function ImageUpload({
@@ -24,10 +28,19 @@ export function ImageUpload({
   venueId,
   compact = false,
   label,
+  fallbackUrl,
 }: ImageUploadProps) {
+  const hasFallback = fallbackUrl !== undefined;
   // An accessible name must contain the visible text (WCAG 2.5.3); the label makes it unique.
   const named = (visible: string) => (label ? `${visible}, ${label}` : undefined);
   const [value, setValue] = useState(defaultValue ?? "");
+  const uploadText = hasFallback
+    ? value
+      ? "Change"
+      : "Choose image"
+    : value
+      ? "Replace"
+      : "Upload Image";
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hiddenRef = useRef<HTMLInputElement>(null);
@@ -105,14 +118,22 @@ export function ImageUpload({
       <div className={compact ? "flex items-center gap-3" : "space-y-2"}>
         {compact ? (
           <div className="border-border bg-muted size-[72px] shrink-0 overflow-hidden rounded-md border">
-            {value && (
+            {(value || fallbackUrl) && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 loading="lazy"
                 decoding="async"
-                src={value}
-                alt={label ? `${label} preview` : "Selected image preview"}
-                className="size-full object-cover"
+                src={value || fallbackUrl || ""}
+                alt={
+                  value
+                    ? label
+                      ? `${label} preview`
+                      : "Selected image preview"
+                    : label
+                      ? `${label}: default image`
+                      : "Default image"
+                }
+                className={`size-full object-cover ${value ? "" : "opacity-80"}`}
               />
             )}
           </div>
@@ -131,46 +152,53 @@ export function ImageUpload({
           )
         )}
 
-        <div className={compact ? "flex min-w-0 flex-1 flex-wrap gap-2" : "flex gap-2"}>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="hover:bg-muted hover:text-foreground flex-1"
-            disabled={uploading}
-            aria-label={named(uploading ? "Uploading…" : value ? "Replace" : "Upload Image")}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {uploading ? "Uploading…" : value ? "Replace" : "Upload Image"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="hover:bg-muted hover:text-foreground flex-1"
-            aria-label={named(showLibrary ? "Hide Library" : "Library")}
-            aria-expanded={showLibrary}
-            onClick={() => setShowLibrary((v) => !v)}
-          >
-            {showLibrary ? "Hide Library" : "Library"}
-          </Button>
-          {value && (
+        <div className={compact ? "min-w-0 flex-1 space-y-2" : undefined}>
+          {hasFallback && !value && (
+            <p className="text-muted-foreground text-xs font-medium">
+              {fallbackUrl ? "Using default" : "No image yet"}
+            </p>
+          )}
+          <div className={compact ? "flex flex-wrap gap-2" : "flex gap-2"}>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="text-destructive hover:text-destructive px-2"
-              aria-label={named("Remove")}
-              onClick={() => setValue("")}
+              className="hover:bg-muted hover:text-foreground flex-1"
+              disabled={uploading}
+              aria-label={named(uploading ? "Uploading…" : uploadText)}
+              onClick={() => fileInputRef.current?.click()}
             >
-              Remove
+              {uploading ? "Uploading…" : uploadText}
             </Button>
-          )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="hover:bg-muted hover:text-foreground flex-1"
+              aria-label={named(showLibrary ? "Hide Library" : "Library")}
+              aria-expanded={showLibrary}
+              onClick={() => setShowLibrary((v) => !v)}
+            >
+              {showLibrary ? "Hide Library" : "Library"}
+            </Button>
+            {value && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="px-2 text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                aria-label={named(hasFallback ? "Use default" : "Remove")}
+                onClick={() => setValue("")}
+              >
+                {hasFallback ? "Use default" : "Remove"}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       {error && (
-        <p role="alert" className="text-xs text-red-700">
+        <p role="alert" className="text-xs text-red-700 dark:text-red-400">
           {error}
         </p>
       )}

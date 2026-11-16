@@ -16,7 +16,9 @@ export function NavLink({ href, children, exact = false, activeParam }: NavLinkP
   const searchParams = useSearchParams();
 
   const hrefPath = href.split("?")[0];
-  const pathnameMatch = exact ? pathname === hrefPath : pathname === hrefPath || pathname.startsWith(hrefPath + "/");
+  const pathnameMatch = exact
+    ? pathname === hrefPath
+    : pathname === hrefPath || pathname.startsWith(hrefPath + "/");
   const isActive = activeParam
     ? pathnameMatch && searchParams.get(activeParam.key) === activeParam.value
     : pathnameMatch;
@@ -27,8 +29,8 @@ export function NavLink({ href, children, exact = false, activeParam }: NavLinkP
       className={cn(
         "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
         isActive
-          ? "bg-primary/10 text-primary font-semibold"
-          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          ? "bg-primary/10 text-foreground before:bg-primary relative font-semibold before:absolute before:top-2 before:bottom-2 before:left-0 before:w-[3px] before:rounded-full"
+          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
       )}
     >
       {children}

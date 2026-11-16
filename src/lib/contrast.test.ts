@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { contrastRatio, isHex, readableOn } from "./contrast";
+import { contrastOnCream, contrastRatio, isHex, readableOn, readableTextOn } from "./contrast";
 
 describe("contrastRatio", () => {
   it("matches the WCAG reference values", () => {
@@ -49,8 +49,12 @@ describe("neutral text tokens in globals.css", () => {
   const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   // Pull `--name: #hex` out of one block of the stylesheet.
   const tokens = (block: string) =>
-    Object.fromEntries([...block.matchAll(/--([a-z-]+):\s*(#[0-9a-fA-F]{6})/g)].map((m) => [m[1], m[2]]));
-  const lightTokens = tokens(css.slice(css.indexOf(":root {"), css.indexOf("@media (prefers-color-scheme: dark)")));
+    Object.fromEntries(
+      [...block.matchAll(/--([a-z-]+):\s*(#[0-9a-fA-F]{6})/g)].map((m) => [m[1], m[2]]),
+    );
+  const lightTokens = tokens(
+    css.slice(css.indexOf(":root {"), css.indexOf("@media (prefers-color-scheme: dark)")),
+  );
   const darkTokens = tokens(css.slice(css.indexOf("@media (prefers-color-scheme: dark)")));
 
   it.each([
@@ -61,5 +65,29 @@ describe("neutral text tokens in globals.css", () => {
       if (!t[surface]) continue;
       expect(contrastRatio(t["muted-foreground"], t[surface]), surface).toBeGreaterThanOrEqual(4.5);
     }
+  });
+});
+
+describe("contrastOnCream / readableTextOn", () => {
+  it("reports the ratio of a brand color on the cream background", () => {
+    const teal = contrastOnCream("#1a7a6d");
+    expect(teal?.ratio).toBeCloseTo(4.57, 1);
+    expect(teal?.passes).toBe(true);
+  });
+
+  it("fails a light color and passes a dark one", () => {
+    expect(contrastOnCream("#d4b483")?.passes).toBe(false);
+    expect(contrastOnCream("#111111")?.passes).toBe(true);
+  });
+
+  it("is null for something that is not a hex color", () => {
+    expect(contrastOnCream("teal")).toBeNull();
+    expect(contrastOnCream("")).toBeNull();
+  });
+
+  it("picks black or white text for a button color", () => {
+    expect(readableTextOn("#1a7a6d")).toBe("#ffffff");
+    expect(readableTextOn("#f5f0e8")).toBe("#111111");
+    expect(readableTextOn("nope")).toBe("#ffffff");
   });
 });

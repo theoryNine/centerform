@@ -53,8 +53,18 @@ export default async function VenueSettingsPage({
         initialTab={parseVenueTab(tab)}
         panels={{
           general: <VenueGeneralForm venue={v} />,
-          images: <VenueImagesForm venueId={v.id} images={pageImages} />,
-          branding: <VenueThemeForm venueId={v.id} venueName={v.name} theme={theme} />,
+          images: (
+            <VenueImagesForm venueId={v.id} images={pageImages} coverImageUrl={v.cover_image_url} />
+          ),
+          branding: (
+            <VenueThemeForm
+              venueId={v.id}
+              venueName={v.name}
+              welcomeHeading={v.welcome_heading}
+              welcomeBody={v.welcome_body}
+              theme={theme}
+            />
+          ),
         }}
       />
     </div>

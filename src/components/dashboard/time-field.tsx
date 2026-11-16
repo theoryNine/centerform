@@ -445,7 +445,10 @@ function TimeSheet({
           />
           <p
             id={hintId}
-            className={cn("text-xs", error ? "font-medium text-red-700" : "text-muted-foreground")}
+            className={cn(
+              "text-xs",
+              error ? "font-medium text-red-700 dark:text-red-400" : "text-muted-foreground",
+            )}
             role={error ? "alert" : undefined}
           >
             {error ? timeErrorMessage(lang) : hint}

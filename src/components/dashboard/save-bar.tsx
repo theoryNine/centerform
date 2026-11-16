@@ -25,7 +25,7 @@ export function SaveBar({
     <div className="bg-background sticky bottom-0 z-10 -mx-6 mt-6 -mb-6 flex min-h-[72px] flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t px-6 py-3">
       <div className="min-w-0 text-sm" role="status" aria-live="polite">
         {error ? (
-          <span role="alert" className="font-medium text-red-700">
+          <span role="alert" className="font-medium text-red-700 dark:text-red-400">
             {error}
           </span>
         ) : dirty ? (

@@ -132,7 +132,7 @@ export function DateTimeField({
         <p
           id={errorId}
           role="alert"
-          className="flex items-center gap-1.5 text-sm font-medium text-red-700"
+          className="flex items-center gap-1.5 text-sm font-medium text-red-700 dark:text-red-400"
         >
           <CircleAlert aria-hidden className="size-4 shrink-0" />
           {shownError}
