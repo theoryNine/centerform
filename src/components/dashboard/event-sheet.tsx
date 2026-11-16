@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
+import { Sheet } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +12,8 @@ import {
   deleteVenueEventAction,
 } from "@/app/dashboard/venue/events/actions";
 import { ImageUpload } from "@/components/dashboard/image-upload";
+import { EventWhenFields, type EventWhenHandle } from "@/components/dashboard/event-when-fields";
+import { SheetSection, SheetShell, SwitchRow } from "@/components/dashboard/sheet-shell";
 import type { VenueEvent } from "@/types";
 
 interface EventSheetProps {
@@ -27,26 +23,47 @@ interface EventSheetProps {
   venueId: string;
 }
 
-function toDatetimeLocal(iso: string | null | undefined): string {
-  if (!iso) return "";
-  return iso.slice(0, 16);
-}
-
 export function EventSheet({ open, onOpenChange, event, venueId }: EventSheetProps) {
   const router = useRouter();
+  const uid = useId();
+  const whenRef = useRef<EventWhenHandle>(null);
   const [pending, setPending] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(event?.is_active ?? true);
+  const [isFeatured, setIsFeatured] = useState(event?.is_featured ?? false);
 
   const isEdit = event !== null;
 
+  // The sheet stays mounted between uses, so reload the switches each time it opens.
+  useEffect(() => {
+    if (!open) return;
+    setIsActive(event?.is_active ?? true);
+    setIsFeatured(event?.is_featured ?? false);
+    setConfirmDelete(false);
+    setError(null);
+  }, [open, event]);
+
+  function describe(err: unknown, verb: "save" | "delete" = "save") {
+    const detail = err instanceof Error && err.message ? ` ${err.message}` : "";
+    return process.env.NODE_ENV === "production"
+      ? `Couldn't ${verb}. Try again.`
+      : `Couldn't ${verb}.${detail}`;
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // Start/end checks live in the picker (it also focuses the field that needs attention).
+    if (!whenRef.current?.validate()) return;
     setPending(true);
+    setError(null);
     try {
       const fd = new FormData(e.currentTarget);
       await upsertVenueEventAction(fd);
       onOpenChange(false);
       router.refresh();
+    } catch (err) {
+      setError(describe(err));
     } finally {
       setPending(false);
     }
@@ -55,6 +72,7 @@ export function EventSheet({ open, onOpenChange, event, venueId }: EventSheetPro
   async function handleDelete() {
     if (!event) return;
     setPending(true);
+    setError(null);
     try {
       const fd = new FormData();
       fd.set("id", event.id);
@@ -62,154 +80,165 @@ export function EventSheet({ open, onOpenChange, event, venueId }: EventSheetPro
       await deleteVenueEventAction(fd);
       onOpenChange(false);
       router.refresh();
+    } catch (err) {
+      setError(describe(err, "delete"));
     } finally {
       setPending(false);
       setConfirmDelete(false);
     }
   }
 
+  const footer = confirmDelete ? (
+    <>
+      <p className="mr-auto text-sm font-medium">Delete this event?</p>
+      <Button
+        type="button"
+        variant="outline"
+        className="h-10"
+        disabled={pending}
+        onClick={() => setConfirmDelete(false)}
+      >
+        Keep event
+      </Button>
+      <Button
+        type="button"
+        variant="destructive"
+        className="h-10"
+        disabled={pending}
+        onClick={handleDelete}
+      >
+        {pending ? "Deleting…" : "Confirm delete"}
+      </Button>
+    </>
+  ) : (
+    <>
+      {isEdit && (
+        <Button
+          type="button"
+          variant="ghost"
+          className="mr-auto h-10 text-red-700 hover:text-red-800"
+          disabled={pending}
+          onClick={() => setConfirmDelete(true)}
+        >
+          Delete event
+        </Button>
+      )}
+      <Button
+        type="button"
+        variant="outline"
+        className={isEdit ? "h-10" : "ml-auto h-10"}
+        disabled={pending}
+        onClick={() => onOpenChange(false)}
+      >
+        Cancel
+      </Button>
+      <Button type="submit" className="h-10" disabled={pending}>
+        {pending ? "Saving…" : isEdit ? "Save changes" : "Add event"}
+      </Button>
+    </>
+  );
+
   return (
-    <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); setConfirmDelete(false); }}>
-      <SheetContent side="right">
-        <SheetHeader>
-          <SheetTitle>{isEdit ? "Edit Event" : "Add Event"}</SheetTitle>
-        </SheetHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetShell
+        title={isEdit ? "Edit event" : "Add event"}
+        description="Event title, time, image and visibility."
+        onSubmit={handleSubmit}
+        footer={footer}
+      >
+        <input type="hidden" name="venueId" value={venueId} />
+        {isEdit && <input type="hidden" name="id" value={event.id} />}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 overflow-y-auto px-4 pb-2">
-          <input type="hidden" name="venueId" value={venueId} />
-          {isEdit && <input type="hidden" name="id" value={event.id} />}
-
+        <SheetSection title="Basics">
           <div className="space-y-2">
-            <Label htmlFor="evt-title">Title</Label>
+            <Label htmlFor={`${uid}-title`}>Title (required)</Label>
             <Input
-              id="evt-title"
+              id={`${uid}-title`}
               name="title"
               required
               defaultValue={event?.title ?? ""}
               placeholder="Live Jazz Night"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="evt-location">Location</Label>
+            <Label htmlFor={`${uid}-location`}>Location</Label>
             <Input
-              id="evt-location"
+              id={`${uid}-location`}
               name="location"
               defaultValue={event?.location ?? ""}
               placeholder="Lobby Bar"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="evt-description">Description</Label>
+            <Label htmlFor={`${uid}-description`}>Description</Label>
             <Textarea
-              id="evt-description"
+              id={`${uid}-description`}
               name="description"
               rows={3}
               defaultValue={event?.description ?? ""}
             />
           </div>
+        </SheetSection>
 
-          <div className="space-y-2">
-            <Label htmlFor="evt-start">Start Time</Label>
-            <Input
-              id="evt-start"
-              name="start_time"
-              type="datetime-local"
-              required
-              defaultValue={toDatetimeLocal(event?.start_time)}
-            />
-          </div>
+        <SheetSection title="When">
+          <EventWhenFields
+            ref={whenRef}
+            defaultStart={event?.start_time}
+            defaultEnd={event?.end_time}
+          />
+        </SheetSection>
 
-          <div className="space-y-2">
-            <Label htmlFor="evt-end">End Time</Label>
-            <Input
-              id="evt-end"
-              name="end_time"
-              type="datetime-local"
-              defaultValue={toDatetimeLocal(event?.end_time)}
-            />
-          </div>
-
+        <SheetSection title="Image and booking">
           <div className="space-y-2">
             <Label>Image</Label>
-            <ImageUpload name="image_url" defaultValue={event?.image_url} venueId={venueId} />
+            <ImageUpload
+              name="image_url"
+              defaultValue={event?.image_url}
+              venueId={venueId}
+              compact
+              label="event image"
+            />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="evt-booking">Booking URL</Label>
+            <Label htmlFor={`${uid}-booking`}>Booking link</Label>
             <Input
-              id="evt-booking"
+              id={`${uid}-booking`}
               name="booking_url"
               defaultValue={event?.booking_url ?? ""}
               placeholder="https://eventbrite.com/..."
+              aria-describedby={`${uid}-booking-hint`}
             />
-            <p className="text-[11px] text-muted-foreground">
-              Affiliate or ticketing link — clicks are tracked via /api/go
+            <p id={`${uid}-booking-hint`} className="text-muted-foreground text-xs">
+              Optional. Clicks on &lsquo;Book now&rsquo; are tracked.
             </p>
           </div>
+        </SheetSection>
 
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2">
-              <select
-                name="is_active"
-                defaultValue={String(event?.is_active ?? true)}
-                className="border-input bg-background h-9 rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-              >
-                <option value="true">Active</option>
-                <option value="false">Draft</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2">
-              <select
-                name="is_featured"
-                defaultValue={String(event?.is_featured ?? false)}
-                className="border-input bg-background h-9 rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-              >
-                <option value="false">Not Featured</option>
-                <option value="true">Featured</option>
-              </select>
-            </div>
-          </div>
+        <SheetSection title="Visibility">
+          <SwitchRow
+            id={`${uid}-active`}
+            name="is_active"
+            label="Show to guests"
+            hint="Turn off to keep it as a draft."
+            checked={isActive}
+            onCheckedChange={setIsActive}
+          />
+          <SwitchRow
+            id={`${uid}-featured`}
+            name="is_featured"
+            label="Feature this event"
+            hint="Adds a Featured badge."
+            checked={isFeatured}
+            onCheckedChange={setIsFeatured}
+          />
+        </SheetSection>
 
-          <SheetFooter className="px-0">
-            <Button type="submit" disabled={pending} className="w-full">
-              {pending ? "Saving…" : isEdit ? "Save Changes" : "Add Event"}
-            </Button>
-            {isEdit && !confirmDelete && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-destructive hover:text-destructive"
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete Event
-              </Button>
-            )}
-            {isEdit && confirmDelete && (
-              <div className="flex gap-2 w-full">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="flex-1"
-                  disabled={pending}
-                  onClick={handleDelete}
-                >
-                  Confirm Delete
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setConfirmDelete(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </SheetFooter>
-        </form>
-      </SheetContent>
+        {error && (
+          <p role="alert" className="text-sm font-medium text-red-700">
+            {error}
+          </p>
+        )}
+      </SheetShell>
     </Sheet>
   );
 }

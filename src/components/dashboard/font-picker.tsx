@@ -62,9 +62,11 @@ interface FontPickerProps {
   name: string;
   defaultValue: string;
   variant: "heading" | "body";
+  /** Shown in the heading sample ("Welcome to {venueName}"). */
+  venueName?: string;
 }
 
-export function FontPicker({ id, name, defaultValue, variant }: FontPickerProps) {
+export function FontPicker({ id, name, defaultValue, variant, venueName }: FontPickerProps) {
   const fonts = variant === "heading" ? HEADING_FONTS : BODY_FONTS;
   const [value, setValue] = useState(defaultValue);
 
@@ -79,7 +81,7 @@ export function FontPicker({ id, name, defaultValue, variant }: FontPickerProps)
         name={name}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+        className="border-input bg-background focus-visible:ring-ring/50 h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-[3px]"
       >
         {fonts.map((f) => (
           <option key={f.value} value={f.value}>
@@ -89,15 +91,15 @@ export function FontPicker({ id, name, defaultValue, variant }: FontPickerProps)
       </select>
 
       <div
-        className="rounded-md border border-border bg-muted/30 px-4 py-3"
+        className="border-border bg-muted/30 rounded-md border px-4 py-3"
         style={{ fontFamily: `"${value}", sans-serif` }}
       >
         {variant === "heading" ? (
-          <p className="text-xl font-semibold leading-snug text-foreground">
-            Welcome to The Grand Hotel
+          <p className="text-foreground text-xl leading-snug font-semibold">
+            Welcome to {venueName || "your venue"}
           </p>
         ) : (
-          <p className="text-sm leading-relaxed text-foreground">
+          <p className="text-foreground text-sm leading-relaxed">
             Check-in from 3:00 PM · Complimentary breakfast included
           </p>
         )}
