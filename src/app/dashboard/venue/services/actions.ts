@@ -1,5 +1,6 @@
 "use server";
 
+import { detailsForStorage } from "@/lib/service-details";
 import { authorizeVenue, nextDisplayOrder, finishVenueWrite } from "@/lib/venue-action";
 
 export async function upsertServiceAction(formData: FormData): Promise<void> {
@@ -16,25 +17,25 @@ export async function upsertServiceAction(formData: FormData): Promise<void> {
     formData.get("display_order"),
   );
 
-  const rawDetails = (formData.get("details") as string)?.trim();
-  let details = null;
-  if (rawDetails) {
-    try {
-      details = JSON.parse(rawDetails);
-    } catch {
-      throw new Error("Details must be valid JSON.");
-    }
-  }
+  // `details_keep` means the editor could not show the stored details and the owner left them
+  // alone: leave the column untouched instead of overwriting it.
+  const keepDetails = formData.get("details_keep") === "true";
+  const details = keepDetails
+    ? undefined
+    : detailsForStorage(String(formData.get("details") ?? ""));
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) throw new Error("Name is required.");
 
   const payload = {
     venue_id: venueId,
-    name: formData.get("name") as string,
+    name,
     description: (formData.get("description") as string) || null,
     category: formData.get("category") as string,
     icon: (formData.get("icon") as string) || null,
     display_order: displayOrder,
     is_active: formData.get("is_active") === "true",
-    details,
+    ...(details === undefined ? {} : { details }),
   };
 
   const { error } = id

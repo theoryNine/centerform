@@ -1,41 +1,40 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AmenitySheet } from "@/components/dashboard/amenity-sheet";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { EmptyState } from "@/components/dashboard/list-parts";
+import { AMENITY_CATEGORIES, AmenitySheet } from "@/components/dashboard/amenity-sheet";
+import { toast } from "@/components/dashboard/toaster";
+import { groupInOrder, humanize } from "@/lib/dashboard-lists";
 import { toggleAmenityAction } from "./actions";
 import type { AmenityCategory, VenueAmenity } from "@/types";
 
-const CATEGORY_LABELS: Record<AmenityCategory, string> = {
-  general: "General",
-  room: "Room",
-  bathroom: "Bathroom",
-  kitchen: "Kitchen",
-  dining: "Dining",
-  recreation: "Recreation",
-  business: "Business",
-  wellness: "Wellness",
-  parking: "Parking",
-  accessibility: "Accessibility",
-  family: "Family",
-  safety: "Safety",
-  outdoor: "Outdoor",
-};
+const categoryLabel = (c: string) =>
+  AMENITY_CATEGORIES.find((x) => x.value === c)?.label ?? humanize(c);
 
 interface AmenitiesClientProps {
   amenities: VenueAmenity[];
   venueId: string;
 }
 
-export function AmenitiesClient({ amenities, venueId }: AmenitiesClientProps) {
+export function AmenitiesClient({ amenities: initial, venueId }: AmenitiesClientProps) {
+  const router = useRouter();
+  const [amenities, setAmenities] = useState(initial);
+  const [saving, setSaving] = useState<Set<string>>(new Set());
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selected, setSelected] = useState<VenueAmenity | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [newCategory, setNewCategory] = useState<AmenityCategory>("general");
 
-  function openCreate() {
+  // Follow the server after a refresh (an add, edit or delete).
+  useEffect(() => setAmenities(initial), [initial]);
+
+  function openCreate(category: AmenityCategory = "general") {
     setSelected(null);
+    setNewCategory(category);
     setSheetOpen(true);
   }
 
@@ -44,85 +43,121 @@ export function AmenitiesClient({ amenities, venueId }: AmenitiesClientProps) {
     setSheetOpen(true);
   }
 
-  function handleToggle(amenity: VenueAmenity) {
-    startTransition(async () => {
-      await toggleAmenityAction(amenity.id, !amenity.is_available);
-    });
+  async function toggle(amenity: VenueAmenity, next: boolean) {
+    // Optimistic: flip it now, put it back (with a message) if the save fails.
+    setAmenities((prev) =>
+      prev.map((a) => (a.id === amenity.id ? { ...a, is_available: next } : a)),
+    );
+    setSaving((prev) => new Set(prev).add(amenity.id));
+    try {
+      await toggleAmenityAction(amenity.id, next);
+      router.refresh();
+    } catch {
+      setAmenities((prev) =>
+        prev.map((a) => (a.id === amenity.id ? { ...a, is_available: !next } : a)),
+      );
+      toast(`Couldn't update ${amenity.name}. Try again.`, "error");
+    } finally {
+      setSaving((prev) => {
+        const copy = new Set(prev);
+        copy.delete(amenity.id);
+        return copy;
+      });
+    }
   }
 
-  const grouped = amenities.reduce<Record<string, VenueAmenity[]>>((acc, a) => {
-    if (!acc[a.category]) acc[a.category] = [];
-    acc[a.category].push(a);
-    return acc;
-  }, {});
+  const groups = groupInOrder(amenities, (a) => a.category);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Amenities</h1>
-          <p className="text-muted-foreground">Feature flags and amenity details for guests.</p>
+          <p className="text-muted-foreground">Switch an amenity off to hide it from guests.</p>
         </div>
-        <Button onClick={openCreate}>Add Amenity</Button>
+        <Button onClick={() => openCreate()} className="h-10">
+          Add amenity
+        </Button>
       </div>
 
       {amenities.length === 0 ? (
-        <Card>
-          <CardContent className="p-6 text-center text-sm text-muted-foreground">
-            No amenities yet. Add your first to get started.
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Sparkles}
+          title="No amenities yet"
+          description="Amenities are the features guests can count on, like free Wi-Fi, a pool or parking. They appear on your guest site."
+          actionLabel="Add amenity"
+          onAction={() => openCreate()}
+        />
       ) : (
-        Object.entries(grouped).map(([category, items]) => (
-          <Card key={category}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                {CATEGORY_LABELS[category as AmenityCategory] ?? category}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y">
-                {items.map((amenity) => (
-                  <div key={amenity.id} className="flex items-center justify-between px-4 py-3">
-                    <div>
-                      <p className="text-sm font-medium">{amenity.name}</p>
-                      {amenity.description && (
-                        <p className="text-xs text-muted-foreground">{amenity.description}</p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleToggle(amenity)}
-                        disabled={isPending}
-                        className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors"
-                        style={{
-                          backgroundColor: amenity.is_available
-                            ? "hsl(var(--primary))"
-                            : "hsl(var(--muted))",
-                          color: amenity.is_available
-                            ? "hsl(var(--primary-foreground))"
-                            : "hsl(var(--muted-foreground))",
-                        }}
-                      >
-                        {amenity.is_available ? "Available" : "Unavailable"}
-                      </button>
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(amenity)}>
-                        Edit
-                      </Button>
-                    </div>
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          {groups.map(([category, items]) => {
+            const available = items.filter((a) => a.is_available).length;
+            return (
+              <Card key={category} className="gap-0 py-0">
+                <CardHeader className="flex flex-row items-center justify-between gap-3 border-b px-4 py-3">
+                  <div>
+                    <CardTitle>
+                      <h2 className="text-base">{categoryLabel(category)}</h2>
+                    </CardTitle>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      {available} of {items.length} available
+                    </p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))
+                  <Button
+                    variant="outline"
+                    className="h-10"
+                    aria-label={`Add to ${categoryLabel(category)}`}
+                    onClick={() => openCreate(category as AmenityCategory)}
+                  >
+                    Add
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ul className="divide-y">
+                    {items.map((amenity) => (
+                      <li key={amenity.id} className="flex items-center gap-3 px-4">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(amenity)}
+                          className="focus-visible:ring-primary min-h-11 min-w-0 flex-1 rounded-md py-1 text-left outline-none hover:underline focus-visible:ring-2"
+                        >
+                          <span
+                            className={`block truncate text-sm font-medium ${
+                              amenity.is_available ? "" : "text-muted-foreground"
+                            }`}
+                          >
+                            {amenity.name}
+                          </span>
+                          {amenity.description && (
+                            <span className="text-muted-foreground block truncate text-xs">
+                              {amenity.description}
+                            </span>
+                          )}
+                        </button>
+                        <Switch
+                          checked={amenity.is_available}
+                          disabled={saving.has(amenity.id)}
+                          aria-busy={saving.has(amenity.id)}
+                          aria-label={`${amenity.name} available to guests`}
+                          onCheckedChange={(next) => toggle(amenity, next)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       )}
 
       <AmenitySheet
+        key={selected?.id ?? `new-${newCategory}`}
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         amenity={selected}
         venueId={venueId}
+        defaultCategory={newCategory}
       />
     </div>
   );

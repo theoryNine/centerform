@@ -18,7 +18,7 @@ export function StatLink({ label, value, href, linkText }: StatLinkProps) {
     >
       <p className="text-muted-foreground text-sm font-medium">{label}</p>
       <p className="mt-3 text-3xl font-bold md:mt-4">{value}</p>
-      <p className="text-primary sr-only items-center gap-1 text-sm font-medium md:not-sr-only md:mt-3 md:flex">
+      <p className="text-primary dark:text-ring sr-only items-center gap-1 text-sm font-medium md:not-sr-only md:mt-3 md:flex">
         {linkText}
         <ArrowRight
           aria-hidden

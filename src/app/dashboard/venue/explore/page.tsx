@@ -15,16 +15,22 @@ export default async function ExploreCollectionsPage() {
   const supabase = createAdminClient();
   const { data: collectionsRaw } = await supabase
     .from("explore_collections")
-    .select("*, explore_collection_items(id)")
+    .select("*, explore_collection_items(id, display_order, place:nearby_places(image_url))")
     .eq("venue_id", active.venue.id)
     .order("display_order", { ascending: true });
 
-  const collections = (collectionsRaw ?? []).map((c) => ({
-    ...(c as ExploreCollection),
-    itemCount: Array.isArray((c as { explore_collection_items?: unknown[] }).explore_collection_items)
-      ? (c as { explore_collection_items: unknown[] }).explore_collection_items.length
-      : 0,
-  }));
+  type RawItem = { display_order: number; place: { image_url: string | null } | null };
+  const collections = (collectionsRaw ?? []).map((c) => {
+    const items = ((c as { explore_collection_items?: RawItem[] }).explore_collection_items ?? [])
+      .slice()
+      .sort((a, b) => a.display_order - b.display_order);
+    return {
+      ...(c as ExploreCollection),
+      itemCount: items.length,
+      // Collections have no cover image of their own: use the first place that has a photo.
+      coverUrl: items.find((i) => i.place?.image_url)?.place?.image_url ?? null,
+    };
+  });
 
   return <ExploreClient collections={collections} venueId={active.venue.id} />;
 }

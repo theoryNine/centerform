@@ -1,11 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useMemo, useState } from "react";
+import { BedDouble, Car, ConciergeBell, Info, Sparkles, Ticket, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ServiceSheet } from "@/components/dashboard/service-sheet";
-import type { Service } from "@/types";
+import {
+  Chip,
+  EmptyState,
+  ListGroup,
+  ListRow,
+  ListToolbar,
+  NoResults,
+  Thumb,
+} from "@/components/dashboard/list-parts";
+import { SERVICE_CATEGORIES, ServiceSheet } from "@/components/dashboard/service-sheet";
+import { groupInOrder, humanize, matchesQuery, plural } from "@/lib/dashboard-lists";
+import type { Service, ServiceCategory } from "@/types";
+
+const CATEGORY_ICONS: Partial<
+  Record<ServiceCategory, React.ComponentType<{ className?: string }>>
+> = {
+  room_service: BedDouble,
+  spa: Sparkles,
+  concierge: ConciergeBell,
+  dining: Utensils,
+  transportation: Car,
+  activities: Ticket,
+  other: Info,
+};
+
+const categoryLabel = (c: string) =>
+  SERVICE_CATEGORIES.find((x) => x.value === c)?.label ?? humanize(c);
 
 interface ServicesClientProps {
   services: Service[];
@@ -15,6 +39,8 @@ interface ServicesClientProps {
 export function ServicesClient({ services, venueId }: ServicesClientProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selected, setSelected] = useState<Service | null>(null);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
 
   function openCreate() {
     setSelected(null);
@@ -26,46 +52,82 @@ export function ServicesClient({ services, venueId }: ServicesClientProps) {
     setSheetOpen(true);
   }
 
+  const filters = useMemo(() => {
+    const present = [...new Set(services.map((s) => s.category))];
+    return [
+      { key: "all", label: "All" },
+      ...present.map((c) => ({ key: c, label: categoryLabel(c) })),
+    ];
+  }, [services]);
+
+  const visible = services.filter(
+    (s) =>
+      (filter === "all" || s.category === filter) &&
+      matchesQuery(search, s.name, s.description, categoryLabel(s.category)),
+  );
+  const groups = groupInOrder(visible, (s) => s.category);
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Services</h1>
           <p className="text-muted-foreground">Manage the services available to your guests.</p>
         </div>
-        <Button onClick={openCreate}>Add Service</Button>
+        <Button onClick={openCreate} className="h-10">
+          Add service
+        </Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="divide-y">
-            {services.length === 0 ? (
-              <p className="p-6 text-center text-sm text-muted-foreground">
-                No services yet. Add your first service to get started.
-              </p>
-            ) : (
-              services.map((service) => (
-                <div key={service.id} className="flex items-center justify-between p-4">
-                  <div>
-                    <p className="text-sm font-medium">{service.name}</p>
-                    <p className="text-xs text-muted-foreground capitalize">
-                      {service.category.replace(/_/g, " ")}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={service.is_active ? "default" : "secondary"}>
-                      {service.is_active ? "Active" : "Inactive"}
-                    </Badge>
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(service)}>
-                      Edit
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {services.length === 0 ? (
+        <EmptyState
+          icon={ConciergeBell}
+          title="No services yet"
+          description="Services are what guests can ask for, like Wi-Fi, housekeeping or parking. They appear on the Services page."
+          actionLabel="Add service"
+          onAction={openCreate}
+        />
+      ) : (
+        <>
+          <ListToolbar
+            search={search}
+            onSearch={setSearch}
+            searchLabel="Search services"
+            filters={filters}
+            filter={filter}
+            onFilter={setFilter}
+            filterLabel="Filter services by category"
+            countText={plural(visible.length, "service")}
+          />
+
+          {visible.length === 0 ? (
+            <NoResults
+              query={search}
+              onClear={() => {
+                setSearch("");
+                setFilter("all");
+              }}
+            />
+          ) : (
+            <div className="space-y-6">
+              {groups.map(([category, items]) => (
+                <ListGroup key={category} heading={categoryLabel(category)} count={items.length}>
+                  {items.map((service) => (
+                    <ListRow
+                      key={service.id}
+                      title={service.name}
+                      meta={service.description?.replace(/\s+/g, " ") || undefined}
+                      leading={<Thumb icon={CATEGORY_ICONS[service.category] ?? Info} />}
+                      chips={!service.is_active ? <Chip>Draft</Chip> : undefined}
+                      onOpen={() => openEdit(service)}
+                    />
+                  ))}
+                </ListGroup>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       <ServiceSheet
         open={sheetOpen}

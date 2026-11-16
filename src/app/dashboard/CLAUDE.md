@@ -83,6 +83,19 @@ export async function upsertXAction(formData: FormData): Promise<void> {
 
 **Always scope mutations by tenant.** The service role bypasses RLS, so every `update`/`delete` by `id` must also filter `.eq("venue_id", venueId)` (or the parent `collection_id`), and any foreign ids from the form (`collection_id`, `place_id`) must be verified to belong to that venue (see `assertCollectionInVenue` in `explore/[collectionId]/actions.ts`). Delete requires `"admin"`; upsert requires `"staff"`. Actions whose venue is derived from a row id (e.g. `toggleAmenityAction`) look the venue up first, then check the role. Media actions use `getVenueRole`/`requireVenueRole` directly. Server Actions live in `actions.ts` beside their page.
 
+### List pages
+
+Services, Dining & Drinks, Nearby Places, Events and Collections share the pattern in `src/components/dashboard/list-parts.tsx`: a toolbar (search + filter chips + count), grouped rows, an empty state, and a "no matches" state. Page specifics:
+- **Events** default to the Upcoming filter; Past = end (or start) before now, judged in the browser, so the list renders after hydration (`useHydrated`) to avoid server/client mismatches on dates and "Today".
+- **Dining** groups mirror the guest page (At the hotel = `area "on-site"`, Nearby recommendations, Collection cards); **Nearby** groups by area.
+- **Collections** are cards; there is no collection cover image column, so the cover is the first place's photo. Delete is in the card's menu with a confirm that says the places themselves stay.
+- **Collection detail**: drag to reorder (plus up/down buttons), optimistic with revert and a toast on failure. A collection has one Start and one End: saving one makes the previous one a regular stop (done in `upsertCollectionItemAction`).
+- **Amenities**: the switch is `is_available`, and the guest site hides unavailable amenities, so the switch means "shown to guests". It saves immediately (optimistic).
+- **Hotel Details** (`/dashboard/venue/info`): four fixed groups, each with its own Add (no category picker).
+- **Images**: drag-and-drop zone, upload queue with progress and retry, select mode with bulk delete. `getMediaUsageAction` finds where an image is used so the delete confirm can warn.
+- `venue/loading.tsx` and `venue/error.tsx` give every page under `/dashboard/venue` a skeleton and a retry banner.
+- Sheets must keep fields the form doesn't edit (the service and amenity `icon`), or saving wipes them.
+
 ### Forms Strategy
 
 All list pages use a right-side shadcn `Sheet` (`side="right"`) for create/edit, built on `SheetShell`/`SheetSection` (see `src/components/dashboard/CLAUDE.md`). One exception: Venue Settings stays as an inline full-page form, now split into tabs with dirty tracking (`DirtyForm`).

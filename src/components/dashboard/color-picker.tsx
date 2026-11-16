@@ -23,7 +23,7 @@ export function ColorPicker({ id, name, defaultValue }: ColorPickerProps) {
         <PopoverPrimitive.Trigger asChild>
           <button
             type="button"
-            className="border-border/60 h-5 w-5 shrink-0 cursor-pointer rounded-sm border transition-opacity hover:opacity-80"
+            className="border-border/60 size-6 shrink-0 cursor-pointer rounded-sm border transition-opacity hover:opacity-80"
             style={{ backgroundColor: value }}
             aria-label="Open color picker"
           />
@@ -35,7 +35,7 @@ export function ColorPicker({ id, name, defaultValue }: ColorPickerProps) {
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="flex-1 bg-transparent font-mono text-sm outline-none"
+          className="h-6 min-w-0 flex-1 bg-transparent font-mono text-sm outline-none"
           spellCheck={false}
         />
       </div>

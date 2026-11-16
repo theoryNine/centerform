@@ -1,25 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { useEffect, useId, useState } from "react";
+import { Sheet } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  upsertAmenityAction,
-  deleteAmenityAction,
-} from "@/app/dashboard/venue/amenities/actions";
+import { upsertAmenityAction, deleteAmenityAction } from "@/app/dashboard/venue/amenities/actions";
+import { EditSheetFooter, SheetError, useEditSheet } from "@/components/dashboard/edit-sheet";
+import { SheetSection, SheetShell, SwitchRow } from "@/components/dashboard/sheet-shell";
 import type { AmenityCategory, VenueAmenity } from "@/types";
 
-const AMENITY_CATEGORIES: { value: AmenityCategory; label: string }[] = [
+export const AMENITY_CATEGORIES: { value: AmenityCategory; label: string }[] = [
   { value: "general", label: "General" },
   { value: "room", label: "Room" },
   { value: "bathroom", label: "Bathroom" },
@@ -40,74 +31,81 @@ interface AmenitySheetProps {
   onOpenChange: (open: boolean) => void;
   amenity: VenueAmenity | null;
   venueId: string;
+  /** Category for a new amenity (the group whose Add button was used). */
+  defaultCategory?: AmenityCategory;
 }
 
-export function AmenitySheet({ open, onOpenChange, amenity, venueId }: AmenitySheetProps) {
-  const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
+export function AmenitySheet({
+  open,
+  onOpenChange,
+  amenity,
+  venueId,
+  defaultCategory = "general",
+}: AmenitySheetProps) {
+  const uid = useId();
   const isEdit = amenity !== null;
+  const [isAvailable, setIsAvailable] = useState(amenity?.is_available ?? true);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setPending(true);
-    try {
-      const fd = new FormData(e.currentTarget);
-      await upsertAmenityAction(fd);
-      onOpenChange(false);
-      router.refresh();
-    } finally {
-      setPending(false);
-    }
-  }
+  useEffect(() => {
+    if (open) setIsAvailable(amenity?.is_available ?? true);
+  }, [open, amenity]);
 
-  async function handleDelete() {
-    if (!amenity) return;
-    setPending(true);
-    try {
+  const sheet = useEditSheet({
+    open,
+    onOpenChange,
+    save: (fd) => upsertAmenityAction(fd),
+    remove: async () => {
+      if (!amenity) return;
       const fd = new FormData();
       fd.set("id", amenity.id);
       fd.set("venueId", venueId);
       await deleteAmenityAction(fd);
-      onOpenChange(false);
-      router.refresh();
-    } finally {
-      setPending(false);
-      setConfirmDelete(false);
-    }
-  }
+    },
+  });
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); setConfirmDelete(false); }}>
-      <SheetContent side="right">
-        <SheetHeader>
-          <SheetTitle>{isEdit ? "Edit Amenity" : "Add Amenity"}</SheetTitle>
-        </SheetHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetShell
+        title={isEdit ? "Edit amenity" : "Add amenity"}
+        description="Amenity name, category, note and availability."
+        onSubmit={sheet.handleSubmit}
+        footer={
+          <EditSheetFooter
+            isEdit={isEdit}
+            pending={sheet.pending}
+            confirmDelete={sheet.confirmDelete}
+            onConfirmDelete={sheet.setConfirmDelete}
+            onDelete={sheet.handleDelete}
+            onCancel={() => onOpenChange(false)}
+            noun="amenity"
+            addLabel="Add amenity"
+          />
+        }
+      >
+        <input type="hidden" name="venueId" value={venueId} />
+        {isEdit && <input type="hidden" name="id" value={amenity.id} />}
+        {isEdit && <input type="hidden" name="display_order" value={amenity.display_order} />}
+        {/* The sheet has no icon field; keep whatever the amenity already has (it shows on the guest page). */}
+        <input type="hidden" name="icon" value={amenity?.icon ?? ""} />
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 overflow-y-auto px-4 pb-2">
-          <input type="hidden" name="venueId" value={venueId} />
-          {isEdit && <input type="hidden" name="id" value={amenity.id} />}
-          {isEdit && <input type="hidden" name="display_order" value={amenity.display_order} />}
-
+        <SheetSection title="Basics">
           <div className="space-y-2">
-            <Label htmlFor="am-name">Name</Label>
+            <Label htmlFor={`${uid}-name`}>Name (required)</Label>
             <Input
-              id="am-name"
+              id={`${uid}-name`}
               name="name"
               required
               defaultValue={amenity?.name ?? ""}
               placeholder="Free Wi-Fi"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="am-category">Category</Label>
+            <Label htmlFor={`${uid}-category`}>Category</Label>
             <select
-              id="am-category"
+              id={`${uid}-category`}
               name="category"
-              defaultValue={amenity?.category ?? "general"}
-              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              defaultValue={amenity?.category ?? defaultCategory}
+              className="border-input bg-background focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-[3px]"
             >
               {AMENITY_CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>
@@ -116,67 +114,31 @@ export function AmenitySheet({ open, onOpenChange, amenity, venueId }: AmenitySh
               ))}
             </select>
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="am-description">Description</Label>
+            <Label htmlFor={`${uid}-description`}>Note</Label>
             <Textarea
-              id="am-description"
+              id={`${uid}-description`}
               name="description"
               rows={2}
               defaultValue={amenity?.description ?? ""}
+              placeholder="Shown under the name, e.g. Open 6am to 10pm"
             />
           </div>
+        </SheetSection>
 
-          <div className="space-y-2">
-            <Label>Availability</Label>
-            <select
-              name="is_available"
-              defaultValue={String(amenity?.is_available ?? true)}
-              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            >
-              <option value="true">Available</option>
-              <option value="false">Unavailable</option>
-            </select>
-          </div>
+        <SheetSection title="Availability">
+          <SwitchRow
+            id={`${uid}-available`}
+            name="is_available"
+            label="Available to guests"
+            hint="Turn off to hide it from the guest site."
+            checked={isAvailable}
+            onCheckedChange={setIsAvailable}
+          />
+        </SheetSection>
 
-          <SheetFooter className="px-0">
-            <Button type="submit" disabled={pending} className="w-full">
-              {pending ? "Saving…" : isEdit ? "Save Changes" : "Add Amenity"}
-            </Button>
-            {isEdit && !confirmDelete && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-destructive hover:text-destructive"
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete Amenity
-              </Button>
-            )}
-            {isEdit && confirmDelete && (
-              <div className="flex gap-2 w-full">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="flex-1"
-                  disabled={pending}
-                  onClick={handleDelete}
-                >
-                  Confirm Delete
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setConfirmDelete(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </SheetFooter>
-        </form>
-      </SheetContent>
+        <SheetError message={sheet.error} />
+      </SheetShell>
     </Sheet>
   );
 }

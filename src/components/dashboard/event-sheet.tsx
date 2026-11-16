@@ -116,7 +116,7 @@ export function EventSheet({ open, onOpenChange, event, venueId }: EventSheetPro
         <Button
           type="button"
           variant="ghost"
-          className="mr-auto h-10 text-red-700 hover:text-red-800"
+          className="mr-auto h-10 text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
           disabled={pending}
           onClick={() => setConfirmDelete(true)}
         >
@@ -234,7 +234,7 @@ export function EventSheet({ open, onOpenChange, event, venueId }: EventSheetPro
         </SheetSection>
 
         {error && (
-          <p role="alert" className="text-sm font-medium text-red-700">
+          <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-400">
             {error}
           </p>
         )}

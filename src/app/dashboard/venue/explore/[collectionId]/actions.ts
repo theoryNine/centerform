@@ -42,20 +42,51 @@ export async function upsertCollectionItemAction(formData: FormData): Promise<vo
     formData.get("display_order"),
   );
 
+  // The form sends one `position` (middle, start or end). The older is_start / is_end fields
+  // are still understood.
+  const position = formData.get("position");
+  const isStart =
+    position === "start" || (position === null && formData.get("is_start") === "true");
+  const isEnd =
+    position === "end" || (position === null && formData.get("is_end") === "true" && !isStart);
+
   const payload = {
     collection_id: collectionId,
     place_id: placeId,
     display_order: displayOrder,
     time_label: (formData.get("time_label") as string) || null,
-    is_start: formData.get("is_start") === "true",
-    is_end: formData.get("is_end") === "true",
+    is_start: isStart,
+    is_end: isEnd,
   };
 
-  const { error } = id
-    ? await supabase.from("explore_collection_items").update(payload).eq("id", id).eq("collection_id", collectionId)
-    : await supabase.from("explore_collection_items").insert(payload);
+  const saved = id
+    ? await supabase
+        .from("explore_collection_items")
+        .update(payload)
+        .eq("id", id)
+        .eq("collection_id", collectionId)
+        .select("id")
+        .maybeSingle()
+    : await supabase.from("explore_collection_items").insert(payload).select("id").single();
 
-  if (error) throw new Error(error.message);
+  if (saved.error) throw new Error(saved.error.message);
+  if (!saved.data) throw new Error("Item not found.");
+
+  // A collection has one Start and one End: choosing it for this item makes any other a regular stop.
+  for (const [flag, on] of [
+    ["is_start", isStart],
+    ["is_end", isEnd],
+  ] as const) {
+    if (!on) continue;
+    const { error } = await supabase
+      .from("explore_collection_items")
+      .update({ [flag]: false })
+      .eq("collection_id", collectionId)
+      .eq(flag, true)
+      .neq("id", saved.data.id);
+    if (error) throw new Error(error.message);
+  }
+
   await finishVenueWrite(venueId, `/dashboard/venue/explore/${collectionId}`);
 }
 
@@ -79,7 +110,7 @@ export async function removeCollectionItemAction(formData: FormData): Promise<vo
 export async function reorderCollectionItemsAction(
   venueId: string,
   collectionId: string,
-  orderedIds: string[]
+  orderedIds: string[],
 ): Promise<void> {
   const { supabase } = await authorizeVenue(venueId, "staff");
   await assertCollectionInVenue(supabase, collectionId, venueId);
@@ -89,8 +120,8 @@ export async function reorderCollectionItemsAction(
         .from("explore_collection_items")
         .update({ display_order: index + 1 })
         .eq("id", id)
-        .eq("collection_id", collectionId)
-    )
+        .eq("collection_id", collectionId),
+    ),
   );
   const failed = results.find((r) => r.error);
   if (failed?.error) throw new Error(failed.error.message);

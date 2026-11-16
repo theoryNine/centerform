@@ -1,22 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { useEffect, useId, useState } from "react";
+import { Sheet } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { upsertServiceAction, deleteServiceAction } from "@/app/dashboard/venue/services/actions";
+import { EditSheetFooter, SheetError, useEditSheet } from "@/components/dashboard/edit-sheet";
+import { ServiceDetailsEditor } from "@/components/dashboard/service-details-editor";
+import { SheetSection, SheetShell, SwitchRow } from "@/components/dashboard/sheet-shell";
 import type { Service, ServiceCategory } from "@/types";
 
-const SERVICE_CATEGORIES: { value: ServiceCategory; label: string }[] = [
+export const SERVICE_CATEGORIES: { value: ServiceCategory; label: string }[] = [
   { value: "room_service", label: "Room Service" },
   { value: "spa", label: "Spa" },
   { value: "concierge", label: "Concierge" },
@@ -34,74 +29,70 @@ interface ServiceSheetProps {
 }
 
 export function ServiceSheet({ open, onOpenChange, service, venueId }: ServiceSheetProps) {
-  const router = useRouter();
-  const formRef = useRef<HTMLFormElement>(null);
-  const [pending, setPending] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
+  const uid = useId();
   const isEdit = service !== null;
+  const [isActive, setIsActive] = useState(service?.is_active ?? true);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setPending(true);
-    try {
-      const fd = new FormData(e.currentTarget);
-      await upsertServiceAction(fd);
-      onOpenChange(false);
-      router.refresh();
-    } finally {
-      setPending(false);
-    }
-  }
+  useEffect(() => {
+    if (open) setIsActive(service?.is_active ?? true);
+  }, [open, service]);
 
-  async function handleDelete() {
-    if (!service) return;
-    setPending(true);
-    try {
+  const sheet = useEditSheet({
+    open,
+    onOpenChange,
+    save: (fd) => upsertServiceAction(fd),
+    remove: async () => {
+      if (!service) return;
       const fd = new FormData();
       fd.set("id", service.id);
       fd.set("venueId", venueId);
       await deleteServiceAction(fd);
-      onOpenChange(false);
-      router.refresh();
-    } finally {
-      setPending(false);
-      setConfirmDelete(false);
-    }
-  }
+    },
+  });
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); setConfirmDelete(false); }}>
-      <SheetContent side="right">
-        <SheetHeader>
-          <SheetTitle>{isEdit ? "Edit Service" : "Add Service"}</SheetTitle>
-        </SheetHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetShell
+        title={isEdit ? "Edit service" : "Add service"}
+        description="Service name, category, description, details and visibility."
+        onSubmit={sheet.handleSubmit}
+        footer={
+          <EditSheetFooter
+            isEdit={isEdit}
+            pending={sheet.pending}
+            confirmDelete={sheet.confirmDelete}
+            onConfirmDelete={sheet.setConfirmDelete}
+            onDelete={sheet.handleDelete}
+            onCancel={() => onOpenChange(false)}
+            noun="service"
+            addLabel="Add service"
+          />
+        }
+      >
+        <input type="hidden" name="venueId" value={venueId} />
+        {isEdit && <input type="hidden" name="id" value={service.id} />}
+        {isEdit && <input type="hidden" name="display_order" value={service.display_order} />}
+        {/* The sheet has no icon field; keep whatever the service already has. */}
+        <input type="hidden" name="icon" value={service?.icon ?? ""} />
 
-        <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4 overflow-y-auto px-4 pb-2">
-          <input type="hidden" name="venueId" value={venueId} />
-          {isEdit && <input type="hidden" name="id" value={service.id} />}
-          {isEdit && (
-            <input type="hidden" name="display_order" value={service.display_order} />
-          )}
-
+        <SheetSection title="Basics">
           <div className="space-y-2">
-            <Label htmlFor="svc-name">Name</Label>
+            <Label htmlFor={`${uid}-name`}>Name (required)</Label>
             <Input
-              id="svc-name"
+              id={`${uid}-name`}
               name="name"
               required
               defaultValue={service?.name ?? ""}
               placeholder="Wi-Fi"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="svc-category">Category</Label>
+            <Label htmlFor={`${uid}-category`}>Category</Label>
             <select
-              id="svc-category"
+              id={`${uid}-category`}
               name="category"
               defaultValue={service?.category ?? "other"}
-              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              className="border-input bg-background focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-[3px]"
             >
               {SERVICE_CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>
@@ -110,80 +101,35 @@ export function ServiceSheet({ open, onOpenChange, service, venueId }: ServiceSh
               ))}
             </select>
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="svc-description">Description</Label>
+            <Label htmlFor={`${uid}-description`}>Description</Label>
             <Textarea
-              id="svc-description"
+              id={`${uid}-description`}
               name="description"
               rows={3}
               defaultValue={service?.description ?? ""}
               placeholder="Brief summary shown to guests."
             />
           </div>
+        </SheetSection>
 
-          <div className="space-y-2">
-            <Label htmlFor="svc-details">Details (JSON)</Label>
-            <Textarea
-              id="svc-details"
-              name="details"
-              rows={6}
-              defaultValue={service?.details ? JSON.stringify(service.details, null, 2) : ""}
-              placeholder='[{"type":"bullets","items":["Item 1","Item 2"]}]'
-              className="font-mono text-xs"
-            />
-          </div>
+        <SheetSection title="Details">
+          <ServiceDetailsEditor defaultValue={service?.details ?? null} />
+        </SheetSection>
 
-          <div className="flex items-center gap-2">
-            <select
-              name="is_active"
-              defaultValue={String(service?.is_active ?? true)}
-              className="border-input bg-background h-9 rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            >
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
-            <Label className="text-sm text-muted-foreground">Visibility</Label>
-          </div>
+        <SheetSection title="Visibility">
+          <SwitchRow
+            id={`${uid}-active`}
+            name="is_active"
+            label="Show to guests"
+            hint="Turn off to keep it as a draft."
+            checked={isActive}
+            onCheckedChange={setIsActive}
+          />
+        </SheetSection>
 
-          <SheetFooter className="px-0">
-            <Button type="submit" disabled={pending} className="w-full">
-              {pending ? "Saving…" : isEdit ? "Save Changes" : "Add Service"}
-            </Button>
-            {isEdit && !confirmDelete && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-destructive hover:text-destructive"
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete Service
-              </Button>
-            )}
-            {isEdit && confirmDelete && (
-              <div className="flex gap-2 w-full">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="flex-1"
-                  disabled={pending}
-                  onClick={handleDelete}
-                >
-                  Confirm Delete
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setConfirmDelete(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </SheetFooter>
-        </form>
-      </SheetContent>
+        <SheetError message={sheet.error} />
+      </SheetShell>
     </Sheet>
   );
 }

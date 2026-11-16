@@ -207,7 +207,7 @@ export function EventWhenFields({ defaultStart, defaultEnd, ref }: EventWhenFiel
             ref={addEndRef}
             type="button"
             variant="ghost"
-            className="text-primary hover:text-primary h-11 justify-start px-2 md:h-10"
+            className="text-primary dark:text-ring h-11 justify-start px-2 md:h-10"
             onClick={addEnd}
           >
             <Plus aria-hidden />

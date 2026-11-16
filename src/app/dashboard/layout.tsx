@@ -5,6 +5,7 @@ import { getVenuesForUser } from "@/lib/permissions";
 import { NavLink } from "@/components/dashboard/nav-link";
 import { VenueSwitcher } from "@/components/dashboard/venue-switcher";
 import { MobileNav } from "@/components/dashboard/mobile-nav";
+import { Toaster } from "@/components/dashboard/toaster";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -18,7 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             You don&apos;t have access to any venues yet.
           </p>
         </div>
@@ -33,7 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="hidden w-64 flex-col border-r bg-muted/30 md:flex">
+      <aside className="bg-muted/30 hidden w-64 flex-col border-r md:flex">
         <div className="flex h-14 items-center border-b px-4">
           <span className="text-sm font-semibold tracking-tight">Centerform</span>
         </div>
@@ -48,10 +49,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </NavLink>
 
           <div className="py-2">
-            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-muted-foreground px-3 pb-1 text-xs font-semibold tracking-wider uppercase">
               Hotel
             </p>
-            <NavLink href="/dashboard/venue" exact>Hotel Info & Branding</NavLink>
+            <NavLink href="/dashboard/venue" exact>
+              Hotel Info & Branding
+            </NavLink>
             <NavLink href="/dashboard/venue/info">Hotel Details</NavLink>
             <NavLink href="/dashboard/venue/amenities">Amenities</NavLink>
             <NavLink href="/dashboard/venue/services">Services</NavLink>
@@ -61,18 +64,28 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Separator />
 
           <div className="py-2">
-            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-muted-foreground px-3 pb-1 text-xs font-semibold tracking-wider uppercase">
               Places
             </p>
-            <NavLink href="/dashboard/venue/places?type=dining" activeParam={{ key: "type", value: "dining" }}>Dining & Drinks</NavLink>
-            <NavLink href="/dashboard/venue/places?type=places" activeParam={{ key: "type", value: "places" }}>Nearby Places</NavLink>
+            <NavLink
+              href="/dashboard/venue/places?type=dining"
+              activeParam={{ key: "type", value: "dining" }}
+            >
+              Dining & Drinks
+            </NavLink>
+            <NavLink
+              href="/dashboard/venue/places?type=places"
+              activeParam={{ key: "type", value: "places" }}
+            >
+              Nearby Places
+            </NavLink>
             <NavLink href="/dashboard/venue/explore">Explore Collections</NavLink>
           </div>
 
           <Separator />
 
           <div className="py-2">
-            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-muted-foreground px-3 pb-1 text-xs font-semibold tracking-wider uppercase">
               Media
             </p>
             <NavLink href="/dashboard/venue/media">Images</NavLink>
@@ -80,16 +93,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </nav>
 
         <div className="border-t p-4">
-          <p className="truncate px-3 py-1 text-xs text-muted-foreground">{session.user.email}</p>
+          <p className="text-muted-foreground truncate px-3 py-1 text-xs">{session.user.email}</p>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 items-center justify-between border-b px-4 md:px-6">
           <div className="flex items-center gap-2">
             <MobileNav venues={memberships} activeVenueId={active.venue.id} />
-            <h2 className="text-sm font-medium text-muted-foreground">{active.venue.name}</h2>
+            <h2 className="text-muted-foreground text-sm font-medium">{active.venue.name}</h2>
           </div>
           <form
             action={async () => {
@@ -103,6 +116,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </form>
         </header>
         <main className="flex-1 p-6">{children}</main>
+        <Toaster />
       </div>
     </div>
   );

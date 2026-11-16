@@ -245,6 +245,10 @@
     --secondary-foreground: #EDE8DE;
     --muted: #2E2B27;
     --muted-foreground: #A09A90;
+    /* Hover/focus fill and its text (outline and ghost buttons, menu items). Without these the
+       light-mode accent-foreground (dark text) landed on a dark fill. Same values as .dark below. */
+    --accent: #2E2B27;
+    --accent-foreground: #EDE8DE;
     --border: #3A3632;
     --input: #3A3632;
     --ring: #22A090;

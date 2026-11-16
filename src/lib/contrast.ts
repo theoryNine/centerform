@@ -40,7 +40,8 @@ function rgbToHsl([r, g, b]: Rgb): [number, number, number] {
   if (max === min) return [0, 0, l];
   const d = max - min;
   const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  const h = max === R ? (G - B) / d + (G < B ? 6 : 0) : max === G ? (B - R) / d + 2 : (R - G) / d + 4;
+  const h =
+    max === R ? (G - B) / d + (G < B ? 6 : 0) : max === G ? (B - R) / d + 2 : (R - G) / d + 4;
   return [h / 6, s, l];
 }
 
@@ -81,4 +82,20 @@ export function readableOn(
     if (worst(candidate) >= min) return candidate;
   }
   return candidate; // as far as it can go (pure white/black)
+}
+
+/** The guest site's light background, which brand text colors have to read on. */
+export const CREAM_BACKGROUND = "#F5F0E8";
+
+/** WCAG contrast of a brand color on the cream background, and whether it passes AA for normal text. */
+export function contrastOnCream(hex: string): { ratio: number; passes: boolean } | null {
+  if (!isHex(hex)) return null;
+  const ratio = contrastRatio(hex, CREAM_BACKGROUND);
+  return { ratio, passes: ratio >= 4.5 };
+}
+
+/** Black or white, whichever reads better on `hex` (for text on a brand-colored button). */
+export function readableTextOn(hex: string): "#ffffff" | "#111111" {
+  if (!isHex(hex)) return "#ffffff";
+  return contrastRatio(hex, "#ffffff") >= contrastRatio(hex, "#111111") ? "#ffffff" : "#111111";
 }

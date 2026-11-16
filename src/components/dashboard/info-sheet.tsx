@@ -1,21 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { useId } from "react";
+import { Sheet } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { upsertInfoAction, deleteInfoAction } from "@/app/dashboard/venue/info/actions";
+import { EditSheetFooter, SheetError, useEditSheet } from "@/components/dashboard/edit-sheet";
+import { SheetSection, SheetShell } from "@/components/dashboard/sheet-shell";
 import type { InfoCategory, VenueInfo } from "@/types";
 
-const INFO_CATEGORIES: { value: InfoCategory; label: string }[] = [
+export const INFO_CATEGORIES: { value: InfoCategory; label: string }[] = [
   { value: "general", label: "General" },
   { value: "policies", label: "Policies" },
   { value: "hours", label: "Hours" },
@@ -27,132 +21,84 @@ interface InfoSheetProps {
   onOpenChange: (open: boolean) => void;
   info: VenueInfo | null;
   venueId: string;
+  /** Group for a new item: the group whose Add button was used. (There is no category picker.) */
+  category?: InfoCategory;
 }
 
-export function InfoSheet({ open, onOpenChange, info, venueId }: InfoSheetProps) {
-  const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
+export function InfoSheet({
+  open,
+  onOpenChange,
+  info,
+  venueId,
+  category = "general",
+}: InfoSheetProps) {
+  const uid = useId();
   const isEdit = info !== null;
+  const group = info?.category ?? category;
+  const groupLabel = INFO_CATEGORIES.find((c) => c.value === group)?.label ?? group;
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setPending(true);
-    try {
-      const fd = new FormData(e.currentTarget);
-      await upsertInfoAction(fd);
-      onOpenChange(false);
-      router.refresh();
-    } finally {
-      setPending(false);
-    }
-  }
-
-  async function handleDelete() {
-    if (!info) return;
-    setPending(true);
-    try {
+  const sheet = useEditSheet({
+    open,
+    onOpenChange,
+    save: (fd) => upsertInfoAction(fd),
+    remove: async () => {
+      if (!info) return;
       const fd = new FormData();
       fd.set("id", info.id);
       fd.set("venueId", venueId);
       await deleteInfoAction(fd);
-      onOpenChange(false);
-      router.refresh();
-    } finally {
-      setPending(false);
-      setConfirmDelete(false);
-    }
-  }
+    },
+  });
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); setConfirmDelete(false); }}>
-      <SheetContent side="right">
-        <SheetHeader>
-          <SheetTitle>{isEdit ? "Edit Info" : "Add Info"}</SheetTitle>
-        </SheetHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetShell
+        title={isEdit ? "Edit detail" : `Add to ${groupLabel}`}
+        description="A label and value shown to guests, such as Check-in time."
+        onSubmit={sheet.handleSubmit}
+        footer={
+          <EditSheetFooter
+            isEdit={isEdit}
+            pending={sheet.pending}
+            confirmDelete={sheet.confirmDelete}
+            onConfirmDelete={sheet.setConfirmDelete}
+            onDelete={sheet.handleDelete}
+            onCancel={() => onOpenChange(false)}
+            noun="detail"
+            addLabel="Add detail"
+          />
+        }
+      >
+        <input type="hidden" name="venueId" value={venueId} />
+        <input type="hidden" name="category" value={group} />
+        {isEdit && <input type="hidden" name="id" value={info.id} />}
+        {isEdit && <input type="hidden" name="display_order" value={info.display_order} />}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 overflow-y-auto px-4 pb-2">
-          <input type="hidden" name="venueId" value={venueId} />
-          {isEdit && <input type="hidden" name="id" value={info.id} />}
-          {isEdit && <input type="hidden" name="display_order" value={info.display_order} />}
-
+        <SheetSection title={groupLabel}>
           <div className="space-y-2">
-            <Label htmlFor="info-category">Category</Label>
-            <select
-              id="info-category"
-              name="category"
-              defaultValue={info?.category ?? "general"}
-              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            >
-              {INFO_CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="info-key">Label</Label>
+            <Label htmlFor={`${uid}-key`}>Label (required)</Label>
             <Input
-              id="info-key"
+              id={`${uid}-key`}
               name="key"
               required
               defaultValue={info?.key ?? ""}
               placeholder="Check-in Time"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="info-value">Value</Label>
+            <Label htmlFor={`${uid}-value`}>Value (required)</Label>
             <Input
-              id="info-value"
+              id={`${uid}-value`}
               name="value"
               required
               defaultValue={info?.value ?? ""}
               placeholder="3:00 PM"
             />
           </div>
+        </SheetSection>
 
-          <SheetFooter className="px-0">
-            <Button type="submit" disabled={pending} className="w-full">
-              {pending ? "Saving…" : isEdit ? "Save Changes" : "Add Info"}
-            </Button>
-            {isEdit && !confirmDelete && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-destructive hover:text-destructive"
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete
-              </Button>
-            )}
-            {isEdit && confirmDelete && (
-              <div className="flex gap-2 w-full">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="flex-1"
-                  disabled={pending}
-                  onClick={handleDelete}
-                >
-                  Confirm Delete
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setConfirmDelete(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </SheetFooter>
-        </form>
-      </SheetContent>
+        <SheetError message={sheet.error} />
+      </SheetShell>
     </Sheet>
   );
 }

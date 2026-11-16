@@ -1,15 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { useEffect, useId, useState } from "react";
+import { Sheet } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +9,15 @@ import {
   upsertCollectionAction,
   deleteCollectionAction,
 } from "@/app/dashboard/venue/explore/actions";
-import type { ExploreCollection } from "@/types";
+import { EditSheetFooter, SheetError, useEditSheet } from "@/components/dashboard/edit-sheet";
+import { SegmentedControl } from "@/components/dashboard/segmented-control";
+import { SheetSection, SheetShell, SwitchRow } from "@/components/dashboard/sheet-shell";
+import type { CollectionLayout, ExploreCollection } from "@/types";
+
+const LAYOUT_OPTIONS = [
+  { value: "cards", label: "Cards" },
+  { value: "timeline", label: "Timeline" },
+];
 
 interface CollectionSheetProps {
   open: boolean;
@@ -26,165 +26,123 @@ interface CollectionSheetProps {
   venueId: string;
 }
 
-export function CollectionSheet({
-  open,
-  onOpenChange,
-  collection,
-  venueId,
-}: CollectionSheetProps) {
-  const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
+export function CollectionSheet({ open, onOpenChange, collection, venueId }: CollectionSheetProps) {
+  const uid = useId();
   const isEdit = collection !== null;
+  const [layout, setLayout] = useState<CollectionLayout>(collection?.layout ?? "cards");
+  const [isActive, setIsActive] = useState(collection?.is_active ?? true);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setPending(true);
-    try {
-      const fd = new FormData(e.currentTarget);
-      await upsertCollectionAction(fd);
-      onOpenChange(false);
-      router.refresh();
-    } finally {
-      setPending(false);
-    }
-  }
+  useEffect(() => {
+    if (!open) return;
+    setLayout(collection?.layout ?? "cards");
+    setIsActive(collection?.is_active ?? true);
+  }, [open, collection]);
 
-  async function handleDelete() {
-    if (!collection) return;
-    setPending(true);
-    try {
+  const sheet = useEditSheet({
+    open,
+    onOpenChange,
+    save: (fd) => upsertCollectionAction(fd),
+    remove: async () => {
+      if (!collection) return;
       const fd = new FormData();
       fd.set("id", collection.id);
       fd.set("venueId", venueId);
       await deleteCollectionAction(fd);
-      onOpenChange(false);
-      router.push("/dashboard/venue/explore");
-    } finally {
-      setPending(false);
-      setConfirmDelete(false);
-    }
-  }
+    },
+  });
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); setConfirmDelete(false); }}>
-      <SheetContent side="right">
-        <SheetHeader>
-          <SheetTitle>{isEdit ? "Edit Collection" : "New Collection"}</SheetTitle>
-        </SheetHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetShell
+        title={isEdit ? "Edit collection" : "New collection"}
+        description="Collection title, layout, area and visibility."
+        onSubmit={sheet.handleSubmit}
+        footer={
+          <EditSheetFooter
+            isEdit={isEdit}
+            pending={sheet.pending}
+            confirmDelete={sheet.confirmDelete}
+            onConfirmDelete={sheet.setConfirmDelete}
+            onDelete={sheet.handleDelete}
+            onCancel={() => onOpenChange(false)}
+            noun="collection"
+            addLabel="Create collection"
+          />
+        }
+      >
+        <input type="hidden" name="venueId" value={venueId} />
+        {isEdit && <input type="hidden" name="id" value={collection.id} />}
+        {isEdit && <input type="hidden" name="display_order" value={collection.display_order} />}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 overflow-y-auto px-4 pb-2">
-          <input type="hidden" name="venueId" value={venueId} />
-          {isEdit && <input type="hidden" name="id" value={collection.id} />}
-          {isEdit && (
-            <input type="hidden" name="display_order" value={collection.display_order} />
-          )}
-
+        <SheetSection title="Basics">
           <div className="space-y-2">
-            <Label htmlFor="col-title">Title</Label>
+            <Label htmlFor={`${uid}-title`}>Title (required)</Label>
             <Input
-              id="col-title"
+              id={`${uid}-title`}
               name="title"
               required
               defaultValue={collection?.title ?? ""}
               placeholder="Date Night"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="col-subtitle">Subtitle</Label>
+            <Label htmlFor={`${uid}-subtitle`}>Subtitle</Label>
             <Input
-              id="col-subtitle"
+              id={`${uid}-subtitle`}
               name="subtitle"
               defaultValue={collection?.subtitle ?? ""}
               placeholder="Romantic spots near the hotel"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="col-description">Description</Label>
+            <Label htmlFor={`${uid}-description`}>Description</Label>
             <Textarea
-              id="col-description"
+              id={`${uid}-description`}
               name="description"
               rows={3}
               defaultValue={collection?.description ?? ""}
             />
           </div>
+        </SheetSection>
 
+        <SheetSection title="Layout and area">
           <div className="space-y-2">
-            <Label htmlFor="col-area">Area</Label>
+            <p className="text-sm leading-none font-medium">Layout</p>
+            <SegmentedControl
+              name="layout"
+              label="Layout"
+              options={LAYOUT_OPTIONS}
+              value={layout}
+              onValueChange={(v) => setLayout(v as CollectionLayout)}
+            />
+            <p className="text-muted-foreground text-xs">
+              Cards are stacked photos. Timeline is a step-by-step itinerary.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={`${uid}-area`}>Area</Label>
             <Input
-              id="col-area"
+              id={`${uid}-area`}
               name="area"
               defaultValue={collection?.area ?? ""}
               placeholder="Capitol Hill"
             />
           </div>
+        </SheetSection>
 
-          <div className="space-y-2">
-            <Label htmlFor="col-layout">Layout</Label>
-            <select
-              id="col-layout"
-              name="layout"
-              defaultValue={collection?.layout ?? "cards"}
-              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            >
-              <option value="cards">Cards</option>
-              <option value="timeline">Timeline</option>
-            </select>
-          </div>
+        <SheetSection title="Visibility">
+          <SwitchRow
+            id={`${uid}-active`}
+            name="is_active"
+            label="Show to guests"
+            hint="Turn off to hide it from the Explore page."
+            checked={isActive}
+            onCheckedChange={setIsActive}
+          />
+        </SheetSection>
 
-          <div className="space-y-2">
-            <Label>Visibility</Label>
-            <select
-              name="is_active"
-              defaultValue={String(collection?.is_active ?? true)}
-              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            >
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
-          </div>
-
-          <SheetFooter className="px-0">
-            <Button type="submit" disabled={pending} className="w-full">
-              {pending ? "Saving…" : isEdit ? "Save Changes" : "Create Collection"}
-            </Button>
-            {isEdit && !confirmDelete && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-destructive hover:text-destructive"
-                onClick={() => setConfirmDelete(true)}
-              >
-                Delete Collection
-              </Button>
-            )}
-            {isEdit && confirmDelete && (
-              <div className="flex gap-2 w-full">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="flex-1"
-                  disabled={pending}
-                  onClick={handleDelete}
-                >
-                  Confirm Delete
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setConfirmDelete(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </SheetFooter>
-        </form>
-      </SheetContent>
+        <SheetError message={sheet.error} />
+      </SheetShell>
     </Sheet>
   );
 }
